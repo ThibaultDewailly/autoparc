@@ -1,0 +1,723 @@
+# AutoParc - MVP Implementation TODO
+
+## MVP Expected Functionalities
+
+Once this MVP is complete, the AutoParc application will provide the following features:
+
+### User Authentication
+- ✅ **Login System**: Administrative employees can securely log in with email and password
+- ✅ **Session Management**: Secure session-based authentication with HTTP-only cookies
+- ✅ **Logout**: Users can logout, immediately invalidating their session
+- ✅ **Protected Routes**: All pages except login require authentication
+
+### Car Management (Full CRUD)
+- ✅ **Create Car**: Add new cars to the fleet with all required information
+  - License plate (validated with regex: AA-123-BB format)
+  - Brand and model
+  - Grey card number
+  - Associated insurance company
+  - Rental start date
+  - Status (active, maintenance, retired)
+- ✅ **View Car List**: Browse all cars in a paginated table/grid view
+  - Display key information: license plate, brand, model, status
+  - Support for pagination (20 cars per page)
+  - Quick actions: Edit, Delete, View Details
+- ✅ **View Car Details**: See complete information about a specific car
+  - All car attributes
+  - Associated insurance company details
+  - Creation and update metadata
+  - Future: Will show full history (assignments, accidents, repairs)
+- ✅ **Edit Car**: Update any car information
+  - Modify brand, model, insurance, status, etc.
+  - Cannot change license plate (unique identifier)
+- ✅ **Delete Car**: Remove a car from the system
+  - Soft delete by setting status to 'retired'
+
+### Search & Filtering
+- ✅ **Global Search**: Search cars by:
+  - License plate (partial or full match)
+  - Brand name
+  - Model name
+- ✅ **Filter by Status**: Filter cars by active, maintenance, or retired status
+- ✅ **Sorting**: Sort results by creation date, brand, or model
+
+### Dashboard
+- ✅ **Welcome Page**: Central hub with search bar and quick access
+- ✅ **Quick Statistics**: Display total cars, active cars count
+- ✅ **Search Bar**: Prominent search functionality on homepage
+
+### Data Management
+- ✅ **Insurance Companies**: View list of insurance companies for car assignment
+- ✅ **Audit Logging**: All car operations (create, update, delete) are logged with:
+  - Who performed the action
+  - When it was performed
+  - What changed (JSONB format)
+
+### User Interface
+- ✅ **French Language**: All UI text, labels, buttons, and messages in French
+- ✅ **Responsive Design**: Works on desktop, tablet, and mobile devices
+- ✅ **Intuitive Navigation**: Clear navigation with navbar and breadcrumbs
+- ✅ **Form Validation**: Real-time validation with helpful error messages in French
+- ✅ **Date Formatting**: French date format (DD/MM/YYYY)
+
+### Technical Features
+- ✅ **RESTful API**: Clean, documented API with proper HTTP status codes
+- ✅ **Session Security**: 
+  - HTTP-only cookies (XSS protection)
+  - SameSite cookies (CSRF protection)
+  - Secure flag for HTTPS
+- ✅ **Database Integrity**: 
+  - License plate uniqueness enforced
+  - Regex validation at database level
+  - Proper foreign key relationships
+- ✅ **Code Quality**:
+  - 80%+ unit test coverage (backend and frontend)
+  - Integration tests for all workflows
+  - E2E tests for critical user paths
+  - All tests passing in CI/CD pipeline
+- ✅ **CI/CD Pipeline**: Automated testing and validation on every commit
+
+### What's NOT in MVP (Future Iterations)
+- ❌ Car operators management
+- ❌ Assigning operators to cars
+- ❌ Accident declarations and photo uploads
+- ❌ Repair management
+- ❌ Vehicle inspections and scheduling
+- ❌ Notification center with deadlines
+- ❌ Email notifications
+- ❌ Garage management
+- ❌ Advanced reporting and analytics
+- ❌ Export to PDF/CSV
+- ❌ Multi-role support (only admin role in MVP)
+
+---
+
+## Phase 1: Project Setup & Infrastructure
+
+### 1.1 Repository Setup
+- [ ] Initialize Git repository
+- [ ] Create folder structure:
+  - [ ] `/backend` - Golang API
+  - [ ] `/frontend` - React + Vite
+  - [ ] `/migrations` - Database migrations
+  - [ ] `/.github/workflows` - CI/CD pipelines
+- [ ] Create .gitignore files (Go, Node, IDE)
+- [ ] Create README.md with project description
+- [ ] Initialize Go module (go.mod)
+- [ ] Initialize Node.js project (package.json)
+
+### 1.2 Development Environment
+- [ ] Create docker-compose.yml with PostgreSQL 18
+- [ ] Configure PostgreSQL container with test database
+- [ ] Create .env.example files for backend and frontend
+- [ ] Document local development setup instructions
+
+---
+
+## Phase 2: Database Setup
+
+### 2.1 Database Schema
+- [ ] Install golang-migrate tool
+- [ ] Create migration 001: administrative_employees table
+  - [ ] id (UUID)
+  - [ ] email (unique, not null)
+  - [ ] password_hash
+  - [ ] first_name, last_name
+  - [ ] role (default 'admin')
+  - [ ] is_active
+  - [ ] created_at, updated_at, last_login_at
+- [ ] Create migration 002: sessions table
+  - [ ] id (UUID)
+  - [ ] user_id (FK to administrative_employees)
+  - [ ] session_token (unique)
+  - [ ] expires_at
+  - [ ] ip_address, user_agent
+  - [ ] created_at
+- [ ] Create migration 003: insurance_companies table
+  - [ ] id (UUID)
+  - [ ] name, contact_person
+  - [ ] phone, email, address
+  - [ ] policy_number
+  - [ ] is_active
+  - [ ] created_at, updated_at, created_by
+- [ ] Create migration 004: cars table
+  - [ ] id (UUID)
+  - [ ] license_plate (unique, CHECK regex: ^[A-Z]{2}-[0-9]{3}-[A-Z]{2}$)
+  - [ ] brand, model, grey_card_number
+  - [ ] insurance_company_id (FK)
+  - [ ] rental_start_date
+  - [ ] status (CHECK: active|maintenance|retired)
+  - [ ] created_at, updated_at, created_by
+- [ ] Create migration 005: action_logs table
+  - [ ] id (UUID)
+  - [ ] entity_type, entity_id
+  - [ ] action_type
+  - [ ] performed_by (FK)
+  - [ ] changes (JSONB)
+  - [ ] timestamp
+- [ ] Create migration 006: indexes
+  - [ ] idx_cars_license_plate
+  - [ ] idx_cars_brand_model
+  - [ ] idx_sessions_token
+  - [ ] idx_sessions_user
+  - [ ] idx_sessions_expires
+  - [ ] idx_action_logs_entity
+  - [ ] idx_action_logs_timestamp
+- [ ] Create seed data migration (001_seed):
+  - [ ] Create default admin user (with bcrypt password)
+  - [ ] Create 2-3 sample insurance companies
+- [ ] Test migrations up and down
+
+---
+
+## Phase 3: Backend Development
+
+### 3.1 Project Structure Setup
+- [ ] Create folder structure:
+  ```
+  backend/
+    cmd/api/main.go
+    internal/
+      config/
+      middleware/
+      models/
+      handlers/
+      service/
+      repository/
+      database/
+    pkg/utils/
+    tests/
+      integration/
+      fixtures/
+  ```
+
+### 3.2 Configuration & Database Connection
+- [ ] Create config package
+  - [ ] Load environment variables
+  - [ ] Database config
+  - [ ] Server config (port, cors, etc.)
+  - [ ] Session config (cookie settings)
+- [ ] Create database package
+  - [ ] PostgreSQL connection with pgx
+  - [ ] Connection pooling
+  - [ ] Health check function
+- [ ] Write unit tests for config loading
+
+### 3.3 Models
+- [ ] Create models/user.go (AdministrativeEmployee)
+- [ ] Create models/session.go
+- [ ] Create models/car.go
+- [ ] Create models/insurance_company.go
+- [ ] Create models/action_log.go
+- [ ] Add validation tags to models
+
+### 3.4 Utilities
+- [ ] pkg/utils/password.go
+  - [ ] HashPassword(password string) (string, error)
+  - [ ] CheckPassword(hash, password string) bool
+  - [ ] Write unit tests (min 80% coverage)
+- [ ] pkg/utils/session.go
+  - [ ] GenerateSessionToken() string
+  - [ ] Write unit tests
+- [ ] pkg/utils/validator.go
+  - [ ] ValidateLicensePlate(plate string) bool
+  - [ ] ValidateEmail(email string) bool
+  - [ ] Write unit tests
+
+### 3.5 Repository Layer (Database Access)
+- [ ] repository/user_repository.go
+  - [ ] FindByEmail(email string) (*User, error)
+  - [ ] FindByID(id string) (*User, error)
+  - [ ] UpdateLastLogin(id string) error
+  - [ ] Write unit tests with mock database
+- [ ] repository/session_repository.go
+  - [ ] Create(session *Session) error
+  - [ ] FindByToken(token string) (*Session, error)
+  - [ ] Delete(token string) error
+  - [ ] DeleteExpired() error
+  - [ ] Write unit tests
+- [ ] repository/car_repository.go
+  - [ ] Create(car *Car) error
+  - [ ] FindByID(id string) (*Car, error)
+  - [ ] FindAll(filters map[string]interface{}, page, limit int) ([]*Car, int, error)
+  - [ ] Update(id string, updates map[string]interface{}) error
+  - [ ] Delete(id string) error
+  - [ ] Search(query string, page, limit int) ([]*Car, int, error)
+  - [ ] Write unit tests
+- [ ] repository/insurance_repository.go
+  - [ ] FindAll() ([]*InsuranceCompany, error)
+  - [ ] FindByID(id string) (*InsuranceCompany, error)
+  - [ ] Write unit tests
+- [ ] repository/action_log_repository.go
+  - [ ] Create(log *ActionLog) error
+  - [ ] Write unit tests
+
+### 3.6 Service Layer (Business Logic)
+- [ ] service/auth_service.go
+  - [ ] Login(email, password string) (*User, *Session, error)
+  - [ ] Logout(token string) error
+  - [ ] ValidateSession(token string) (*User, error)
+  - [ ] Write unit tests with mocked repositories (min 80% coverage)
+- [ ] service/car_service.go
+  - [ ] CreateCar(car *Car, userID string) error
+  - [ ] GetCar(id string) (*Car, error)
+  - [ ] GetCars(filters, page, limit) ([]*Car, int, error)
+  - [ ] UpdateCar(id string, updates, userID string) error
+  - [ ] DeleteCar(id string, userID string) error
+  - [ ] SearchCars(query string, page, limit) ([]*Car, int, error)
+  - [ ] Write unit tests (min 80% coverage)
+- [ ] service/insurance_service.go
+  - [ ] GetInsuranceCompanies() ([]*InsuranceCompany, error)
+  - [ ] Write unit tests
+- [ ] service/audit_service.go
+  - [ ] LogAction(entityType, entityID, actionType, userID, changes) error
+  - [ ] Write unit tests
+
+### 3.7 Middleware
+- [ ] middleware/auth.go
+  - [ ] AuthMiddleware() - validate session cookie
+  - [ ] Extract user from session and add to context
+  - [ ] Write unit tests
+- [ ] middleware/cors.go
+  - [ ] CORS middleware with credentials support
+- [ ] middleware/logger.go
+  - [ ] HTTP request/response logging
+- [ ] Write unit tests for all middleware
+
+### 3.8 HTTP Handlers
+- [ ] handlers/auth_handler.go
+  - [ ] POST /api/v1/auth/login
+  - [ ] GET /api/v1/auth/me
+  - [ ] POST /api/v1/auth/logout
+  - [ ] Write unit tests with mock services
+- [ ] handlers/car_handler.go
+  - [ ] GET /api/v1/cars (with pagination, filters, search)
+  - [ ] GET /api/v1/cars/:id
+  - [ ] POST /api/v1/cars
+  - [ ] PUT /api/v1/cars/:id
+  - [ ] DELETE /api/v1/cars/:id
+  - [ ] Write unit tests
+- [ ] handlers/insurance_handler.go
+  - [ ] GET /api/v1/insurance-companies
+  - [ ] Write unit tests
+
+### 3.9 API Server Setup
+- [ ] cmd/api/main.go
+  - [ ] Initialize database connection
+  - [ ] Initialize repositories
+  - [ ] Initialize services
+  - [ ] Initialize handlers
+  - [ ] Setup router (Gin or Echo)
+  - [ ] Register middleware
+  - [ ] Register routes
+  - [ ] Start server
+- [ ] Graceful shutdown handling
+
+### 3.10 Integration Tests
+- [ ] tests/integration/auth_test.go
+  - [ ] Test login flow
+  - [ ] Test logout flow
+  - [ ] Test session validation
+  - [ ] Test invalid credentials
+- [ ] tests/integration/car_test.go
+  - [ ] Test create car
+  - [ ] Test get cars (list with pagination)
+  - [ ] Test get car by ID
+  - [ ] Test update car
+  - [ ] Test delete car
+  - [ ] Test search cars
+  - [ ] Test license plate validation
+- [ ] Use dockertest for PostgreSQL container
+- [ ] Create test fixtures in tests/fixtures/
+
+---
+
+## Phase 4: Frontend Development
+
+### 4.1 Project Setup
+- [ ] Initialize Vite + React project
+- [ ] Install dependencies:
+  - [ ] react-router-dom
+  - [ ] axios
+  - [ ] date-fns (for French date formatting)
+  - [ ] vitest + @testing-library/react
+  - [ ] playwright
+- [ ] Setup Vite config (proxy for API)
+- [ ] Create folder structure:
+  ```
+  frontend/
+    src/
+      components/
+        common/
+        cars/
+        auth/
+      pages/
+      services/
+      contexts/
+      hooks/
+      utils/
+      __tests__/
+    public/
+  ```
+
+### 4.2 Configuration & Services
+- [ ] src/services/api.js
+  - [ ] Configure axios with base URL
+  - [ ] Set withCredentials: true for cookies
+  - [ ] Add error interceptor
+- [ ] src/services/authService.js
+  - [ ] login(email, password)
+  - [ ] logout()
+  - [ ] getCurrentUser()
+- [ ] src/services/carService.js
+  - [ ] getCars(page, limit, filters, search)
+  - [ ] getCar(id)
+  - [ ] createCar(data)
+  - [ ] updateCar(id, data)
+  - [ ] deleteCar(id)
+- [ ] src/services/insuranceService.js
+  - [ ] getInsuranceCompanies()
+
+### 4.3 Context & Hooks
+- [ ] src/contexts/AuthContext.jsx
+  - [ ] Provide user state
+  - [ ] Provide login/logout functions
+  - [ ] Handle authentication state
+- [ ] src/hooks/useAuth.js
+  - [ ] Custom hook to use AuthContext
+- [ ] src/hooks/useCars.js
+  - [ ] Custom hook for car operations
+  - [ ] Handle loading states
+
+### 4.4 Utilities
+- [ ] src/utils/constants.js
+  - [ ] French labels/translations
+  - [ ] Status options
+  - [ ] API endpoints
+- [ ] src/utils/validators.js
+  - [ ] validateLicensePlate(plate) - regex [A-Z]{2}-[0-9]{3}-[A-Z]{2}
+  - [ ] validateEmail(email)
+  - [ ] validateRequired(value)
+  - [ ] Write unit tests
+- [ ] src/utils/formatters.js
+  - [ ] formatDate(date) - French format DD/MM/YYYY
+  - [ ] Write unit tests
+
+### 4.5 Common Components
+- [ ] src/components/common/Navbar.jsx
+  - [ ] Logo/title
+  - [ ] Navigation links (French)
+  - [ ] User info + logout button
+  - [ ] Write unit tests
+- [ ] src/components/common/SearchBar.jsx
+  - [ ] Input with placeholder (French)
+  - [ ] On change handler
+  - [ ] Write unit tests
+- [ ] src/components/common/Pagination.jsx
+  - [ ] Page controls (French: "Précédent", "Suivant")
+  - [ ] Page numbers
+  - [ ] Write unit tests
+- [ ] src/components/common/FilterPanel.jsx
+  - [ ] Status filter dropdown
+  - [ ] Write unit tests
+- [ ] src/components/common/ProtectedRoute.jsx
+  - [ ] Check authentication
+  - [ ] Redirect to login if not authenticated
+  - [ ] Write unit tests
+
+### 4.6 Authentication Components
+- [ ] src/components/auth/LoginForm.jsx
+  - [ ] Email and password inputs (French labels)
+  - [ ] Submit button
+  - [ ] Error display
+  - [ ] Write unit tests
+- [ ] src/pages/LoginPage.jsx
+  - [ ] Use LoginForm component
+  - [ ] Handle login submission
+  - [ ] Redirect on success
+  - [ ] Write unit tests
+
+### 4.7 Car Components
+- [ ] src/components/cars/CarCard.jsx
+  - [ ] Display car summary
+  - [ ] View details link
+  - [ ] Write unit tests
+- [ ] src/components/cars/CarTable.jsx
+  - [ ] Table with columns (French headers)
+  - [ ] License plate, brand, model, status
+  - [ ] Action buttons (Edit, Delete)
+  - [ ] Write unit tests
+- [ ] src/components/cars/CarForm.jsx
+  - [ ] All input fields (French labels):
+    - [ ] License plate (with validation)
+    - [ ] Brand
+    - [ ] Model
+    - [ ] Grey card number
+    - [ ] Insurance company (dropdown)
+    - [ ] Rental start date
+    - [ ] Status (dropdown)
+  - [ ] Validation on submit
+  - [ ] Error display
+  - [ ] Submit/Cancel buttons (French)
+  - [ ] Write unit tests
+- [ ] src/components/cars/CarDetail.jsx
+  - [ ] Display all car information (French labels)
+  - [ ] Insurance company details
+  - [ ] Edit/Delete buttons
+  - [ ] Write unit tests
+
+### 4.8 Pages
+- [ ] src/pages/DashboardPage.jsx
+  - [ ] Welcome message (French)
+  - [ ] Search bar
+  - [ ] Quick stats
+  - [ ] Link to car list
+  - [ ] Write unit tests
+- [ ] src/pages/CarsPage.jsx
+  - [ ] Search bar
+  - [ ] Filter panel
+  - [ ] CarTable component
+  - [ ] Pagination
+  - [ ] "Add New Car" button (French)
+  - [ ] Handle search, filter, pagination
+  - [ ] Write unit tests
+- [ ] src/pages/CarDetailPage.jsx
+  - [ ] Fetch and display car details
+  - [ ] Edit/Delete handlers
+  - [ ] Write unit tests
+- [ ] src/pages/CarFormPage.jsx
+  - [ ] Create/Edit mode
+  - [ ] Use CarForm component
+  - [ ] Handle submission
+  - [ ] Redirect on success
+  - [ ] Write unit tests
+
+### 4.9 Routing
+- [ ] src/App.jsx
+  - [ ] Setup React Router
+  - [ ] Define routes:
+    - [ ] /login - LoginPage
+    - [ ] / - DashboardPage (protected)
+    - [ ] /cars - CarsPage (protected)
+    - [ ] /cars/new - CarFormPage (protected)
+    - [ ] /cars/:id - CarDetailPage (protected)
+    - [ ] /cars/:id/edit - CarFormPage (protected)
+  - [ ] Wrap protected routes with ProtectedRoute
+- [ ] Wrap app with AuthContext provider
+
+### 4.10 Styling
+- [ ] Choose CSS approach (CSS Modules, Tailwind, or plain CSS)
+- [ ] Create base styles
+- [ ] Style all components
+- [ ] Ensure responsive design
+- [ ] Test on different screen sizes
+
+### 4.11 E2E Tests
+- [ ] tests/e2e/auth.spec.js
+  - [ ] Test login flow
+  - [ ] Test logout flow
+  - [ ] Test redirect when not authenticated
+- [ ] tests/e2e/cars.spec.js
+  - [ ] Test create car flow
+  - [ ] Test view car list
+  - [ ] Test search cars
+  - [ ] Test filter cars
+  - [ ] Test edit car
+  - [ ] Test delete car
+  - [ ] Test license plate validation error
+- [ ] Setup Playwright configuration
+
+---
+
+## Phase 5: CI/CD Pipeline
+
+### 5.1 Backend CI
+- [ ] Create .github/workflows/backend.yml
+  - [ ] Lint job (golangci-lint)
+  - [ ] Unit test job
+  - [ ] Check 80% coverage threshold
+  - [ ] Integration test job (with PostgreSQL service)
+  - [ ] Build job
+  - [ ] Upload artifacts
+- [ ] Test workflow on feature branch
+
+### 5.2 Frontend CI
+- [ ] Create .github/workflows/frontend.yml
+  - [ ] Lint job (ESLint)
+  - [ ] Unit test job with coverage
+  - [ ] Build job
+  - [ ] Upload artifacts
+- [ ] Test workflow on feature branch
+
+### 5.3 E2E Tests CI
+- [ ] Create .github/workflows/e2e.yml
+  - [ ] Setup PostgreSQL service
+  - [ ] Start backend server
+  - [ ] Run Playwright tests
+  - [ ] Upload test reports
+- [ ] Test workflow on pull request
+
+### 5.4 Code Coverage
+- [ ] Setup Codecov account
+- [ ] Add CODECOV_TOKEN to GitHub secrets
+- [ ] Integrate coverage upload in workflows
+- [ ] Add coverage badge to README
+
+### 5.5 Branch Protection
+- [ ] Configure main branch protection
+- [ ] Require PR reviews
+- [ ] Require status checks to pass
+- [ ] Require branches to be up to date
+
+---
+
+## Phase 6: Documentation
+
+### 6.1 Code Documentation
+- [ ] Add godoc comments to all public functions (backend)
+- [ ] Add JSDoc comments to services and utilities (frontend)
+- [ ] Document all API endpoints
+
+### 6.2 Project Documentation
+- [ ] Update README.md with:
+  - [ ] Project description
+  - [ ] Features
+  - [ ] Tech stack
+  - [ ] Getting started guide
+  - [ ] Development setup
+  - [ ] Running tests
+  - [ ] CI/CD badges
+- [ ] Create CONTRIBUTING.md
+- [ ] Create API documentation (Swagger/OpenAPI - optional)
+
+### 6.3 User Documentation
+- [ ] Create user guide (French) with:
+  - [ ] Login instructions
+  - [ ] How to add a car
+  - [ ] How to search for cars
+  - [ ] How to edit/delete cars
+  - [ ] Screenshots
+
+---
+
+## Phase 7: Testing & Validation
+
+### 7.1 Backend Testing
+- [ ] Run all unit tests
+- [ ] Verify 80%+ code coverage
+- [ ] Run all integration tests
+- [ ] Manual API testing with Postman/Insomnia
+- [ ] Test error scenarios
+- [ ] Test session expiration
+- [ ] Test license plate regex validation
+
+### 7.2 Frontend Testing
+- [ ] Run all component unit tests
+- [ ] Verify 80%+ code coverage
+- [ ] Run E2E tests
+- [ ] Manual UI testing in browser
+- [ ] Test all forms with validation errors
+- [ ] Test navigation flows
+- [ ] Test responsive design on mobile/tablet
+
+### 7.3 Integration Testing
+- [ ] Test complete user workflows:
+  - [ ] Login → Dashboard → Create Car → View List → Logout
+  - [ ] Login → Search Car → Edit Car → View Details
+  - [ ] Login → Delete Car → Confirm deletion
+- [ ] Test with different user scenarios
+- [ ] Test French language display
+
+### 7.4 Security Testing
+- [ ] Verify session cookies are HTTP-only
+- [ ] Verify CSRF protection with SameSite cookies
+- [ ] Test authentication on all protected routes
+- [ ] Test SQL injection prevention
+- [ ] Verify passwords are bcrypt hashed
+- [ ] Test CORS configuration
+
+---
+
+## Phase 8: Deployment Preparation
+
+### 8.1 Environment Configuration
+- [ ] Create production environment variables
+- [ ] Configure production database
+- [ ] Setup HTTPS/SSL certificates
+- [ ] Configure CORS for production domain
+
+### 8.2 Build & Deploy
+- [ ] Build production backend binary
+- [ ] Build production frontend bundle
+- [ ] Test production builds locally
+- [ ] Create deployment scripts/documentation
+
+### 8.3 Monitoring & Logging (Optional for MVP)
+- [ ] Setup application logging
+- [ ] Configure log levels
+- [ ] Setup basic monitoring
+
+---
+
+## Definition of Done for MVP
+
+### Backend
+- [x] All 5 API endpoints implemented and tested
+- [x] Session-based authentication working
+- [x] Database migrations all working
+- [x] All unit tests passing with 80%+ coverage
+- [x] All integration tests passing
+- [x] Action logs recording all car operations
+- [x] License plate regex validation enforced
+
+### Frontend
+- [x] All 5 pages implemented and styled
+- [x] French UI fully implemented
+- [x] Authentication flow working
+- [x] All car CRUD operations working
+- [x] Search and filter working
+- [x] All unit tests passing with 80%+ coverage
+- [x] E2E tests covering main workflows passing
+- [x] Responsive design working
+
+### CI/CD
+- [x] Backend workflow running and passing
+- [x] Frontend workflow running and passing
+- [x] E2E workflow running and passing
+- [x] Branch protection configured
+- [x] Code coverage reporting working
+
+### Documentation
+- [x] README with setup instructions
+- [x] API endpoints documented
+- [x] User guide created (French)
+
+### Quality
+- [x] No critical bugs
+- [x] All tests green
+- [x] Code reviewed
+- [x] Security requirements met
+
+---
+
+## Estimated Timeline
+
+- **Phase 1-2 (Setup + Database)**: 2-3 days
+- **Phase 3 (Backend)**: 5-7 days
+- **Phase 4 (Frontend)**: 5-7 days
+- **Phase 5 (CI/CD)**: 2-3 days
+- **Phase 6 (Documentation)**: 1-2 days
+- **Phase 7 (Testing & Validation)**: 2-3 days
+- **Phase 8 (Deployment Prep)**: 1-2 days
+
+**Total Estimated Time**: 18-27 days (approximately 3-4 weeks)
+
+---
+
+## Notes
+
+- Each task should be completed on a feature branch
+- Create pull requests for code review before merging to main
+- Run CI/CD pipeline on each PR
+- Update this TODO as work progresses
+- Mark items complete with [x] as you finish them
