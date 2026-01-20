@@ -1,4 +1,4 @@
-# CarAdm - Car Pool Administration System
+# AutoParc - Car Pool Administration System
 ## Design Document
 
 ---
@@ -31,6 +31,7 @@
 - **Database**: PostgreSQL 18
 - **Session Store**: PostgreSQL (or Redis for future scaling)
 - **File Storage**: PostgreSQL BYTEA with compression (gzip)
+- **UI Language**: French (all user-facing text, labels, messages, and errors)
 
 ### 1.3 Security
 - Session-based authentication with HTTP-only cookies
@@ -731,6 +732,22 @@ Only the following tables:
 - `FilterPanel`
 - `ProtectedRoute` (auth guard)
 
+**Localization**:
+- All UI text in French (buttons, labels, placeholders, error messages)
+- Date formatting: French format (DD/MM/YYYY)
+- Examples of French labels:
+  - "Connexion" (Login)
+  - "Déconnexion" (Logout)
+  - "Véhicules" (Cars)
+  - "Plaque d'immatriculation" (License Plate)
+  - "Marque" (Brand)
+  - "Modèle" (Model)
+  - "Statut" (Status)
+  - "Ajouter un véhicule" (Add New Car)
+  - "Modifier" (Edit)
+  - "Supprimer" (Delete)
+  - "Rechercher" (Search)
+
 ### 4.5 Success Criteria for MVP
 - ✅ Admin can login/logout
 - ✅ Admin can create a new car
@@ -1025,14 +1042,644 @@ src/
 - Each iteration has its own migration set
 - Rollback capability for each migration
 
-### 7.5 Testing Strategy (Future)
-- Backend: Unit tests with testify, integration tests with dockertest
-- Frontend: Vitest for components, Playwright for E2E
-- API tests with Postman/Newman
+### 7.5 Testing Strategy
+
+#### 7.5.1 Testing Requirements
+- **All functions must have unit tests**
+- **All features must have functional tests**
+- **Minimum code coverage target: 80%**
+- **Tests must pass before merging to main branch**
+
+#### 7.5.2 Backend Testing (Golang)
+
+**Unit Tests**:
+- **Framework**: `testing` (standard library) + `testify/assert` for assertions
+- **Test all functions** in services, handlers, and utilities
+- **Mock dependencies**: Use `testify/mock` or `gomock` for database, external services
+- **Test coverage**: Use `go test -cover` and aim for 80%+ coverage
+
+**Test Structure**:
+```
+internal/
+  service/
+    car_service.go
+    car_service_test.go
+  handlers/
+    car_handler.go
+    car_handler_test.go
+  repository/
+    car_repository.go
+    car_repository_test.go
+```
+
+**Unit Test Examples**:
+- Service layer: Business logic validation, data transformation
+- Repository layer: Database query logic (with mock database)
+- Handler layer: Request validation, response formatting (with mock service)
+- Utilities: Password hashing, validation functions, token generation
+
+**Integration Tests**:
+- **Framework**: `testify/suite` + `dockertest` for PostgreSQL container
+- Test complete workflows: Login → Create Car → Fetch Car → Update → Delete
+- Test database constraints and migrations
+- Test session management and authentication flows
+
+**Test Database**:
+- Use `dockertest` to spin up PostgreSQL container for integration tests
+- Run migrations before each test suite
+- Clean database between tests
+
+#### 7.5.3 Frontend Testing (React)
+
+**Unit Tests**:
+- **Framework**: Vitest + React Testing Library
+- **Test all components**: Rendering, props, user interactions
+- **Test hooks**: Custom hooks like `useAuth`, `useCars`
+- **Test utilities**: Validation functions, formatters
+
+**Component Test Examples**:
+```
+src/
+  components/
+    cars/
+      CarList.jsx
+      CarList.test.jsx
+      CarForm.jsx
+      CarForm.test.jsx
+```
+
+**What to Test**:
+- Component rendering with different props
+- User interactions (clicks, form inputs)
+- Conditional rendering based on state
+- Form validation logic
+- Error handling and display
+
+**Integration Tests**:
+- **Framework**: React Testing Library
+- Test page-level components with mocked API calls
+- Test routing and navigation
+- Test authentication flows
+
+**End-to-End Tests**:
+- **Framework**: Playwright or Cypress
+- Test complete user workflows:
+  - Login flow
+  - Create new car workflow
+  - Search and filter cars
+  - Edit car details
+  - Delete car
+- Run against development server with test database
+
+#### 7.5.4 API Testing
+
+**Manual Testing**:
+- **Tool**: Postman or Insomnia
+- Create collection with all endpoints
+- Test request/response formats
+- Test error scenarios
+
+**Automated API Tests**:
+- **Framework**: Postman/Newman or Go integration tests
+- Test all CRUD operations
+- Test authentication and authorization
+- Test input validation and error responses
+- Test pagination, filtering, and sorting
+
+#### 7.5.5 Test Organization for MVP
+
+**MVP Test Coverage**:
+- ✅ Unit tests for all service functions (auth, car CRUD, session management)
+- ✅ Unit tests for all repository functions (database queries)
+- ✅ Unit tests for handlers (request/response processing)
+- ✅ Unit tests for validation functions (license plate regex, etc.)
+- ✅ Integration tests for authentication flow
+- ✅ Integration tests for car CRUD operations
+- ✅ Frontend unit tests for Car components
+- ✅ Frontend unit tests for authentication components
+- ✅ E2E test for complete user workflow (login → create car → view → logout)
+
+**Test Execution**:
+```bash
+# Backend
+go test ./... -cover -v
+
+# Frontend
+npm run test
+npm run test:coverage
+
+# E2E
+npm run test:e2e
+```
+
+#### 7.5.6 Continuous Integration
+
+**CI Pipeline Requirements**:
+- Run all unit tests on each commit
+- Run integration tests before merge
+- Generate code coverage reports
+- Block merge if tests fail or coverage drops below 80%
+- Run E2E tests on staging environment
+
+**Tools**: GitHub Actions, GitLab CI, or Jenkins
+
+#### 7.5.7 Test Data Management
+
+**Test Fixtures**:
+- Create test data fixtures for consistent testing
+- Use factory pattern for generating test objects
+- Mock external dependencies (insurance companies, etc.)
+
+**Example Test Data**:
+```go
+// fixtures/car_fixtures.go
+func ValidCarData() map[string]interface{} {
+    return map[string]interface{}{
+        "license_plate": "AB-123-CD",
+        "brand": "Toyota",
+        "model": "Corolla",
+        "grey_card_number": "GC123456",
+        "rental_start_date": "2023-01-15",
+        "status": "active",
+    }
+}
+```
 
 ---
 
-## 8. DEPLOYMENT CONSIDERATIONS (Future)
+## 8. CI/CD PIPELINE WITH GITHUB ACTIONS
+
+### 8.1 Pipeline Overview
+The CI/CD pipeline will automate testing, building, and deployment using GitHub Actions. The pipeline ensures code quality, runs all tests, and deploys to staging/production environments.
+
+### 8.2 Workflow Structure
+
+#### 8.2.1 Backend Workflow (.github/workflows/backend.yml)
+
+**Triggers**:
+- Push to `main` branch
+- Pull requests to `main` branch
+- Manual workflow dispatch
+
+**Jobs**:
+
+**1. Lint & Format Check**
+```yaml
+lint:
+  runs-on: ubuntu-latest
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.25'
+    
+    - name: Run golangci-lint
+      uses: golangci/golangci-lint-action@v4
+      with:
+        version: latest
+        args: --timeout=5m
+```
+
+**2. Unit Tests**
+```yaml
+unit-tests:
+  runs-on: ubuntu-latest
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.25'
+    
+    - name: Run unit tests
+      run: |
+        go test ./... -v -coverprofile=coverage.out -covermode=atomic
+    
+    - name: Check coverage threshold
+      run: |
+        coverage=$(go tool cover -func=coverage.out | grep total | awk '{print $3}' | sed 's/%//')
+        echo "Coverage: $coverage%"
+        if (( $(echo "$coverage < 80" | bc -l) )); then
+          echo "Coverage $coverage% is below 80% threshold"
+          exit 1
+        fi
+    
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        files: ./coverage.out
+        flags: backend
+```
+
+**3. Integration Tests**
+```yaml
+integration-tests:
+  runs-on: ubuntu-latest
+  services:
+    postgres:
+      image: postgres:18
+      env:
+        POSTGRES_DB: autoparc_test
+        POSTGRES_USER: test_user
+        POSTGRES_PASSWORD: test_password
+      options: >-
+        --health-cmd pg_isready
+        --health-interval 10s
+        --health-timeout 5s
+        --health-retries 5
+      ports:
+        - 5432:5432
+  
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.25'
+    
+    - name: Run migrations
+      run: |
+        # Install golang-migrate
+        go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+        # Run migrations
+        migrate -path ./migrations -database "postgresql://test_user:test_password@localhost:5432/autoparc_test?sslmode=disable" up
+    
+    - name: Run integration tests
+      env:
+        DATABASE_URL: "postgresql://test_user:test_password@localhost:5432/autoparc_test?sslmode=disable"
+      run: |
+        go test ./tests/integration/... -v
+```
+
+**4. Build**
+```yaml
+build:
+  runs-on: ubuntu-latest
+  needs: [lint, unit-tests, integration-tests]
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.25'
+    
+    - name: Build binary
+      run: |
+        CGO_ENABLED=0 GOOS=linux go build -o autoparc-api ./cmd/api
+    
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: autoparc-api
+        path: autoparc-api
+```
+
+#### 8.2.2 Frontend Workflow (.github/workflows/frontend.yml)
+
+**Triggers**:
+- Push to `main` branch
+- Pull requests to `main` branch
+- Manual workflow dispatch
+
+**Jobs**:
+
+**1. Lint & Format Check**
+```yaml
+lint:
+  runs-on: ubuntu-latest
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+    
+    - name: Install dependencies
+      working-directory: ./frontend
+      run: npm ci
+    
+    - name: Run ESLint
+      working-directory: ./frontend
+      run: npm run lint
+```
+
+**2. Unit Tests**
+```yaml
+unit-tests:
+  runs-on: ubuntu-latest
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+    
+    - name: Install dependencies
+      working-directory: ./frontend
+      run: npm ci
+    
+    - name: Run tests with coverage
+      working-directory: ./frontend
+      run: npm run test:coverage
+    
+    - name: Check coverage threshold
+      working-directory: ./frontend
+      run: |
+        # Vitest outputs coverage summary
+        # This step would parse and check the coverage
+        npm run test:coverage -- --reporter=json --outputFile=coverage.json
+    
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        files: ./frontend/coverage/coverage-final.json
+        flags: frontend
+```
+
+**3. Build**
+```yaml
+build:
+  runs-on: ubuntu-latest
+  needs: [lint, unit-tests]
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+    
+    - name: Install dependencies
+      working-directory: ./frontend
+      run: npm ci
+    
+    - name: Build for production
+      working-directory: ./frontend
+      run: npm run build
+      env:
+        VITE_API_URL: ${{ secrets.API_URL }}
+    
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: frontend-dist
+        path: frontend/dist
+```
+
+#### 8.2.3 E2E Tests Workflow (.github/workflows/e2e.yml)
+
+**Triggers**:
+- Pull requests to `main` branch
+- Scheduled (nightly)
+- Manual workflow dispatch
+
+**Jobs**:
+```yaml
+e2e-tests:
+  runs-on: ubuntu-latest
+  services:
+    postgres:
+      image: postgres:18
+      env:
+        POSTGRES_DB: autoparc_e2e
+        POSTGRES_USER: e2e_user
+        POSTGRES_PASSWORD: e2e_password
+      options: >-
+        --health-cmd pg_isready
+        --health-interval 10s
+        --health-timeout 5s
+        --health-retries 5
+      ports:
+        - 5432:5432
+  
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.25'
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+    
+    - name: Run migrations
+      run: |
+        go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+        migrate -path ./migrations -database "postgresql://e2e_user:e2e_password@localhost:5432/autoparc_e2e?sslmode=disable" up
+    
+    - name: Start backend server
+      run: |
+        cd backend
+        go build -o autoparc-api ./cmd/api
+        ./autoparc-api &
+      env:
+        DATABASE_URL: "postgresql://e2e_user:e2e_password@localhost:5432/autoparc_e2e?sslmode=disable"
+        PORT: 8080
+    
+    - name: Install frontend dependencies
+      working-directory: ./frontend
+      run: npm ci
+    
+    - name: Install Playwright
+      working-directory: ./frontend
+      run: npx playwright install --with-deps
+    
+    - name: Run E2E tests
+      working-directory: ./frontend
+      run: npm run test:e2e
+      env:
+        VITE_API_URL: http://localhost:8080
+    
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: playwright-report
+        path: frontend/playwright-report
+```
+
+#### 8.2.4 Deployment Workflow (.github/workflows/deploy.yml)
+
+**Triggers**:
+- Push to `main` branch (only after all tests pass)
+- Manual workflow dispatch
+
+**Jobs**:
+
+**1. Deploy to Staging**
+```yaml
+deploy-staging:
+  runs-on: ubuntu-latest
+  needs: [backend-build, frontend-build, e2e-tests]
+  environment: staging
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Download backend artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: autoparc-api
+    
+    - name: Download frontend artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: frontend-dist
+    
+    - name: Deploy to staging server
+      uses: appleboy/scp-action@master
+      with:
+        host: ${{ secrets.STAGING_HOST }}
+        username: ${{ secrets.STAGING_USER }}
+        key: ${{ secrets.STAGING_SSH_KEY }}
+        source: "autoparc-api,dist"
+        target: "/var/www/autoparc-staging"
+    
+    - name: Restart services
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.STAGING_HOST }}
+        username: ${{ secrets.STAGING_USER }}
+        key: ${{ secrets.STAGING_SSH_KEY }}
+        script: |
+          sudo systemctl restart autoparc-api
+          sudo systemctl restart nginx
+```
+
+**2. Deploy to Production** (with manual approval)
+```yaml
+deploy-production:
+  runs-on: ubuntu-latest
+  needs: deploy-staging
+  environment: production
+  steps:
+    - name: Download artifacts
+      uses: actions/download-artifact@v4
+    
+    - name: Deploy to production
+      # Similar to staging but with production secrets
+      # Includes database backup before deployment
+```
+
+### 8.3 Required GitHub Secrets
+
+**Backend**:
+- `DATABASE_URL` - Production database connection string
+- `SESSION_SECRET` - Secret for session encryption
+
+**Frontend**:
+- `API_URL` - Production API endpoint
+
+**Deployment**:
+- `STAGING_HOST` - Staging server hostname
+- `STAGING_USER` - SSH username for staging
+- `STAGING_SSH_KEY` - SSH private key for staging
+- `PRODUCTION_HOST` - Production server hostname
+- `PRODUCTION_USER` - SSH username for production
+- `PRODUCTION_SSH_KEY` - SSH private key for production
+
+**Optional**:
+- `CODECOV_TOKEN` - Token for Codecov integration
+- `SLACK_WEBHOOK` - Webhook for deployment notifications
+
+### 8.4 Branch Protection Rules
+
+Configure branch protection for `main` branch:
+- ✅ Require pull request before merging
+- ✅ Require status checks to pass:
+  - Backend lint
+  - Backend unit tests
+  - Backend integration tests
+  - Frontend lint
+  - Frontend unit tests
+  - Frontend build
+- ✅ Require branches to be up to date
+- ✅ Require code review approval (1+ reviewers)
+- ✅ Dismiss stale pull request approvals when new commits are pushed
+
+### 8.5 Workflow Badges
+
+Add badges to README.md:
+```markdown
+![Backend Tests](https://github.com/username/autoparc/workflows/backend/badge.svg)
+![Frontend Tests](https://github.com/username/autoparc/workflows/frontend/badge.svg)
+![E2E Tests](https://github.com/username/autoparc/workflows/e2e/badge.svg)
+[![codecov](https://codecov.io/gh/username/autoparc/branch/main/graph/badge.svg)](https://codecov.io/gh/username/autoparc)
+```
+
+### 8.6 Notification Strategy
+
+**On Success**:
+- Merge to main: No notification (expected behavior)
+- Deployment to staging: Slack notification with build info
+- Deployment to production: Slack notification + email to team
+
+**On Failure**:
+- Test failures: GitHub UI notification to PR author
+- Build failures: Email to committer
+- Deployment failures: Slack alert + email to DevOps team
+
+### 8.7 Performance Optimizations
+
+**Caching**:
+- Cache Go modules: `actions/setup-go` with caching
+- Cache npm dependencies: `actions/setup-node` with cache
+- Cache build artifacts between jobs
+
+**Parallelization**:
+- Run backend and frontend pipelines in parallel
+- Run unit tests in parallel when possible
+
+**Job Timeouts**:
+- Lint jobs: 5 minutes
+- Unit test jobs: 10 minutes
+- Integration test jobs: 15 minutes
+- E2E test jobs: 30 minutes
+- Build jobs: 10 minutes
+
+### 8.8 MVP CI/CD Requirements
+
+For MVP (Iteration 1), implement:
+- ✅ Backend workflow (lint, unit tests, integration tests, build)
+- ✅ Frontend workflow (lint, unit tests, build)
+- ✅ E2E workflow (basic login + car CRUD tests)
+- ✅ Branch protection on `main`
+- ✅ Code coverage reporting (Codecov or similar)
+
+For Future Iterations:
+- Automated deployment to staging
+- Production deployment with manual approval
+- Database migration automation in CI
+- Performance testing integration
+- Security scanning (Snyk, Dependabot)
+
+---
+
+## 9. DEPLOYMENT CONSIDERATIONS (Future)
 
 ### 8.1 Development Environment
 - Docker Compose with 3 services: frontend, backend, database
@@ -1051,7 +1698,7 @@ src/
 
 ## SUMMARY
 
-This design document provides a complete architecture for the CarAdm system. The MVP (Iteration 1) focuses on delivering a working car management system with authentication, CRUD operations, and search functionality. Future iterations will progressively add operators, assignments, accidents, repairs, inspections, notifications, and email capabilities.
+This design document provides a complete architecture for the AutoParc system. The MVP (Iteration 1) focuses on delivering a working car management system with authentication, CRUD operations, and search functionality. Future iterations will progressively add operators, assignments, accidents, repairs, inspections, notifications, and email capabilities.
 
 The design ensures:
 - **Time-saving**: Quick access to car information through search
