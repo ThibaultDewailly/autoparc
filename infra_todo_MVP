@@ -1,0 +1,905 @@
+# AutoParc - Infrastructure Setup TODO
+## VM: 192.168.1.22
+
+This file lists all infrastructure tasks required on the VM to support development, testing, and deployment of the AutoParc MVP.
+
+---
+
+## Phase 1: Initial VM Setup
+
+### 1.1 System Update & Basic Tools
+- [ ] SSH into VM: `ssh user@192.168.1.22`
+- [ ] Update system packages:
+  ```bash
+  apt update && apt upgrade -y
+  ```
+- [ ] Install essential tools:
+  ```bash
+  apt install -y curl wget vim git htop net-tools ufw
+  ```
+- [ ] Set correct timezone:
+  ```bash
+  timedatectl set-timezone Europe/Paris
+  ```
+- [ ] Verify system info:
+  ```bash
+  cat /etc/os-release
+  uname -a
+  ```
+
+### 1.2 Create Application Users
+- [ ] Create production user for AutoParc (web app hosting):
+  ```bash
+  adduser --shell /bin/false autoparc
+  ```
+- [ ] Create Docker development user for testing:
+  ```bash
+  adduser dockerdev
+  ```
+- [ ] Setup SSH key authentication for dockerdev user only:
+  ```bash
+  -u dockerdev mkdir -p /home/dockerdev/.ssh
+  -u dockerdev chmod 700 /home/dockerdev/.ssh
+  # Copy your public key to /home/dockerdev/.ssh/authorized_keys
+  ```
+- [ ] Note: autoparc user cannot login (shell=/bin/false) - service account only
+- [ ] Note: Neither autoparc nor dockerdev have sudo/root access (security best practice)
+
+---
+
+## Phase 2: Docker Installation
+
+### 2.1 Install Docker Engine
+- [ ] Remove old Docker versions (if any):
+  ```bash
+  apt remove docker docker-engine docker.io containerd runc
+  ```
+- [ ] Install prerequisites:
+  ```bash
+  apt install -y apt-transport-https ca-certificates curl gnupg lsb-release
+  ```
+- [ ] Add Docker's official GPG key:
+  ```bash
+  mkdir -p /etc/apt/keyrings
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+  ```
+- [ ] Setup Docker repository:
+  ```bash
+  echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list
+  ```
+- [ ] Install Docker:
+  ```bash
+  apt update
+  apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+  ```
+- [ ] Verify Docker installation:
+  ```bash
+  docker --version
+  docker run hello-world
+  ```
+- [ ] Add dockerdev user to docker group (for testing purposes):
+  ```bash
+  usermod -aG docker dockerdev
+  ```
+- [ ] Switch to dockerdev user and test Docker:
+  ```bash
+  su - dockerdev
+  docker ps
+  docker run hello-world
+  exit
+  ```
+- [ ] Note: autoparc user does NOT have Docker access (production isolation)
+
+### 2.2 Install Docker Compose
+- [ ] Verify Docker Compose is installed (comes with docker-compose-plugin):
+  ```bash
+  docker compose version
+  ```
+
+### 2.3 Configure Docker
+- [ ] Create Docker daemon configuration:
+  ```bash
+  mkdir -p /etc/docker
+  tee /etc/docker/daemon.json <<EOF
+  {
+    "log-driver": "json-file",
+    "log-opts": {
+      "max-size": "10m",
+      "max-file": "3"
+    }
+  }
+  EOF
+  ```
+- [ ] Restart Docker:
+  ```bash
+  systemctl restart docker
+  systemctl enable docker
+  ```
+
+---
+
+## Phase 3: PostgreSQL 18 Installation (Production Database)
+
+### 3.1 Install PostgreSQL 18
+- [ ] Add PostgreSQL APT repository:
+  ```bash
+  apt install -y postgresql-common
+  /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh
+  ```
+- [ ] Install PostgreSQL 18:
+  ```bash
+  apt install -y postgresql-18 postgresql-contrib-18
+  ```
+- [ ] Verify installation:
+  ```bash
+  psql --version
+  systemctl status postgresql
+  ```
+
+### 3.2 Configure PostgreSQL
+- [ ] Switch to postgres user:
+  ```bash
+  -i -u postgres
+  ```
+- [ ] Create AutoParc database and user:
+  ```sql
+  psql
+  CREATE DATABASE autoparc_prod;
+  CREATE USER autoparc_user WITH ENCRYPTED PASSWORD 'CHANGE_THIS_PASSWORD';
+  GRANT ALL PRIVILEGES ON DATABASE autoparc_prod TO autoparc_user;
+  \q
+  ```
+- [ ] Configure PostgreSQL to accept connections:
+  ```bash
+  vim /etc/postgresql/18/main/postgresql.conf
+  # Change: listen_addresses = 'localhost' to 'localhost, 192.168.1.22'
+  ```
+- [ ] Configure authentication:
+  ```bash
+  vim /etc/postgresql/18/main/pg_hba.conf
+  # Add: host autoparc_prod autoparc_user 127.0.0.1/32 scram-sha-256
+  # Add: host autoparc_prod autoparc_user 192.168.1.22/32 scram-sha-256
+  ```
+- [ ] Restart PostgreSQL:
+  ```bash
+  systemctl restart postgresql
+  ```
+- [ ] Test connection:
+  ```bash
+  psql -h localhost -U autoparc_user -d autoparc_prod
+  ```
+
+### 3.3 Create Test Database (for integration tests)
+- [ ] Create test database:
+  ```sql
+  -u postgres psql
+  CREATE DATABASE autoparc_test;
+  GRANT ALL PRIVILEGES ON DATABASE autoparc_test TO autoparc_user;
+  \q
+  ```
+
+---
+
+## Phase 4: Development Tools Installation
+
+### 4.1 Install Golang 1.25
+- [ ] Download Go 1.25:
+  ```bash
+  cd /tmp
+  wget https://go.dev/dl/go1.25.0.linux-amd64.tar.gz
+  ```
+- [ ] Remove old Go installation (if any):
+  ```bash
+  rm -rf /usr/local/go
+  ```
+- [ ] Install Go:
+  ```bash
+  tar -C /usr/local -xzf go1.25.0.linux-amd64.tar.gz
+  ```
+- [ ] Add Go to PATH for all users:
+  ```bash
+  echo 'export PATH=$PATH:/usr/local/go/bin' | tee /etc/profile.d/go.sh
+  source /etc/profile.d/go.sh
+  ```
+- [ ] Add Go to autoparc user profile:
+  ```bash
+  echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bashrc
+  echo 'export GOPATH=$HOME/go' >> ~/.bashrc
+  source ~/.bashrc
+  ```
+- [ ] Verify Go installation:
+  ```bash
+  go version
+  ```
+- [ ] Install golang-migrate:
+  ```bash
+  go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+  export PATH=$PATH:$(go env GOPATH)/bin
+  echo 'export PATH=$PATH:$(go env GOPATH)/bin' >> ~/.bashrc
+  ```
+
+### 4.2 Install Node.js 20+
+- [ ] Install Node.js from NodeSource:
+  ```bash
+  curl -fsSL https://deb.nodesource.com/setup_20.x | -E bash -
+  apt install -y nodejs
+  ```
+- [ ] Verify Node.js installation:
+  ```bash
+  node --version
+  npm --version
+  ```
+- [ ] Install global npm packages:
+  ```bash
+  npm install -g pm2
+  ```
+
+### 4.3 Install Build Tools
+- [ ] Install build essentials:
+  ```bash
+  apt install -y build-essential
+  ```
+
+---
+
+## Phase 5: Web Server Setup (Nginx)
+
+### 5.1 Install Nginx
+- [ ] Install Nginx:
+  ```bash
+  apt install -y nginx
+  ```
+- [ ] Verify Nginx installation:
+  ```bash
+  nginx -v
+  systemctl status nginx
+  ```
+- [ ] Enable Nginx:
+  ```bash
+  systemctl enable nginx
+  ```
+
+### 5.2 Configure Nginx for AutoParc
+- [ ] Create Nginx configuration:
+  ```bash
+  vim /etc/nginx/sites-available/autoparc
+  ```
+  ```nginx
+  server {
+      listen 80;
+      server_name 192.168.1.22;
+
+      # Frontend
+      location / {
+          root /var/www/autoparc/frontend;
+          try_files $uri $uri/ /index.html;
+      }
+
+      # Backend API
+      location /api/ {
+          proxy_pass http://localhost:8080;
+          proxy_http_version 1.1;
+          proxy_set_header Upgrade $http_upgrade;
+          proxy_set_header Connection 'upgrade';
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+          proxy_cache_bypass $http_upgrade;
+      }
+  }
+  ```
+- [ ] Enable site:
+  ```bash
+  ln -s /etc/nginx/sites-available/autoparc /etc/nginx/sites-enabled/
+  rm /etc/nginx/sites-enabled/default
+  ```
+- [ ] Test Nginx configuration:
+  ```bash
+  nginx -t
+  ```
+- [ ] Reload Nginx:
+  ```bash
+  systemctl reload nginx
+  ```
+
+### 5.3 Create Application Directories
+- [ ] Create directories:
+  ```bash
+  mkdir -p /var/www/autoparc/{frontend,backend}
+  chown -R autoparc:autoparc /var/www/autoparc
+  ```
+
+---
+
+## Phase 6: SSL/TLS Setup (Optional for MVP, Required for Production)
+
+### 6.1 Install Certbot (Let's Encrypt)
+- [ ] Install Certbot:
+  ```bash
+  apt install -y certbot python3-certbot-nginx
+  ```
+- [ ] Skip for MVP (using HTTP)
+- [ ] For production with domain name:
+  ```bash
+  certbot --nginx -d yourdomain.com
+  systemctl reload nginx
+  ```
+
+---
+
+## Phase 7: Application Deployment Setup
+
+### 7.1 Setup Systemd Service for Backend
+- [ ] Create systemd service file:
+  ```bash
+  vim /etc/systemd/system/autoparc-api.service
+  ```
+  ```ini
+  [Unit]
+  Description=AutoParc API Server
+  After=network.target postgresql.service
+
+  [Service]
+  Type=simple
+  User=autoparc
+  WorkingDirectory=/var/www/autoparc/backend
+  ExecStart=/var/www/autoparc/backend/autoparc-api
+  Restart=on-failure
+  RestartSec=5s
+  Environment="DATABASE_URL=postgresql://autoparc_user:PASSWORD@localhost:5432/autoparc_prod?sslmode=disable"
+  Environment="PORT=8080"
+  Environment="SESSION_SECRET=CHANGE_THIS_TO_RANDOM_STRING"
+
+  [Install]
+  WantedBy=multi-user.target
+  ```
+- [ ] Reload systemd:
+  ```bash
+  systemctl daemon-reload
+  ```
+- [ ] Enable service (don't start yet, no binary):
+  ```bash
+  systemctl enable autoparc-api
+  ```
+
+### 7.2 Setup Environment Files
+- [ ] Create backend .env file:
+  ```bash
+  mkdir -p /var/www/autoparc/backend
+  vim /var/www/autoparc/backend/.env
+  ```
+  ```env
+  DATABASE_URL=postgresql://autoparc_user:PASSWORD@localhost:5432/autoparc_prod?sslmode=disable
+  PORT=8080
+  SESSION_SECRET=CHANGE_THIS_TO_RANDOM_SECRET_KEY
+  SESSION_MAX_AGE=604800
+  CORS_ORIGIN=http://192.168.1.22
+  ENV=production
+  ```
+
+---
+
+## Phase 9: Development Environment Setup
+
+### 9.1 Clone Repository (when ready)
+- [ ] Setup SSH key for GitHub:
+  ```bash
+  ssh-keygen -t ed25519 -C "autoparc@192.168.1.22"
+  cat ~/.ssh/id_ed25519.pub
+  # Add to GitHub
+  ```
+- [ ] Clone repository:
+  ```bash
+  cd /home/autoparc
+  git clone git@github.com:username/autoparc.git
+  cd autoparc
+  ```
+
+### 9.2 Setup Docker Compose for Testing
+- [ ] Create docker-compose.yml in project root:
+  ```yaml
+  version: '3.8'
+  
+  services:
+    postgres-test:
+      image: postgres:18
+      container_name: autoparc-postgres-test
+      environment:
+        POSTGRES_DB: autoparc_test
+        POSTGRES_USER: test_user
+        POSTGRES_PASSWORD: test_password
+      ports:
+        - "5433:5432"
+      volumes:
+        - postgres_test_data:/var/lib/postgresql/data
+      healthcheck:
+        test: ["CMD-SHELL", "pg_isready -U test_user"]
+        interval: 10s
+        timeout: 5s
+        retries: 5
+
+  volumes:
+    postgres_test_data:
+  ```
+- [ ] Test Docker Compose:
+  ```bash
+  docker compose up -d
+  docker compose ps
+  docker compose logs
+  docker compose down
+  ```
+
+---
+
+## Phase 10: Monitoring & Logging (Optional for MVP)
+
+### 10.1 Setup Logging
+- [ ] Configure system logs:
+  ```bash
+  mkdir -p /var/log/autoparc
+  chown autoparc:autoparc /var/log/autoparc
+  ```
+- [ ] Setup log rotation:
+  ```bash
+  vim /etc/logrotate.d/autoparc
+  ```
+  ```
+  /var/log/autoparc/*.log {
+      daily
+      rotate 7
+      compress
+      delaycompress
+      missingok
+      notifempty
+  }
+  ```
+
+### 10.2 Basic Monitoring
+- [ ] Install htop for process monitoring:
+  ```bash
+  apt install -y htop
+  ```
+- [ ] Install netstat for network monitoring:
+  ```bash
+  apt install -y net-tools
+  ```
+
+---
+
+## Phase 9: Backup Setup
+
+### 9.1 Database Backup Script
+- [ ] Create backup directory:
+  ```bash
+  mkdir -p /var/backups/autoparc
+  chown autoparc:autoparc /var/backups/autoparc
+  ```
+- [ ] Create backup script:
+  ```bash
+  vim ~/backup-autoparc.sh
+  ```
+  ```bash
+  #!/bin/bash
+  DATE=$(date +%Y%m%d_%H%M%S)
+  BACKUP_DIR="/var/backups/autoparc"
+  
+  pg_dump -h localhost -U autoparc_user -d autoparc_prod | gzip > "$BACKUP_DIR/autoparc_prod_$DATE.sql.gz"
+  
+  # Keep only last 7 days of backups
+  find $BACKUP_DIR -name "autoparc_prod_*.sql.gz" -mtime +7 -delete
+  ```
+- [ ] Make executable:
+  ```bash
+  chmod +x ~/backup-autoparc.sh
+  ```
+- [ ] Setup cron job for daily backups:
+  ```bash
+  crontab -e
+  # Add: 0 2 * * * /home/autoparc/backup-autoparc.sh
+  ```
+
+---
+
+## Phase 12: Testing Environment Verification
+
+### 12.1 Verify All Services
+- [ ] Check Docker:
+  ```bash
+  docker --version
+  docker compose version
+  docker ps
+  ```
+- [ ] Check PostgreSQL:
+  ```bash
+  systemctl status postgresql
+  psql -h localhost -U autoparc_user -d autoparc_prod -c "SELECT version();"
+  ```
+- [ ] Check Nginx:
+  ```bash
+  systemctl status nginx
+  curl http://localhost
+  ```
+- [ ] Check Go:
+  ```bash
+  go version
+  ```
+- [ ] Check Node.js:
+  ```bash
+  node --version
+  npm --version
+  ```
+- [ ] Check disk space:
+  ```bash
+  df -h
+  ```
+- [ ] Check memory:
+  ```bash
+  free -h
+  ```
+
+### 12.2 Network Tests
+- [ ] Test from development machine:
+  ```bash
+  ping 192.168.1.22
+  curl http://192.168.1.22
+  ```
+- [ ] Test PostgreSQL connection from dev machine:
+  ```bash
+  psql -h 192.168.1.22 -U autoparc_user -d autoparc_prod
+  ```
+
+---
+
+## Phase 10: Security Hardening
+
+### 10.1 SSH Hardening
+- [ ] Disable root login:
+  ```bash
+  vim /etc/ssh/sshd_config
+  # Set: PermitRootLogin no
+  ```
+- [ ] Disable password authentication (use SSH keys only):
+  ```bash
+  # Set: PasswordAuthentication no
+  ```
+- [ ] Restart SSH:
+  ```bash
+  systemctl restart sshd
+  ```
+
+### 13.2 System Security
+- [ ] Install fail2ban:
+  ```bash
+  apt install -y fail2ban
+  systemctl enable fail2ban
+  systemctl start fail2ban
+  ```
+- [ ] Keep system updated:
+  ```bash
+  apt update && apt upgrade -y
+  apt autoremove -y
+  ```
+
+---
+
+## Infrastructure Checklist Summary
+
+### Critical for Development (Must Have)
+- [x] VM accessible at 192.168.1.22
+- [ ] Docker & Docker Compose installed
+- [ ] PostgreSQL 18 installed and configured
+- [ ] Golang 1.25 installed
+- [ ] Node.js 20+ installed
+- [ ] Git installed
+- [ ] Application directories created
+
+### Required for Testing
+- [ ] Docker Compose test environment
+- [ ] Test database created
+- [ ] golang-migrate installed
+
+### Required for Deployment
+- [ ] Nginx installed and configured
+- [ ] Systemd service for backend
+- [ ] Firewall configured
+- [ ] Environment files created
+- [ ] Application user created
+
+### Optional but Recommended
+- [ ] SSL/TLS certificates
+- [ ] Backup automation
+- [ ] Log rotation
+- [ ] Monitoring tools
+- [ ] SSH hardening
+- [ ] fail2ban installed
+
+---
+
+## Estimated Time
+
+- **Phase 1-2 (System + Docker)**: 1-2 hours
+- **Phase 3 (PostgreSQL)**: 1 hour
+- **Phase 4 (Dev Tools)**: 30 minutes
+- **Phase 5 (Nginx)**: 30 minutes
+- **Phase 6 (SSL)**: Skip for MVP
+- **Phase 7 (Deployment Setup)**: 1 hour
+- **Phase 10-13 (Monitoring + Security)**: 1-2 hours
+
+**Total Estimated Time**: 5-8 hours
+
+---
+
+## Final Verification Checklist
+
+### System Status Verification
+- [ ] All services running:
+  ```bash
+  systemctl status postgresql
+  systemctl status nginx
+  systemctl status docker
+  systemctl status autoparc-api
+  ```
+- [ ] All services enabled at boot:
+  ```bash
+  systemctl is-enabled postgresql nginx docker autoparc-api
+  ```
+
+### User Accounts Verification
+- [ ] Verify autoparc user exists and has no shell:
+  ```bash
+  id autoparc
+  grep autoparc /etc/passwd | grep "/bin/false"
+  ```
+- [ ] Verify dockerdev user exists and has shell:
+  ```bash
+  id dockerdev
+  grep dockerdev /etc/passwd
+  ```
+- [ ] Verify dockerdev can use Docker:
+  ```bash
+  su - dockerdev -c "docker ps"
+  ```
+- [ ] Verify autoparc cannot use Docker:
+  ```bash
+  su - autoparc -c "docker ps" 2>&1 | grep "permission denied"
+  ```
+
+### Database Verification
+- [ ] PostgreSQL is running on correct port:
+  ```bash
+  netstat -tulpn | grep 5432
+  ```
+- [ ] Production database exists:
+  ```bash
+  -u postgres psql -c "\l" | grep autoparc_prod
+  ```
+- [ ] Test database exists:
+  ```bash
+  -u postgres psql -c "\l" | grep autoparc_test
+  ```
+- [ ] Can connect to production database:
+  ```bash
+  PGPASSWORD='PASSWORD' psql -h localhost -U autoparc_user -d autoparc_prod -c "SELECT version();"
+  ```
+- [ ] Database user has correct permissions:
+  ```bash
+  -u postgres psql -c "\du" | grep autoparc_user
+  ```
+
+### Docker Verification
+- [ ] Docker daemon is running:
+  ```bash
+  docker info
+  ```
+- [ ] Docker Compose is available:
+  ```bash
+  docker compose version
+  ```
+- [ ] Test container can be created by dockerdev:
+  ```bash
+  su - dockerdev -c "docker run --rm hello-world"
+  ```
+
+### Web Server Verification
+- [ ] Nginx is running:
+  ```bash
+  nginx -t
+  curl -I http://localhost
+  ```
+- [ ] Application directories exist with correct permissions:
+  ```bash
+  ls -la /var/www/autoparc/
+  stat -c "%U:%G %a" /var/www/autoparc/frontend
+  stat -c "%U:%G %a" /var/www/autoparc/backend
+  ```
+- [ ] Nginx configuration is valid:
+  ```bash
+  nginx -T | grep autoparc
+  ```
+
+### Application Runtime Verification
+- [ ] Go is installed:
+  ```bash
+  go version
+  ```
+- [ ] golang-migrate is available:
+  ```bash
+  migrate -version
+  ```
+- [ ] Node.js is installed:
+  ```bash
+  node --version
+  npm --version
+  ```
+
+### Systemd Service Verification
+- [ ] Service file exists:
+  ```bash
+  cat /etc/systemd/system/autoparc-api.service
+  ```
+- [ ] Service is enabled:
+  ```bash
+  systemctl is-enabled autoparc-api
+  ```
+- [ ] Environment variables are set:
+  ```bash
+  systemctl show autoparc-api | grep Environment
+  ```
+
+### Security Verification
+- [ ] fail2ban is running:
+  ```bash
+  systemctl status fail2ban
+  fail2ban-client status
+  ```
+- [ ] SSH configuration is hardened:
+  ```bash
+  grep "PermitRootLogin" /etc/ssh/sshd_config
+  grep "PasswordAuthentication" /etc/ssh/sshd_config
+  ```
+- [ ] No unnecessary ports open:
+  ```bash
+  netstat -tulpn | grep LISTEN
+  ```
+
+### Backup & Logging Verification
+- [ ] Backup directory exists:
+  ```bash
+  ls -la /var/backups/autoparc/
+  ```
+- [ ] Backup script is executable:
+  ```bash
+  test -x /home/dockerdev/backup-autoparc.sh && echo "OK" || echo "FAIL"
+  ```
+- [ ] Cron job for backup exists:
+  ```bash
+  -u dockerdev crontab -l | grep backup
+  ```
+- [ ] Log directory exists:
+  ```bash
+  ls -la /var/log/autoparc/
+  stat -c "%U:%G %a" /var/log/autoparc
+  ```
+- [ ] Log rotation configured:
+  ```bash
+  cat /etc/logrotate.d/autoparc
+  ```
+
+### Resource Verification
+- [ ] Sufficient disk space (at least 10GB free):
+  ```bash
+  df -h | grep -E "/$|/var"
+  ```
+- [ ] Sufficient memory (at least 2GB free):
+  ```bash
+  free -h
+  ```
+- [ ] CPU usage is normal (< 50%):
+  ```bash
+  top -bn1 | head -20
+  ```
+
+### Final Integration Test
+- [ ] Run complete system check script:
+  ```bash
+  cat > /tmp/system-check.sh << 'EOF'
+  #!/bin/bash
+  echo "=== AutoParc Infrastructure Check ==="
+  echo ""
+  
+  echo "[✓] Checking PostgreSQL..."
+  systemctl is-active postgresql && echo "  PostgreSQL: RUNNING" || echo "  PostgreSQL: FAILED"
+  
+  echo "[✓] Checking Nginx..."
+  systemctl is-active nginx && echo "  Nginx: RUNNING" || echo "  Nginx: FAILED"
+  
+  echo "[✓] Checking Docker..."
+  systemctl is-active docker && echo "  Docker: RUNNING" || echo "  Docker: FAILED"
+  
+  echo "[✓] Checking users..."
+  id autoparc > /dev/null 2>&1 && echo "  autoparc user: EXISTS" || echo "  autoparc user: MISSING"
+  id dockerdev > /dev/null 2>&1 && echo "  dockerdev user: EXISTS" || echo "  dockerdev user: MISSING"
+  
+  echo "[✓] Checking directories..."
+  test -d /var/www/autoparc && echo "  /var/www/autoparc: EXISTS" || echo "  /var/www/autoparc: MISSING"
+  test -d /var/log/autoparc && echo "  /var/log/autoparc: EXISTS" || echo "  /var/log/autoparc: MISSING"
+  test -d /var/backups/autoparc && echo "  /var/backups/autoparc: EXISTS" || echo "  /var/backups/autoparc: MISSING"
+  
+  echo "[✓] Checking database connectivity..."
+  PGPASSWORD='PASSWORD' psql -h localhost -U autoparc_user -d autoparc_prod -c "SELECT 1;" > /dev/null 2>&1 && echo "  Database: ACCESSIBLE" || echo "  Database: FAILED"
+  
+  echo "[✓] Checking network..."
+  curl -s -o /dev/null -w "%{http_code}" http://localhost | grep -q "200\|404" && echo "  Nginx HTTP: RESPONDING" || echo "  Nginx HTTP: NOT RESPONDING"
+  
+  echo ""
+  echo "=== Resource Usage ==="
+  echo "Disk:"
+  df -h / | tail -1
+  echo "Memory:"
+  free -h | grep Mem
+  echo ""
+  echo "=== System Ready for MVP Development ==="
+  EOF
+  
+  chmod +x /tmp/system-check.sh
+  /tmp/system-check.sh
+  ```
+- [ ] All checks should pass before proceeding to MVP development
+
+### MVP Development Readiness
+- [ ] ✅ All system services operational
+- [ ] ✅ Database accessible from application
+- [ ] ✅ Web server responding
+- [ ] ✅ Docker available for testing (dockerdev user)
+- [ ] ✅ Application users configured correctly
+- [ ] ✅ Backups configured
+- [ ] ✅ Logging configured
+- [ ] ✅ Sufficient resources available
+- [ ] ✅ Security hardening complete
+
+**Status**: Once all above checks pass, the infrastructure is ready for MVP development and deployment!
+
+---
+
+## Next Steps After Infrastructure Setup
+
+Once all infrastructure is ready, proceed with [todo_MVP](todo_MVP):
+1. Initialize Git repository
+2. Create project structure
+3. Begin Phase 2: Database migrations
+4. Start Phase 3: Backend development
+5. Continue with remaining phases
+
+---
+
+## Troubleshooting Commands
+
+```bash
+# Check all services
+systemctl status postgresql nginx docker
+
+# Check logs
+journalctl -u autoparc-api -f
+journalctl -u postgresql -f
+tail -f /var/log/nginx/error.log
+
+# Check ports
+netstat -tulpn | grep LISTEN
+
+# Check disk space
+df -h
+
+# Check memory
+free -h
+
+# Check Docker
+docker ps
+docker compose ps
+docker logs <container_name>
+
+# Restart services
+systemctl restart postgresql
+systemctl restart nginx
+systemctl restart autoparc-api
+```
