@@ -60,47 +60,182 @@ autoparc/
 
 ### Prerequisites
 
-- Go 1.22 or higher
-- Node.js 18+ and npm
-- Docker and Docker Compose
-- PostgreSQL 18 (or use Docker)
-- golang-migrate tool
+- **Go 1.22 or higher**: [Download Go](https://go.golang.org/dl/)
+- **Node.js 18+ and npm**: [Download Node.js](https://nodejs.org/)
+- **Docker and Docker Compose**: [Download Docker](https://docs.docker.com/get-docker/)
+- **golang-migrate tool** (optional, for manual migrations): 
+  ```bash
+  # macOS
+  brew install golang-migrate
+  
+  # Linux
+  curl -L https://github.com/golang-migrate/migrate/releases/download/v4.17.0/migrate.linux-amd64.tar.gz | tar xvz
+  sudo mv migrate /usr/local/bin/
+  
+  # Or use Docker (no installation needed)
+  # See database setup instructions below
+  ```
 
-### Installation
+### Quick Start
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/goldenkiwi/autoparc.git
-   cd autoparc
-   ```
+Follow these steps to get AutoParc running locally:
 
-2. **Start the database**
-   ```bash
-   docker-compose up -d postgres
-   ```
+#### 1. Clone the Repository
+```bash
+git clone https://github.com/goldenkiwi/autoparc.git
+cd autoparc
+```
 
-3. **Set up the backend**
-   ```bash
-   cd backend
-   cp .env.example .env
-   # Edit .env with your configuration
-   go mod download
-   make migrate-up
-   go run cmd/api/main.go
-   ```
+#### 2. Start the Databases
 
-4. **Set up the frontend**
-   ```bash
-   cd frontend
-   cp .env.example .env
-   # Edit .env with your configuration
-   npm install
-   npm run dev
-   ```
+Start both development and test PostgreSQL databases using Docker Compose:
 
-5. **Access the application**
-   - Frontend: http://localhost:5173
-   - Backend API: http://localhost:8080
+```bash
+docker-compose up -d
+```
+
+This will start:
+- **Development database** on `localhost:5432`
+  - Database: `autoparc_dev`
+  - User: `autoparc`
+  - Password: `autoparc_dev_password`
+  
+- **Test database** on `localhost:5433`
+  - Database: `autoparc_test`
+  - User: `autoparc_test`
+  - Password: `autoparc_test_password`
+
+Verify the databases are running:
+```bash
+docker-compose ps
+```
+
+Check database health:
+```bash
+# Development database
+docker exec -it autoparc_postgres pg_isready -U autoparc -d autoparc_dev
+
+# Test database
+docker exec -it autoparc_postgres_test pg_isready -U autoparc_test -d autoparc_test
+```
+
+#### 3. Set Up the Backend
+
+```bash
+cd backend
+
+# Copy environment configuration
+cp .env.example .env
+
+# Review and edit .env if needed (default values should work for local development)
+# nano .env  # or use your preferred editor
+
+# Download Go dependencies
+go mod download
+
+# Run database migrations (when available)
+# make migrate-up
+
+# Start the API server
+go run cmd/api/main.go
+```
+
+The backend API will be available at `http://localhost:8080`
+
+#### 4. Set Up the Frontend
+
+Open a new terminal window:
+
+```bash
+cd frontend
+
+# Copy environment configuration
+cp .env.example .env
+
+# Review .env (default values should work for local development)
+# nano .env  # or use your preferred editor
+
+# Install dependencies
+npm install
+
+# Start the development server
+npm run dev
+```
+
+The frontend will be available at `http://localhost:5173`
+
+#### 5. Access the Application
+
+- **Frontend**: http://localhost:5173
+- **Backend API**: http://localhost:8080
+- **API Health Check**: http://localhost:8080/health (when implemented)
+
+### Environment Configuration
+
+#### Backend (.env)
+
+The backend uses the following environment variables (see `backend/.env.example`):
+
+- **Database**: Connection settings for PostgreSQL
+- **Server**: Port, host, and CORS configuration
+- **Session**: Cookie settings for authentication
+- **Environment**: Development/production mode
+
+Default values in `.env.example` are configured to work with the Docker Compose setup.
+
+#### Frontend (.env)
+
+The frontend uses these environment variables (see `frontend/.env.example`):
+
+- **VITE_API_URL**: Backend API base URL (default: `http://localhost:8080`)
+- **VITE_API_BASE_PATH**: API version path (default: `/api/v1`)
+
+### Stopping the Development Environment
+
+```bash
+# Stop the databases (keeps data)
+docker-compose stop
+
+# Stop and remove containers (keeps data in volumes)
+docker-compose down
+
+# Stop and remove containers + volumes (deletes all data)
+docker-compose down -v
+```
+
+### Troubleshooting
+
+**Database connection issues:**
+```bash
+# Check if containers are running
+docker-compose ps
+
+# View database logs
+docker-compose logs postgres
+docker-compose logs postgres_test
+
+# Restart databases
+docker-compose restart postgres postgres_test
+```
+
+**Port conflicts:**
+- If port 5432 is already in use, modify `docker-compose.yml` to use different ports
+- If port 8080 is in use, change `SERVER_PORT` in `backend/.env`
+- If port 5173 is in use, Vite will automatically try the next available port
+
+**Go module issues:**
+```bash
+cd backend
+go mod tidy
+go mod download
+```
+
+**Node module issues:**
+```bash
+cd frontend
+rm -rf node_modules package-lock.json
+npm install
+```
 
 ## 📝 Development
 

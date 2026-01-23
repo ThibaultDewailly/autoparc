@@ -107,10 +107,10 @@ Once this MVP is complete, the AutoParc application will provide the following f
 - [ ] Initialize Node.js project (package.json)
 
 ### 1.2 Development Environment
-- [ ] Create docker-compose.yml with PostgreSQL 18
-- [ ] Configure PostgreSQL container with test database
-- [ ] Create .env.example files for backend and frontend
-- [ ] Document local development setup instructions
+- [x] Create docker-compose.yml with PostgreSQL 18
+- [x] Configure PostgreSQL container with test database
+- [x] Create .env.example files for backend and frontend
+- [x] Document local development setup instructions
 
 ---
 
