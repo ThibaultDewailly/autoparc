@@ -117,56 +117,56 @@ Once this MVP is complete, the AutoParc application will provide the following f
 ## Phase 2: Database Setup
 
 ### 2.1 Database Schema
-- [ ] Install golang-migrate tool
-- [ ] Create migration 001: administrative_employees table
-  - [ ] id (UUID)
-  - [ ] email (unique, not null)
-  - [ ] password_hash
-  - [ ] first_name, last_name
-  - [ ] role (default 'admin')
-  - [ ] is_active
-  - [ ] created_at, updated_at, last_login_at
-- [ ] Create migration 002: sessions table
-  - [ ] id (UUID)
-  - [ ] user_id (FK to administrative_employees)
-  - [ ] session_token (unique)
-  - [ ] expires_at
-  - [ ] ip_address, user_agent
-  - [ ] created_at
-- [ ] Create migration 003: insurance_companies table
-  - [ ] id (UUID)
-  - [ ] name, contact_person
-  - [ ] phone, email, address
-  - [ ] policy_number
-  - [ ] is_active
-  - [ ] created_at, updated_at, created_by
-- [ ] Create migration 004: cars table
-  - [ ] id (UUID)
-  - [ ] license_plate (unique, CHECK regex: ^[A-Z]{2}-[0-9]{3}-[A-Z]{2}$)
-  - [ ] brand, model, grey_card_number
-  - [ ] insurance_company_id (FK)
-  - [ ] rental_start_date
-  - [ ] status (CHECK: active|maintenance|retired)
-  - [ ] created_at, updated_at, created_by
-- [ ] Create migration 005: action_logs table
-  - [ ] id (UUID)
-  - [ ] entity_type, entity_id
-  - [ ] action_type
-  - [ ] performed_by (FK)
-  - [ ] changes (JSONB)
-  - [ ] timestamp
-- [ ] Create migration 006: indexes
-  - [ ] idx_cars_license_plate
-  - [ ] idx_cars_brand_model
-  - [ ] idx_sessions_token
-  - [ ] idx_sessions_user
-  - [ ] idx_sessions_expires
-  - [ ] idx_action_logs_entity
-  - [ ] idx_action_logs_timestamp
-- [ ] Create seed data migration (001_seed):
-  - [ ] Create default admin user (with bcrypt password)
-  - [ ] Create 2-3 sample insurance companies
-- [ ] Test migrations up and down
+- [x] Install golang-migrate tool
+- [x] Create migration 001: administrative_employees table
+  - [x] id (UUID)
+  - [x] email (unique, not null)
+  - [x] password_hash
+  - [x] first_name, last_name
+  - [x] role (default 'admin')
+  - [x] is_active
+  - [x] created_at, updated_at, last_login_at
+- [x] Create migration 002: sessions table
+  - [x] id (UUID)
+  - [x] user_id (FK to administrative_employees)
+  - [x] session_token (unique)
+  - [x] expires_at
+  - [x] ip_address, user_agent
+  - [x] created_at
+- [x] Create migration 003: insurance_companies table
+  - [x] id (UUID)
+  - [x] name, contact_person
+  - [x] phone, email, address
+  - [x] policy_number
+  - [x] is_active
+  - [x] created_at, updated_at, created_by
+- [x] Create migration 004: cars table
+  - [x] id (UUID)
+  - [x] license_plate (unique, CHECK regex: ^[A-Z]{2}-[0-9]{3}-[A-Z]{2}$)
+  - [x] brand, model, grey_card_number
+  - [x] insurance_company_id (FK)
+  - [x] rental_start_date
+  - [x] status (CHECK: active|maintenance|retired)
+  - [x] created_at, updated_at, created_by
+- [x] Create migration 005: action_logs table
+  - [x] id (UUID)
+  - [x] entity_type, entity_id
+  - [x] action_type
+  - [x] performed_by (FK)
+  - [x] changes (JSONB)
+  - [x] timestamp
+- [x] Create migration 006: indexes (included in table migrations)
+  - [x] idx_cars_license_plate
+  - [x] idx_cars_brand_model
+  - [x] idx_sessions_token
+  - [x] idx_sessions_user
+  - [x] idx_sessions_expires
+  - [x] idx_action_logs_entity
+  - [x] idx_action_logs_timestamp
+- [x] Create seed data migration (001_seed):
+  - [x] Create default admin user (with bcrypt password)
+  - [x] Create 2-3 sample insurance companies
+- [x] Test migrations up and down
 
 ---
 
