@@ -1,5 +1,10 @@
 # AutoParc - Fleet Management System
 
+[![CI](https://github.com/goldenkiwi/autoparc/actions/workflows/ci.yml/badge.svg)](https://github.com/goldenkiwi/autoparc/actions/workflows/ci.yml)
+[![Backend CI](https://github.com/goldenkiwi/autoparc/actions/workflows/backend.yml/badge.svg)](https://github.com/goldenkiwi/autoparc/actions/workflows/backend.yml)
+[![Frontend CI](https://github.com/goldenkiwi/autoparc/actions/workflows/frontend.yml/badge.svg)](https://github.com/goldenkiwi/autoparc/actions/workflows/frontend.yml)
+[![E2E Tests](https://github.com/goldenkiwi/autoparc/actions/workflows/e2e.yml/badge.svg)](https://github.com/goldenkiwi/autoparc/actions/workflows/e2e.yml)
+
 AutoParc is a comprehensive web-based fleet management system designed for managing company vehicles, insurance, operators, and maintenance operations.
 
 ## 🎯 Project Overview

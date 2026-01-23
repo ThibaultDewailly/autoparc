@@ -1,0 +1,82 @@
+run:
+  timeout: 5m
+  tests: true
+  modules-download-mode: readonly
+
+linters:
+  enable:
+    - errcheck      # Check for unchecked errors
+    - gosimple      # Simplify code
+    - govet         # Reports suspicious constructs
+    - ineffassign   # Detect ineffectual assignments
+    - staticcheck   # Advanced Go linter
+    - typecheck     # Type-check Go code
+    - unused        # Check for unused code
+    - gofmt         # Check formatting
+    - goimports     # Check import ordering
+    - misspell      # Check for misspelled words
+    - goconst       # Find repeated strings that could be constants
+    - gocritic      # Opinionated Go linter
+    - revive        # Fast, configurable, extensible linter
+    - exhaustive    # Check exhaustiveness of enum switch statements
+    - errorlint     # Error wrapping issues
+
+linters-settings:
+  errcheck:
+    check-type-assertions: true
+    check-blank: true
+  
+  govet:
+    enable-all: true
+    disable:
+      - shadow  # Too strict for this project
+  
+  gofmt:
+    simplify: true
+  
+  goimports:
+    local-prefixes: github.com/goldenkiwi/autoparc
+  
+  revive:
+    rules:
+      - name: exported
+        severity: warning
+        disabled: false
+      - name: error-return
+      - name: error-naming
+      - name: if-return
+      - name: var-naming
+      - name: package-comments
+        disabled: true  # Allow missing package comments for internal packages
+  
+  gocritic:
+    enabled-tags:
+      - diagnostic
+      - style
+      - performance
+    disabled-checks:
+      - ifElseChain
+      - singleCaseSwitch
+
+issues:
+  exclude-rules:
+    # Exclude some linters from running on tests files
+    - path: _test\.go
+      linters:
+        - errcheck
+        - goconst
+    
+    # Exclude specific issues in test files
+    - path: tests/
+      linters:
+        - errcheck
+        - goconst
+        - revive
+
+  max-issues-per-linter: 0
+  max-same-issues: 0
+
+output:
+  format: colored-line-number
+  print-issued-lines: true
+  print-linter-name: true
