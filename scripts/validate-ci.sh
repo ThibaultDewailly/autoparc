@@ -153,10 +153,11 @@ fi
 
 # Check coverage
 echo "Checking frontend coverage..."
-npm run test:coverage -- --run > /dev/null 2>&1
+COVERAGE_OUTPUT=$(npm run test:coverage -- --run --reporter=json --reporter=default 2>&1)
 
+# Try to get coverage from JSON file first
 if [ -f "coverage/coverage-summary.json" ]; then
-    COVERAGE=$(cat coverage/coverage-summary.json | grep -o '"total":{"lines":{"total":[0-9]*,"covered":[0-9]*,"skipped":[0-9]*,"pct":[0-9.]*' | grep -o 'pct":[0-9.]*' | cut -d':' -f2)
+    COVERAGE=$(node -pe "JSON.parse(require('fs').readFileSync('coverage/coverage-summary.json')).total.lines.pct" 2>/dev/null || echo "0")
     echo "Frontend coverage: ${COVERAGE}%"
     
     if (( $(echo "$COVERAGE >= 80" | bc -l) )); then
@@ -165,7 +166,18 @@ if [ -f "coverage/coverage-summary.json" ]; then
         print_error "Frontend coverage ${COVERAGE}% is below 80% threshold"
     fi
 else
-    print_warning "Coverage summary not found"
+    # Fallback: Parse from output text
+    COVERAGE=$(echo "$COVERAGE_OUTPUT" | grep "All files" | awk '{print $4}' | head -1)
+    if [ -n "$COVERAGE" ]; then
+        echo "Frontend coverage: ${COVERAGE}%"
+        if (( $(echo "$COVERAGE >= 80" | bc -l) )); then
+            print_success "Frontend coverage ${COVERAGE}% meets 80% threshold"
+        else
+            print_error "Frontend coverage ${COVERAGE}% is below 80% threshold"
+        fi
+    else
+        print_warning "Could not determine coverage percentage"
+    fi
 fi
 
 # Build frontend
