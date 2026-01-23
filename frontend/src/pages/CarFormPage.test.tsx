@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import { userEvent } from '@testing-library/user-event'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { BrowserRouter, MemoryRouter, Route, Routes } from 'react-router-dom'
+import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { AuthProvider } from '@/contexts/AuthContext'
 import { CarFormPage } from './CarFormPage'
 import * as carsHooks from '@/hooks/useCars'
@@ -26,11 +27,11 @@ const mockCar: Car = {
   model: 'Corolla',
   grey_card_number: 'GC123',
   insurance_company_id: '1',
-  insurance_company_name: 'Assurance Test',
   rental_start_date: '2024-01-01',
   status: 'active',
   created_at: '2024-01-01T00:00:00Z',
   updated_at: '2024-01-01T00:00:00Z',
+  created_by: 'user-1',
 }
 
 function createWrapper(initialRoute = '/cars/new') {

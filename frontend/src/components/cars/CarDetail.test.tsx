@@ -10,7 +10,6 @@ const mockCar: Car = {
   model: 'Corolla',
   grey_card_number: 'GC123',
   insurance_company_id: '1',
-  insurance_company_name: 'Assurance Test',
   insurance_company: {
     id: '1',
     name: 'Assurance Test',
@@ -18,14 +17,14 @@ const mockCar: Car = {
     phone: '0123456789',
     email: 'contact@assurance.com',
     policy_number: 'POL123',
-    address: '123 Rue de Test',
-    created_at: '2024-01-01T00:00:00Z',
+    address: '123 Rue de Test',    is_active: true,    created_at: '2024-01-01T00:00:00Z',
     updated_at: '2024-01-01T00:00:00Z',
   },
   rental_start_date: '2024-01-01',
   status: 'active',
   created_at: '2024-01-01T00:00:00Z',
   updated_at: '2024-01-02T00:00:00Z',
+  created_by: 'user-1',
 }
 
 describe('CarDetail', () => {

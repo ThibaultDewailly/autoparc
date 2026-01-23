@@ -1,6 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { userEvent } from '@testing-library/user-event'
 import { BrowserRouter } from 'react-router-dom'
 import { CarTable } from './CarTable'
 import type { Car } from '@/types'
@@ -23,11 +22,11 @@ const mockCars: Car[] = [
     model: 'Corolla',
     grey_card_number: 'GC123',
     insurance_company_id: 'ins-1',
-    insurance_company_name: 'Assurance Test',
     rental_start_date: '2024-01-01',
     status: 'active',
     created_at: '2024-01-01T00:00:00Z',
     updated_at: '2024-01-01T00:00:00Z',
+    created_by: 'user-1',
   },
   {
     id: '2',
@@ -36,11 +35,11 @@ const mockCars: Car[] = [
     model: 'Civic',
     grey_card_number: 'GC456',
     insurance_company_id: 'ins-2',
-    insurance_company_name: 'Assurance Pro',
     rental_start_date: '2024-02-01',
     status: 'maintenance',
     created_at: '2024-02-01T00:00:00Z',
     updated_at: '2024-02-01T00:00:00Z',
+    created_by: 'user-1',
   },
 ]
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook, waitFor } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -32,7 +33,10 @@ describe('useInsuranceCompanies', () => {
         phone: '0123456789',
         email: 'contact@axa.fr',
         policy_number: 'POL123',
+        address: '123 Rue Test',
         is_active: true,
+        created_at: '2024-01-01T00:00:00Z',
+        updated_at: '2024-01-01T00:00:00Z',
       },
       {
         id: '2',
@@ -41,7 +45,10 @@ describe('useInsuranceCompanies', () => {
         phone: '0987654321',
         email: 'contact@allianz.fr',
         policy_number: 'POL456',
+        address: '456 Rue Test',
         is_active: true,
+        created_at: '2024-01-01T00:00:00Z',
+        updated_at: '2024-01-01T00:00:00Z',
       },
     ]
     

@@ -88,7 +88,16 @@ describe('AuthContext', () => {
 
   it('should handle login successfully', async () => {
     vi.mocked(authService.getCurrentUser).mockResolvedValue(mockUser)
-    vi.mocked(authService.login).mockResolvedValue({ user: mockUser })
+    vi.mocked(authService.login).mockResolvedValue({
+      user: mockUser,
+      session: {
+        id: 'session-123',
+        user_id: mockUser.id,
+        session_token: 'token-123',
+        expires_at: '2024-12-31T23:59:59Z',
+        created_at: '2024-01-01T00:00:00Z',
+      },
+    })
 
     const { result } = renderHook(() => useAuth(), { wrapper })
 

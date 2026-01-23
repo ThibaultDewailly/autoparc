@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import { userEvent } from '@testing-library/user-event'
@@ -27,22 +28,16 @@ const mockCarsData: PaginatedResponse<Car> = {
       model: 'Corolla',
       grey_card_number: 'GC123',
       insurance_company_id: 'ins-1',
-      insurance_company_name: 'Assurance Test',
       rental_start_date: '2024-01-01',
       status: 'active',
       created_at: '2024-01-01T00:00:00Z',
       updated_at: '2024-01-01T00:00:00Z',
+      created_by: 'user-1',
     },
   ],
-  pagination: {
-    page: 1,
-    limit: 10,
-    total_items: 1,
-    total_pages: 1,
-  },
   page: 1,
   limit: 10,
-  total_items: 1,
+  total: 1,
   total_pages: 1,
 }
 

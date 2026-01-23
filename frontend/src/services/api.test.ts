@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { apiGet, apiPost, apiPut, apiDelete, ApiClientError } from './api'
 
+// @ts-expect-error - global.fetch is available in test environment
 global.fetch = vi.fn()
 
 describe('API Client', () => {
@@ -47,6 +48,7 @@ describe('API Client', () => {
     })
 
     it('should handle error without JSON body', async () => {
+      // @ts-expect-error - mocking Response object for testing
       vi.mocked(fetch).mockResolvedValue({
         ok: false,
         status: 500,
@@ -144,7 +146,7 @@ describe('API Client', () => {
 
   describe('ApiClientError', () => {
     it('should create error with correct properties', () => {
-      const errorData = { message: 'Test error', code: 'TEST_ERROR' }
+      const errorData = { error: 'Test error', message: 'Test error', code: 'TEST_ERROR' }
       const error = new ApiClientError('Test error', 400, errorData)
 
       expect(error.message).toBe('Test error')
