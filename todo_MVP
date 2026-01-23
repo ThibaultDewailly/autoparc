@@ -173,7 +173,7 @@ Once this MVP is complete, the AutoParc application will provide the following f
 ## Phase 3: Backend Development
 
 ### 3.1 Project Structure Setup
-- [ ] Create folder structure:
+- [x] Create folder structure:
   ```
   backend/
     cmd/api/main.go
