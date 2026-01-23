@@ -72,7 +72,7 @@ jobs:
           echo "Coverage ${COVERAGE}% meets 80% threshold"
 
       - name: Upload coverage to artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: backend-unit-coverage
           path: backend/coverage.out
@@ -136,7 +136,7 @@ jobs:
           go test -v -race -coverprofile=coverage_integration.out -covermode=atomic ./tests/integration/...
 
       - name: Upload integration test coverage
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: backend-integration-coverage
           path: backend/coverage_integration.out
@@ -162,7 +162,7 @@ jobs:
           go build -v -o ../bin/autoparc cmd/api/main.go
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: backend-binary
           path: bin/autoparc
