@@ -1,19 +1,67 @@
-import { BrowserRouter as Router } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
+import { AuthProvider } from '@/contexts/AuthContext'
+import { ProtectedRoute } from '@/components/common/ProtectedRoute'
+import { LoginPage } from '@/pages/LoginPage'
+import { DashboardPage } from '@/pages/DashboardPage'
+import { CarsPage } from '@/pages/CarsPage'
+import { CarDetailPage } from '@/pages/CarDetailPage'
+import { CarFormPage } from '@/pages/CarFormPage'
+import { ROUTES } from '@/utils/constants'
 
 function App() {
   return (
-    <Router>
-      <div className="min-h-screen bg-gray-50">
-        <header className="bg-white shadow">
-          <div className="max-w-7xl mx-auto py-6 px-4">
-            <h1 className="text-3xl font-bold text-gray-900">AutoParc</h1>
-          </div>
-        </header>
-        <main className="max-w-7xl mx-auto py-6 px-4">
-          <p className="text-gray-600">Gestion de Flotte - MVP en développement</p>
-        </main>
-      </div>
-    </Router>
+    <AuthProvider>
+      <Routes>
+        <Route path={ROUTES.login} element={<LoginPage />} />
+        
+        <Route
+          path={ROUTES.dashboard}
+          element={
+            <ProtectedRoute>
+              <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path={ROUTES.cars}
+          element={
+            <ProtectedRoute>
+              <CarsPage />
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path={ROUTES.carNew}
+          element={
+            <ProtectedRoute>
+              <CarFormPage />
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path="/cars/:id"
+          element={
+            <ProtectedRoute>
+              <CarDetailPage />
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path="/cars/:id/edit"
+          element={
+            <ProtectedRoute>
+              <CarFormPage />
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route path="*" element={<Navigate to={ROUTES.dashboard} replace />} />
+      </Routes>
+    </AuthProvider>
   )
 }
 

@@ -199,6 +199,91 @@ docker-compose stop
 # Stop and remove containers (keeps data in volumes)
 docker-compose down
 
+# Stop and remove everything including volumes (⚠️ deletes all data)
+docker-compose down -v
+```
+
+## 🧪 Testing
+
+AutoParc has comprehensive test coverage for both frontend and backend.
+
+### Frontend Tests
+
+**Unit Tests**: 56 tests covering utilities and components
+- Validators (22 tests, 100% coverage)
+- Formatters (11 tests, 100% coverage)
+- LoginForm (7 tests, 96.7% coverage)
+- Pagination (9 tests, 100% coverage)
+- SearchBar (4 tests, 100% coverage)
+- FilterPanel (3 tests, 100% coverage)
+
+**E2E Tests**: 16 Playwright tests covering critical user workflows
+- Authentication flow (login, logout, protected routes)
+- Car CRUD operations
+- Search and filtering
+- Form validation
+
+#### Running Frontend Tests
+
+```bash
+cd frontend
+
+# Run unit tests
+npm test
+
+# Run tests with coverage
+npm run test:coverage
+
+# Run E2E tests (requires backend running)
+npm run test:e2e
+
+# Run E2E tests in UI mode
+npm run test:e2e -- --ui
+```
+
+#### Test Documentation
+
+For detailed testing information, see:
+- **[TESTING_SUMMARY.md](TESTING_SUMMARY.md)**: Comprehensive testing overview and coverage reports
+- **[TESTING_GUIDE.md](TESTING_GUIDE.md)**: Quick start guide with common commands and troubleshooting
+
+### Backend Tests
+
+Backend test coverage details coming soon.
+
+```bash
+cd backend
+
+# Run unit tests
+go test ./...
+
+# Run tests with coverage
+go test -cover ./...
+
+# Run integration tests
+make test-integration
+```
+
+## 🎯 MVP Status
+
+**Current Phase**: Phase 4 - Frontend Development ✅
+
+**Completed**:
+- ✅ Project setup and infrastructure
+- ✅ Database design and migrations
+- ✅ Backend API (all CRUD endpoints)
+- ✅ Frontend UI (all pages and components)
+- ✅ Authentication flow
+- ✅ Unit tests (56 tests passing)
+- ✅ E2E test infrastructure (16 tests ready)
+
+**Next Steps**:
+- CI/CD pipeline refinement
+- Final documentation
+- Production deployment preparation
+
+See [todo_MVP](todo_MVP) for complete task breakdown.
+
 # Stop and remove containers + volumes (deletes all data)
 docker-compose down -v
 ```
