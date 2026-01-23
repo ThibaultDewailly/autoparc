@@ -48,7 +48,7 @@ export function LoginForm({ onSubmit }: LoginFormProps) {
         <p className="text-sm text-default-500">{FRENCH_LABELS.carManagement}</p>
       </CardHeader>
       <CardBody className="px-6 py-6">
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
           <Input
             type="email"
             label={FRENCH_LABELS.email}

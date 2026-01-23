@@ -13,19 +13,28 @@ test.describe('Authentication Flow', () => {
   test('should show validation errors for empty fields', async ({ page }) => {
     await page.goto('/login')
     
+    // Focus and blur email field to trigger validation
+    await page.getByLabel(/email/i).click()
+    await page.getByLabel(/mot de passe/i).click()
+    
+    // Click submit without filling fields
     await page.getByRole('button', { name: /se connecter/i }).click()
     
-    await expect(page.getByText(/email est requis/i)).toBeVisible()
-    await expect(page.getByText(/mot de passe est requis/i)).toBeVisible()
+    // Wait for validation errors to appear
+    await page.waitForTimeout(500)
+    await expect(page.getByText("L'email est requis")).toBeVisible({ timeout: 10000 })
+    await expect(page.getByText('Le mot de passe est requis')).toBeVisible()
   })
 
   test('should show error for invalid email format', async ({ page }) => {
     await page.goto('/login')
     
     await page.getByLabel(/email/i).fill('invalid-email')
+    await page.getByLabel(/mot de passe/i).fill('somepassword')
     await page.getByRole('button', { name: /se connecter/i }).click()
     
-    await expect(page.getByText(/format.*email.*invalide/i)).toBeVisible()
+    await page.waitForTimeout(500)
+    await expect(page.getByText("Format d'email invalide")).toBeVisible({ timeout: 10000 })
   })
 
   test('should redirect to login when accessing protected route', async ({ page }) => {
@@ -38,7 +47,7 @@ test.describe('Authentication Flow', () => {
     await page.goto('/login')
     
     await page.getByLabel(/email/i).fill('admin@autoparc.fr')
-    await page.getByLabel(/mot de passe/i).fill('admin123')
+    await page.getByLabel(/mot de passe/i).fill('Admin123!')
     await page.getByRole('button', { name: /se connecter/i }).click()
     
     // Should redirect to dashboard
@@ -50,13 +59,13 @@ test.describe('Authentication Flow', () => {
     // Login first
     await page.goto('/login')
     await page.getByLabel(/email/i).fill('admin@autoparc.fr')
-    await page.getByLabel(/mot de passe/i).fill('admin123')
+    await page.getByLabel(/mot de passe/i).fill('Admin123!')
     await page.getByRole('button', { name: /se connecter/i }).click()
     
     await expect(page).toHaveURL('/')
     
-    // Click user avatar/menu
-    await page.getByRole('button', { name: /avatar/i }).click()
+    // Open user menu - NextUI dropdown trigger
+    await page.locator('[data-slot="trigger"]').last().click()
     
     // Click logout
     await page.getByRole('menuitem', { name: /déconnexion/i }).click()
@@ -72,7 +81,8 @@ test.describe('Authentication Flow', () => {
     await page.getByLabel(/mot de passe/i).fill('wrongpassword')
     await page.getByRole('button', { name: /se connecter/i }).click()
     
-    // Should show error message
-    await expect(page.getByText(/erreur/i)).toBeVisible()
+    // Should show error message - wait longer as it needs to make API call
+    await page.waitForTimeout(1000)
+    await expect(page.getByText(/invalid credentials|erreur/i)).toBeVisible({ timeout: 10000 })
   })
 })

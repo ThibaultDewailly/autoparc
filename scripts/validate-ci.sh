@@ -190,6 +190,63 @@ fi
 
 cd ..
 
+# ═══════════════════════════════════════════════════════════
+# E2E Tests
+# ═══════════════════════════════════════════════════════════
+print_section "E2E Tests"
+
+echo "Starting Docker Compose services..."
+if ! docker compose up -d --build; then
+    print_error "Failed to start Docker Compose services"
+else
+    print_success "Docker Compose services started"
+    
+    # Wait for backend to be ready
+    echo "Waiting for backend to be ready..."
+    WAIT_COUNT=0
+    MAX_WAIT=30
+    while [ $WAIT_COUNT -lt $MAX_WAIT ]; do
+        if curl -s http://localhost:8080/health > /dev/null 2>&1; then
+            print_success "Backend is ready"
+            break
+        fi
+        echo "Waiting for backend... ($WAIT_COUNT/$MAX_WAIT)"
+        sleep 2
+        WAIT_COUNT=$((WAIT_COUNT + 1))
+    done
+    
+    if [ $WAIT_COUNT -eq $MAX_WAIT ]; then
+        print_error "Backend failed to start within timeout"
+        echo "Backend logs:"
+        docker compose logs backend
+        docker compose down
+    else
+        # Run E2E tests
+        cd frontend
+        
+        echo "Installing Playwright browsers..."
+        if npx playwright install chromium; then
+            print_success "Playwright browsers installed"
+        else
+            print_warning "Failed to install Playwright browsers (may already be installed)"
+        fi
+        
+        echo "Running E2E tests..."
+        if npm run test:e2e; then
+            print_success "E2E tests passed"
+        else
+            print_error "E2E tests failed"
+        fi
+        
+        cd ..
+        
+        # Stop Docker Compose services
+        echo "Stopping Docker Compose services..."
+        docker compose down
+        print_success "Docker Compose services stopped"
+    fi
+fi
+
 # Summary
 print_section "Summary"
 

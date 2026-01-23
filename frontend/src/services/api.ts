@@ -23,7 +23,8 @@ async function handleResponse<T>(response: Response): Promise<T> {
       // If JSON parsing fails, use status text
     }
     
-    const message = errorData?.message || response.statusText || 'Une erreur est survenue'
+    // Check both message and error fields (backend uses 'error', we expect 'message')
+    const message = errorData?.message || errorData?.error || response.statusText || 'Une erreur est survenue'
     
     throw new ApiClientError(message, response.status, errorData)
   }

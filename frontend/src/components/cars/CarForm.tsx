@@ -100,7 +100,7 @@ export function CarForm({ car, onSubmit, onCancel, isLoading }: CarFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
       <Input
         label={FRENCH_LABELS.licensePlate}
         placeholder="AA-123-BB"
