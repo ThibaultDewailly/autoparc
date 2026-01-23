@@ -192,143 +192,143 @@ Once this MVP is complete, the AutoParc application will provide the following f
   ```
 
 ### 3.2 Configuration & Database Connection
-- [ ] Create config package
-  - [ ] Load environment variables
-  - [ ] Database config
-  - [ ] Server config (port, cors, etc.)
-  - [ ] Session config (cookie settings)
-- [ ] Create database package
-  - [ ] PostgreSQL connection with pgx
-  - [ ] Connection pooling
-  - [ ] Health check function
-- [ ] Write unit tests for config loading
+- [x] Create config package
+  - [x] Load environment variables
+  - [x] Database config
+  - [x] Server config (port, cors, etc.)
+  - [x] Session config (cookie settings)
+- [x] Create database package
+  - [x] PostgreSQL connection with pgx
+  - [x] Connection pooling
+  - [x] Health check function
+- [x] Write unit tests for config loading
 
 ### 3.3 Models
-- [ ] Create models/user.go (AdministrativeEmployee)
-- [ ] Create models/session.go
-- [ ] Create models/car.go
-- [ ] Create models/insurance_company.go
-- [ ] Create models/action_log.go
-- [ ] Add validation tags to models
+- [x] Create models/user.go (AdministrativeEmployee)
+- [x] Create models/session.go
+- [x] Create models/car.go
+- [x] Create models/insurance_company.go
+- [x] Create models/action_log.go
+- [x] Add validation tags to models
 
 ### 3.4 Utilities
-- [ ] pkg/utils/password.go
-  - [ ] HashPassword(password string) (string, error)
-  - [ ] CheckPassword(hash, password string) bool
-  - [ ] Write unit tests (min 80% coverage)
-- [ ] pkg/utils/session.go
-  - [ ] GenerateSessionToken() string
-  - [ ] Write unit tests
-- [ ] pkg/utils/validator.go
-  - [ ] ValidateLicensePlate(plate string) bool
-  - [ ] ValidateEmail(email string) bool
-  - [ ] Write unit tests
+- [x] pkg/utils/password.go
+  - [x] HashPassword(password string) (string, error)
+  - [x] CheckPassword(hash, password string) bool
+  - [x] Write unit tests (min 80% coverage)
+- [x] pkg/utils/session.go
+  - [x] GenerateSessionToken() string
+  - [x] Write unit tests
+- [x] pkg/utils/validator.go
+  - [x] ValidateLicensePlate(plate string) bool
+  - [x] ValidateEmail(email string) bool
+  - [x] Write unit tests
 
 ### 3.5 Repository Layer (Database Access)
-- [ ] repository/user_repository.go
-  - [ ] FindByEmail(email string) (*User, error)
-  - [ ] FindByID(id string) (*User, error)
-  - [ ] UpdateLastLogin(id string) error
+- [x] repository/user_repository.go
+  - [x] FindByEmail(email string) (*User, error)
+  - [x] FindByID(id string) (*User, error)
+  - [x] UpdateLastLogin(id string) error
   - [ ] Write unit tests with mock database
-- [ ] repository/session_repository.go
-  - [ ] Create(session *Session) error
-  - [ ] FindByToken(token string) (*Session, error)
-  - [ ] Delete(token string) error
-  - [ ] DeleteExpired() error
+- [x] repository/session_repository.go
+  - [x] Create(session *Session) error
+  - [x] FindByToken(token string) (*Session, error)
+  - [x] Delete(token string) error
+  - [x] DeleteExpired() error
   - [ ] Write unit tests
-- [ ] repository/car_repository.go
-  - [ ] Create(car *Car) error
-  - [ ] FindByID(id string) (*Car, error)
-  - [ ] FindAll(filters map[string]interface{}, page, limit int) ([]*Car, int, error)
-  - [ ] Update(id string, updates map[string]interface{}) error
-  - [ ] Delete(id string) error
-  - [ ] Search(query string, page, limit int) ([]*Car, int, error)
+- [x] repository/car_repository.go
+  - [x] Create(car *Car) error
+  - [x] FindByID(id string) (*Car, error)
+  - [x] FindAll(filters map[string]interface{}, page, limit int) ([]*Car, int, error)
+  - [x] Update(id string, updates map[string]interface{}) error
+  - [x] Delete(id string) error
+  - [x] Search(query string, page, limit int) ([]*Car, int, error)
   - [ ] Write unit tests
-- [ ] repository/insurance_repository.go
-  - [ ] FindAll() ([]*InsuranceCompany, error)
-  - [ ] FindByID(id string) (*InsuranceCompany, error)
+- [x] repository/insurance_repository.go
+  - [x] FindAll() ([]*InsuranceCompany, error)
+  - [x] FindByID(id string) (*InsuranceCompany, error)
   - [ ] Write unit tests
-- [ ] repository/action_log_repository.go
-  - [ ] Create(log *ActionLog) error
+- [x] repository/action_log_repository.go
+  - [x] Create(log *ActionLog) error
   - [ ] Write unit tests
 
 ### 3.6 Service Layer (Business Logic)
-- [ ] service/auth_service.go
-  - [ ] Login(email, password string) (*User, *Session, error)
-  - [ ] Logout(token string) error
-  - [ ] ValidateSession(token string) (*User, error)
+- [x] service/auth_service.go
+  - [x] Login(email, password string) (*User, *Session, error)
+  - [x] Logout(token string) error
+  - [x] ValidateSession(token string) (*User, error)
   - [ ] Write unit tests with mocked repositories (min 80% coverage)
-- [ ] service/car_service.go
-  - [ ] CreateCar(car *Car, userID string) error
-  - [ ] GetCar(id string) (*Car, error)
-  - [ ] GetCars(filters, page, limit) ([]*Car, int, error)
-  - [ ] UpdateCar(id string, updates, userID string) error
-  - [ ] DeleteCar(id string, userID string) error
-  - [ ] SearchCars(query string, page, limit) ([]*Car, int, error)
+- [x] service/car_service.go
+  - [x] CreateCar(car *Car, userID string) error
+  - [x] GetCar(id string) (*Car, error)
+  - [x] GetCars(filters, page, limit) ([]*Car, int, error)
+  - [x] UpdateCar(id string, updates, userID string) error
+  - [x] DeleteCar(id string, userID string) error
+  - [x] SearchCars(query string, page, limit) ([]*Car, int, error)
   - [ ] Write unit tests (min 80% coverage)
-- [ ] service/insurance_service.go
-  - [ ] GetInsuranceCompanies() ([]*InsuranceCompany, error)
+- [x] service/insurance_service.go
+  - [x] GetInsuranceCompanies() ([]*InsuranceCompany, error)
   - [ ] Write unit tests
-- [ ] service/audit_service.go
-  - [ ] LogAction(entityType, entityID, actionType, userID, changes) error
+- [x] service/audit_service.go
+  - [x] LogAction(entityType, entityID, actionType, userID, changes) error
   - [ ] Write unit tests
 
 ### 3.7 Middleware
-- [ ] middleware/auth.go
-  - [ ] AuthMiddleware() - validate session cookie
-  - [ ] Extract user from session and add to context
+- [x] middleware/auth.go
+  - [x] AuthMiddleware() - validate session cookie
+  - [x] Extract user from session and add to context
   - [ ] Write unit tests
-- [ ] middleware/cors.go
-  - [ ] CORS middleware with credentials support
-- [ ] middleware/logger.go
-  - [ ] HTTP request/response logging
+- [x] middleware/cors.go
+  - [x] CORS middleware with credentials support
+- [x] middleware/logger.go
+  - [x] HTTP request/response logging
 - [ ] Write unit tests for all middleware
 
 ### 3.8 HTTP Handlers
-- [ ] handlers/auth_handler.go
-  - [ ] POST /api/v1/auth/login
-  - [ ] GET /api/v1/auth/me
-  - [ ] POST /api/v1/auth/logout
+- [x] handlers/auth_handler.go
+  - [x] POST /api/v1/auth/login
+  - [x] GET /api/v1/auth/me
+  - [x] POST /api/v1/auth/logout
   - [ ] Write unit tests with mock services
-- [ ] handlers/car_handler.go
-  - [ ] GET /api/v1/cars (with pagination, filters, search)
-  - [ ] GET /api/v1/cars/:id
-  - [ ] POST /api/v1/cars
-  - [ ] PUT /api/v1/cars/:id
-  - [ ] DELETE /api/v1/cars/:id
+- [x] handlers/car_handler.go
+  - [x] GET /api/v1/cars (with pagination, filters, search)
+  - [x] GET /api/v1/cars/:id
+  - [x] POST /api/v1/cars
+  - [x] PUT /api/v1/cars/:id
+  - [x] DELETE /api/v1/cars/:id
   - [ ] Write unit tests
-- [ ] handlers/insurance_handler.go
-  - [ ] GET /api/v1/insurance-companies
+- [x] handlers/insurance_handler.go
+  - [x] GET /api/v1/insurance-companies
   - [ ] Write unit tests
 
 ### 3.9 API Server Setup
-- [ ] cmd/api/main.go
-  - [ ] Initialize database connection
-  - [ ] Initialize repositories
-  - [ ] Initialize services
-  - [ ] Initialize handlers
-  - [ ] Setup router (Gin or Echo)
-  - [ ] Register middleware
-  - [ ] Register routes
-  - [ ] Start server
-- [ ] Graceful shutdown handling
+- [x] cmd/api/main.go
+  - [x] Initialize database connection
+  - [x] Initialize repositories
+  - [x] Initialize services
+  - [x] Initialize handlers
+  - [x] Setup router (Gin or Echo)
+  - [x] Register middleware
+  - [x] Register routes
+  - [x] Start server
+- [x] Graceful shutdown handling
 
 ### 3.10 Integration Tests
-- [ ] tests/integration/auth_test.go
-  - [ ] Test login flow
-  - [ ] Test logout flow
-  - [ ] Test session validation
-  - [ ] Test invalid credentials
-- [ ] tests/integration/car_test.go
-  - [ ] Test create car
-  - [ ] Test get cars (list with pagination)
-  - [ ] Test get car by ID
-  - [ ] Test update car
-  - [ ] Test delete car
-  - [ ] Test search cars
-  - [ ] Test license plate validation
-- [ ] Use dockertest for PostgreSQL container
-- [ ] Create test fixtures in tests/fixtures/
+- [x] tests/integration/auth_test.go
+  - [x] Test login flow
+  - [x] Test logout flow
+  - [x] Test session validation
+  - [x] Test invalid credentials
+- [x] tests/integration/car_test.go
+  - [x] Test create car
+  - [x] Test get cars (list with pagination)
+  - [x] Test get car by ID
+  - [x] Test update car
+  - [x] Test delete car
+  - [x] Test search cars
+  - [x] Test license plate validation
+- [x] Use dockertest for PostgreSQL container
+- [x] Create test fixtures in tests/fixtures/
 
 ---
 
