@@ -1,47 +1,175 @@
-Caradm is a car pool administration tool aimed for administrative personnel. It's a web interface, with an API backend as a relational database to store data.
+# AutoParc - Fleet Management System
 
-Core feature is Car administration. The application must be designed to GAIN TIME, NOT MISS DEADLINES, and FOLLOW TODOS.
+AutoParc is a comprehensive web-based fleet management system designed for managing company vehicles, insurance, operators, and maintenance operations.
 
-Base objects : 
-- cars
-- cars operators
-- administrative employees in charge of the car pool
-- Insurance companies
-- Garages
-- Accident
-- Repairs
+## 🎯 Project Overview
 
-What is a car : Brand, Model=, grey card, insirance company and License plate (unique identifier)
-What is a car operator : An Employee using one or more cars during a given period of time
-What is an adminitrative employee : End user of this application
-What is an Insurance company : Company in charge of assuring a vehicle and where to declare a potential accident.
-What is a Garage : Company in charge of Vehicle repair
-What is an accident : An Event associated to a given car
-What is a repair : An event associated to an accident to a given car made by a given garage. 
+AutoParc helps administrative employees efficiently manage:
+- **Vehicle Fleet**: Track cars with license plates, insurance, and maintenance status
+- **Insurance Management**: Manage insurance companies and policies
+- **Operators**: Assign vehicles to operators (company employees)
+- **Accident Tracking**: Record and manage vehicle accidents with photo documentation
+- **Maintenance & Repairs**: Schedule and track vehicle repairs and inspections
+- **Notifications**: Automated alerts for insurance renewals, inspection deadlines, etc.
 
-How to use the application :
-A Welcome page with a search bar to find a vehicle via Brand, Model or license plate
-You can browse the cars, the operators, the administravie employees, The insurance companies, a garage.
-For each item, obtain a description and what did this item did to all the cars (history).
-In the case of a car, have all it's history, and the author of the actions and items.
-A notification center : What to do, the deadlines, a calendar with the different vhicle, a summary of every item list. 
+## 🏗️ Architecture
 
-Actions which can be done on a given car :
-- Schedule Vehicle Inspection (Every 2 years)
-- Declare an accident : Upload Photos / Describe damages at first, can be edited to associate repairs.
-- Schedule Random control 2 times ay ear
+### Tech Stack
 
-Who use the application :
-Administrative employees only.
+**Backend**
+- Go 1.22+ (Standard library net/http with new ServeMux)
+- PostgreSQL 18
+- golang-migrate for database migrations
+- bcrypt for password hashing
+- Session-based authentication with HTTP-only cookies
 
+**Frontend**
+- React 18 with TypeScript
+- Vite (build tool)
+- Tailwind CSS (styling)
+- Next UI (component library)
+- React Router (navigation)
+- TanStack Query (data fetching & caching)
+- React Hook Form (form management)
 
+**Infrastructure**
+- Docker & Docker Compose (local development)
+- GitHub Actions (CI/CD)
+- Automated testing pipeline
 
-Technical constraints :
+### Project Structure
 
-Backend API written in golang.
-Database : PostgreSQL
-Frontend : Present data written in React+Vite
+```
+autoparc/
+├── backend/           # Go API server
+│   ├── cmd/api/       # Application entry point
+│   ├── internal/      # Private application code
+│   └── pkg/           # Public utilities
+├── frontend/          # React application
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── hooks/
+│   │   └── services/
+│   └── public/
+├── migrations/        # Database migration files
+└── .github/workflows/ # CI/CD pipelines
+```
 
+## 🚀 Getting Started
 
+### Prerequisites
 
+- Go 1.22 or higher
+- Node.js 18+ and npm
+- Docker and Docker Compose
+- PostgreSQL 18 (or use Docker)
+- golang-migrate tool
 
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/goldenkiwi/autoparc.git
+   cd autoparc
+   ```
+
+2. **Start the database**
+   ```bash
+   docker-compose up -d postgres
+   ```
+
+3. **Set up the backend**
+   ```bash
+   cd backend
+   cp .env.example .env
+   # Edit .env with your configuration
+   go mod download
+   make migrate-up
+   go run cmd/api/main.go
+   ```
+
+4. **Set up the frontend**
+   ```bash
+   cd frontend
+   cp .env.example .env
+   # Edit .env with your configuration
+   npm install
+   npm run dev
+   ```
+
+5. **Access the application**
+   - Frontend: http://localhost:5173
+   - Backend API: http://localhost:8080
+
+## 📝 Development
+
+### Running Tests
+
+**Backend**
+```bash
+cd backend
+go test ./... -v
+go test ./... -cover
+```
+
+**Frontend**
+```bash
+cd frontend
+npm run test
+npm run test:coverage
+```
+
+### Database Migrations
+
+```bash
+# Create a new migration
+make migrate-create name=create_users_table
+
+# Run migrations
+make migrate-up
+
+# Rollback migrations
+make migrate-down
+```
+
+### Code Quality
+
+- **Backend**: Follow Go idioms and standard practices
+- **Frontend**: Use TypeScript, follow React best practices, use functional components
+- **Testing**: Maintain 80%+ test coverage
+- **Commits**: Use conventional commit messages
+
+## 🔒 Security
+
+- Session-based authentication with HTTP-only cookies
+- CSRF protection with SameSite cookies
+- XSS protection
+- SQL injection prevention with parameterized queries
+- Bcrypt password hashing
+- Environment-based configuration (no secrets in code)
+
+## 📦 Deployment
+
+Deployment instructions will be added as the project progresses.
+
+## 🤝 Contributing
+
+1. Create a feature branch from `main`
+2. Make your changes with tests
+3. Ensure all tests pass
+4. Submit a pull request
+
+## 📄 License
+
+This project is proprietary software. All rights reserved.
+
+## 👥 Team
+
+Developed and maintained by the AutoParc team.
+
+---
+
+**Current Status**: 🚧 MVP Development in Progress
+
+See [todo_MVP](./todo_MVP) for detailed implementation checklist.
