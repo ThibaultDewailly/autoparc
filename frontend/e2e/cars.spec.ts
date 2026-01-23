@@ -1,7 +1,7 @@
-import { test, expect } from '@playwright/test'
+import { test, expect, type Page } from '@playwright/test'
 
 // Helper function to login
-async function login(page) {
+async function login(page: Page) {
   await page.goto('/login')
   await page.getByLabel(/email/i).fill('admin@autoparc.fr')
   await page.getByLabel(/mot de passe/i).fill('admin123')
