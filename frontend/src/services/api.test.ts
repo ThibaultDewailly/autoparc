@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { apiGet, apiPost, apiPut, apiDelete, ApiClientError } from './api'
 
-// @ts-expect-error - global.fetch is available in test environment
 global.fetch = vi.fn()
 
 describe('API Client', () => {
