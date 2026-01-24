@@ -376,7 +376,36 @@ make migrate-down
 
 ## 📦 Deployment
 
-Deployment instructions will be added as the project progresses.
+AutoParc can be deployed to any server or cloud platform that supports Go binaries and static file hosting.
+
+### Quick Deployment
+
+```bash
+# 1. Build backend
+./scripts/build-backend.sh
+
+# 2. Build frontend
+./scripts/build-frontend.sh
+
+# 3. Setup production database
+./scripts/setup-production-db.sh
+```
+
+### Detailed Documentation
+
+- **[Deployment Guide](DEPLOYMENT_GUIDE.md)**: Complete production deployment instructions
+- **[Quick Reference](DEPLOYMENT_QUICK_REFERENCE.md)**: Commands and cheat sheet for deployment
+
+### What's Included
+
+- ✅ Production-ready backend binary (statically linked)
+- ✅ Optimized frontend bundle (Vite production build)
+- ✅ Database migration scripts
+- ✅ Environment variable templates
+- ✅ Systemd service configuration
+- ✅ Nginx configuration examples
+- ✅ Health check endpoints
+- ✅ Backup and monitoring guidelines
 
 ## 🤝 Contributing
 

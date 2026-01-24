@@ -1,0 +1,65 @@
+[Unit]
+Description=AutoParc Backend API Service
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/autoparc/backend
+
+# Environment variables for the application
+Environment="SERVER_PORT=4444"
+Environment="ENVIRONMENT=production"
+Environment="ALLOWED_ORIGIN=https://yourdomain.com"
+
+# Database configuration
+Environment="DB_HOST=localhost"
+Environment="DB_PORT=5432"
+Environment="DB_USER=autoparc_user"
+Environment="DB_NAME=autoparc_prod"
+Environment="DB_SSLMODE=disable"
+
+# Database connection pool settings
+Environment="DB_MAX_OPEN_CONNS=25"
+Environment="DB_MAX_IDLE_CONNS=5"
+
+# Session configuration
+Environment="SESSION_COOKIE_NAME=autoparc_session"
+Environment="SESSION_COOKIE_MAX_AGE=86400"
+Environment="SESSION_COOKIE_SECURE=true"
+Environment="SESSION_COOKIE_SAMESITE=Strict"
+
+# Server timeouts
+Environment="SERVER_READ_TIMEOUT=10s"
+Environment="SERVER_WRITE_TIMEOUT=10s"
+Environment="SERVER_SHUTDOWN_TIMEOUT=30s"
+
+# Sensitive environment variable (loaded from separate file)
+EnvironmentFile=/etc/autoparc/backend.env
+
+# Start the backend API
+ExecStart=/var/www/autoparc/backend/api
+
+# Restart policy
+Restart=always
+RestartSec=5s
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/www/autoparc/backend/logs
+
+# Resource limits
+LimitNOFILE=65536
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=autoparc-backend
+
+[Install]
+WantedBy=multi-user.target
