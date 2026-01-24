@@ -56,13 +56,13 @@ export function Navbar() {
             />
           </DropdownTrigger>
           <DropdownMenu aria-label="User menu">
-            <DropdownItem key="profile" className="h-14 gap-2">
+            <DropdownItem key="profile" className="h-14 gap-2 text-foreground">
               <p className="font-semibold">{user?.email}</p>
               <p className="text-sm">
                 {user?.firstName} {user?.lastName}
               </p>
             </DropdownItem>
-            <DropdownItem key="logout" color="danger" onClick={handleLogout}>
+            <DropdownItem key="logout" color="danger" onClick={handleLogout} className="text-foreground">
               {FRENCH_LABELS.logout}
             </DropdownItem>
           </DropdownMenu>

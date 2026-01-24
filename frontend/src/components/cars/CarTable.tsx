@@ -87,7 +87,7 @@ export function CarTable({ cars, onDelete, isLoading }: CarTableProps) {
             <TableCell>{formatDate(car.rentalStartDate)}</TableCell>
             <TableCell>
               <div className="flex gap-2">
-                <Tooltip content={FRENCH_LABELS.view}>
+                <Tooltip content={FRENCH_LABELS.view} className="text-foreground">
                   <Button
                     isIconOnly
                     size="sm"
@@ -115,7 +115,7 @@ export function CarTable({ cars, onDelete, isLoading }: CarTableProps) {
                     </svg>
                   </Button>
                 </Tooltip>
-                <Tooltip content={FRENCH_LABELS.edit}>
+                <Tooltip content={FRENCH_LABELS.edit} className="text-foreground">
                   <Button
                     isIconOnly
                     size="sm"
@@ -138,7 +138,7 @@ export function CarTable({ cars, onDelete, isLoading }: CarTableProps) {
                     </svg>
                   </Button>
                 </Tooltip>
-                <Tooltip content={FRENCH_LABELS.delete}>
+                <Tooltip content={FRENCH_LABELS.delete} className="text-foreground">
                   <Button
                     isIconOnly
                     size="sm"
