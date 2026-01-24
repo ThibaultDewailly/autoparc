@@ -51,11 +51,14 @@ export interface CarFilters {
 }
 
 export interface PaginatedResponse<T> {
-  data: T[]
-  total: number
+  cars?: T[]
+  data?: T[]
+  totalCount?: number
+  total?: number
   page: number
   limit: number
-  total_pages: number
+  totalPages?: number
+  total_pages?: number
 }
 
 export interface ApiError {

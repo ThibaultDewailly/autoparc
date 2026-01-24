@@ -16,7 +16,7 @@ export function DashboardPage() {
     }
   }
 
-  const totalCars = carsData?.total || 0
+  const totalCars = carsData?.totalCount || carsData?.total || 0
 
   return (
     <div className="min-h-screen bg-gray-50">

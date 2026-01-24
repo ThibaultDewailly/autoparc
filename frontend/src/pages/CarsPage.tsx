@@ -89,7 +89,7 @@ export function CarsPage() {
         <Card>
           <CardBody>
             <CarTable
-              cars={carsData?.data || []}
+              cars={carsData?.cars || carsData?.data || []}
               onDelete={handleDeleteClick}
               isLoading={isLoading}
             />
@@ -97,7 +97,7 @@ export function CarsPage() {
             {carsData && (
               <Pagination
                 currentPage={page}
-                totalPages={carsData.total_pages}
+                totalPages={carsData.totalPages || carsData.total_pages || 1}
                 onPageChange={handlePageChange}
               />
             )}

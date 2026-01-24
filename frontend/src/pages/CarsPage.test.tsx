@@ -20,7 +20,7 @@ vi.mock('react-router-dom', async () => {
 })
 
 const mockCarsData: PaginatedResponse<Car> = {
-  data: [
+  cars: [
     {
       id: '1',
       license_plate: 'AB-123-CD',
@@ -37,8 +37,8 @@ const mockCarsData: PaginatedResponse<Car> = {
   ],
   page: 1,
   limit: 10,
-  total: 1,
-  total_pages: 1,
+  totalCount: 1,
+  totalPages: 1,
 }
 
 function createWrapper() {
