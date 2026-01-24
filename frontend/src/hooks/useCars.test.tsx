@@ -97,12 +97,12 @@ describe('useCar', () => {
 describe('useCreateCar', () => {
   it('should create car', async () => {
     const newCar = {
-      license_plate: 'AB-123-CD',
+      licensePlate: 'AB-123-CD',
       brand: 'Toyota',
       model: 'Corolla',
-      grey_card_number: 'GC123',
-      insurance_company_id: 'ins-1',
-      rental_start_date: '2024-01-01',
+      greyCardNumber: 'GC123',
+      insuranceCompanyId: 'ins-1',
+      rentalStartDate: '2024-01-01',
       status: 'active' as const,
     }
     

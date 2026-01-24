@@ -60,7 +60,7 @@ export function CarForm({ car, onSubmit, onCancel, isLoading }: CarFormProps) {
     
     setGeneralError('')
     
-    const validationErrors = validateCarForm(formData)
+    const validationErrors = validateCarForm(formData, !!car)
     
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors)
@@ -74,20 +74,20 @@ export function CarForm({ car, onSubmit, onCancel, isLoading }: CarFormProps) {
         const updateData: UpdateCarData = {
           brand: formData.brand,
           model: formData.model,
-          grey_card_number: formData.grey_card_number,
-          insurance_company_id: formData.insurance_company_id,
-          rental_start_date: formData.rental_start_date,
+          greyCardNumber: formData.grey_card_number,
+          insuranceCompanyId: formData.insurance_company_id,
+          rentalStartDate: new Date(formData.rental_start_date).toISOString(),
           status: formData.status,
         }
         await onSubmit(updateData)
       } else {
         const createData: CreateCarData = {
-          license_plate: formData.license_plate.toUpperCase(),
+          licensePlate: formData.license_plate.toUpperCase(),
           brand: formData.brand,
           model: formData.model,
-          grey_card_number: formData.grey_card_number,
-          insurance_company_id: formData.insurance_company_id,
-          rental_start_date: formData.rental_start_date,
+          greyCardNumber: formData.grey_card_number,
+          insuranceCompanyId: formData.insurance_company_id,
+          rentalStartDate: new Date(formData.rental_start_date).toISOString(),
           status: formData.status,
         }
         await onSubmit(createData)

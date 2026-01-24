@@ -27,12 +27,12 @@ export async function getCar(id: string): Promise<Car> {
 }
 
 export interface CreateCarData {
-  license_plate: string
+  licensePlate: string
   brand: string
   model: string
-  grey_card_number: string
-  insurance_company_id: string
-  rental_start_date: string
+  greyCardNumber: string
+  insuranceCompanyId: string
+  rentalStartDate: string
   status: CarStatus
 }
 
@@ -43,9 +43,9 @@ export async function createCar(data: CreateCarData): Promise<Car> {
 export interface UpdateCarData {
   brand?: string
   model?: string
-  grey_card_number?: string
-  insurance_company_id?: string
-  rental_start_date?: string
+  greyCardNumber?: string
+  insuranceCompanyId?: string
+  rentalStartDate?: string
   status?: CarStatus
 }
 

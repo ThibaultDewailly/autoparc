@@ -219,6 +219,86 @@ test.describe('Car Management', () => {
     }
   })
 
+  test('should update car brand and model', async ({ page }) => {
+    await page.goto('/cars')
+    
+    // Wait for table to load
+    await page.waitForTimeout(1000)
+    
+    // Find first car row and get edit link
+    const firstRow = page.locator('tbody tr').first()
+    const editLink = firstRow.locator('a[href*="/edit"]').first()
+    
+    if (await editLink.isVisible()) {
+      await editLink.click()
+      
+      // Wait for edit form to load
+      await page.waitForTimeout(1500)
+      
+      // Verify license plate field is disabled
+      const licensePlateInput = page.getByLabel(/plaque.*immatriculation/i)
+      await expect(licensePlateInput).toBeDisabled()
+      
+      // Update brand and model
+      const brandInput = page.getByLabel(/marque/i)
+      const modelInput = page.getByLabel(/modèle/i)
+      
+      await brandInput.clear()
+      await brandInput.fill('UpdatedBrand')
+      await modelInput.clear()
+      await modelInput.fill('UpdatedModel')
+      
+      // Submit the form
+      await page.getByRole('button', { name: /enregistrer/i }).click()
+      
+      // Wait for navigation or success indication
+      await page.waitForTimeout(2000)
+      
+      // Should either navigate away or show success
+      const urlChanged = !page.url().includes('/edit')
+      const hasSuccess = await page.getByText(/succès|modifi/i).isVisible().catch(() => false)
+      
+      expect(urlChanged || hasSuccess).toBeTruthy()
+    }
+  })
+
+  test('should not require license plate when editing car', async ({ page }) => {
+    await page.goto('/cars')
+    
+    // Wait for table to load
+    await page.waitForTimeout(1000)
+    
+    // Find first car row and get edit link
+    const firstRow = page.locator('tbody tr').first()
+    const editLink = firstRow.locator('a[href*="/edit"]').first()
+    
+    if (await editLink.isVisible()) {
+      await editLink.click()
+      
+      // Wait for edit form to load
+      await page.waitForTimeout(1500)
+      
+      // License plate should be disabled
+      const licensePlateInput = page.getByLabel(/plaque.*immatriculation/i)
+      await expect(licensePlateInput).toBeDisabled()
+      
+      // Clear brand to trigger validation
+      const brandInput = page.getByLabel(/marque/i)
+      await brandInput.clear()
+      
+      // Try to submit
+      await page.getByRole('button', { name: /enregistrer/i }).click()
+      
+      // Should show validation error for brand, not license plate
+      await page.waitForTimeout(500)
+      await expect(page.getByText(/marque.*requise/i)).toBeVisible()
+      
+      // Should NOT show license plate error
+      const licensePlateError = await page.getByText(/immatriculation.*requise/i).isVisible().catch(() => false)
+      expect(licensePlateError).toBe(false)
+    }
+  })
+
   test('should delete a car', async ({ page }) => {
     await page.goto('/cars')
     

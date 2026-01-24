@@ -29,13 +29,15 @@ export function validateCarForm(data: {
   insurance_company_id?: string
   rental_start_date?: string
   status?: string
-}): ValidationErrors {
+}, isUpdate: boolean = false): ValidationErrors {
   const errors: ValidationErrors = {}
   
-  if (!validateRequired(data.license_plate)) {
-    errors.license_plate = 'La plaque d\'immatriculation est requise'
-  } else if (!validateLicensePlate(data.license_plate!)) {
-    errors.license_plate = 'Format invalide (ex: AA-123-BB)'
+  if (!isUpdate) {
+    if (!validateRequired(data.license_plate)) {
+      errors.license_plate = 'La plaque d\'immatriculation est requise'
+    } else if (!validateLicensePlate(data.license_plate!)) {
+      errors.license_plate = 'Format invalide (ex: AA-123-BB)'
+    }
   }
   
   if (!validateRequired(data.brand)) {
