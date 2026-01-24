@@ -231,11 +231,35 @@ apt install -y nginx
 log_info "Verifying Nginx installation..."
 nginx -v
 
-log_info "Creating Nginx configuration for AutoParc..."
+log_info "Installing SSL snakeoil certificates..."
+apt install -y ssl-cert
+
+log_info "Creating Nginx configuration for AutoParc with SSL..."
 cat > /etc/nginx/sites-available/autoparc <<'EOF'
+# HTTP server - redirect to HTTPS
 server {
     listen 80;
     server_name 192.168.1.22;
+    
+    # Keep port 80 accessible for initial setup and redirects
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+# HTTPS server with SSL
+server {
+    listen 443 ssl;
+    server_name 192.168.1.22;
+
+    # SSL configuration using snakeoil certificates
+    ssl_certificate /etc/ssl/certs/ssl-cert-snakeoil.pem;
+    ssl_certificate_key /etc/ssl/private/ssl-cert-snakeoil.key;
+    
+    # SSL protocols and ciphers
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+    ssl_prefer_server_ciphers on;
 
     # Frontend
     location / {
