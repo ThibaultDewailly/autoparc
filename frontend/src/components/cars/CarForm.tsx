@@ -154,7 +154,7 @@ export function CarForm({ car, onSubmit, onCancel, isLoading }: CarFormProps) {
         isRequired
       >
         {(insuranceCompanies || []).map((insurance) => (
-          <SelectItem key={insurance.id} value={insurance.id}>
+          <SelectItem key={insurance.id} value={insurance.id} className="text-foreground">
             {insurance.name}
           </SelectItem>
         ))}
@@ -180,7 +180,7 @@ export function CarForm({ car, onSubmit, onCancel, isLoading }: CarFormProps) {
         isRequired
       >
         {CAR_STATUSES.map((status) => (
-          <SelectItem key={status.value} value={status.value}>
+          <SelectItem key={status.value} value={status.value} className="text-foreground">
             {status.label}
           </SelectItem>
         ))}
