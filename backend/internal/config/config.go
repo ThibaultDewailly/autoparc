@@ -16,6 +16,7 @@ type Config struct {
 
 // ServerConfig holds server-related configuration
 type ServerConfig struct {
+	Addr            string
 	Port            string
 	Environment     string
 	AllowedOrigins  []string
@@ -51,6 +52,7 @@ type SessionConfig struct {
 func Load() (*Config, error) {
 	cfg := &Config{
 		Server: ServerConfig{
+			Addr:            getEnv("SERVER_ADDR", "0.0.0.0"),
 			Port:            getEnv("SERVER_PORT", "8080"),
 			Environment:     getEnv("ENVIRONMENT", "development"),
 			AllowedOrigins:  []string{getEnv("ALLOWED_ORIGIN", "http://localhost:5173")},

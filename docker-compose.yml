@@ -31,6 +31,7 @@ services:
       DB_USER: autoparc
       DB_PASSWORD: autoparc_dev_password
       DB_NAME: autoparc_dev
+      SERVER_ADDR: 0.0.0.0
       SERVER_PORT: 8080
       ENVIRONMENT: development
     depends_on:

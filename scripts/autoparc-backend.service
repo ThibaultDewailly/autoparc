@@ -10,6 +10,7 @@ Group=www-data
 WorkingDirectory=/var/www/autoparc/backend
 
 # Environment variables for the application
+Environment="SERVER_ADDR=127.0.0.1"
 Environment="SERVER_PORT=4444"
 Environment="ENVIRONMENT=production"
 #Environment="ALLOWED_ORIGIN=https://yourdomain.com"
@@ -49,6 +50,9 @@ RestartSec=5s
 # Security settings
 NoNewPrivileges=true
 PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/www/autoparc/backend/logs
 
 # Resource limits
 LimitNOFILE=65536
