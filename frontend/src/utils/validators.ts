@@ -22,25 +22,20 @@ export interface ValidationErrors {
 }
 
 export function validateCarForm(data: {
-  license_plate?: string
   licensePlate?: string
   brand?: string
   model?: string
-  grey_card_number?: string
   greyCardNumber?: string
-  insurance_company_id?: string
   insuranceCompanyId?: string
-  rental_start_date?: string
   rentalStartDate?: string
   status?: string
 }, isUpdate: boolean = false): ValidationErrors {
   const errors: ValidationErrors = {}
   
-  // Support both snake_case and camelCase
-  const licensePlate = data.license_plate || data.licensePlate
-  const greyCardNumber = data.grey_card_number || data.greyCardNumber
-  const insuranceCompanyId = data.insurance_company_id || data.insuranceCompanyId
-  const rentalStartDate = data.rental_start_date || data.rentalStartDate
+  const licensePlate = data.licensePlate
+  const greyCardNumber = data.greyCardNumber
+  const insuranceCompanyId = data.insuranceCompanyId
+  const rentalStartDate = data.rentalStartDate
   
   if (!isUpdate) {
     if (!validateRequired(licensePlate)) {
