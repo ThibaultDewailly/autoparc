@@ -38,7 +38,7 @@ export function CarDetail({ car }: CarDetailProps) {
     <Card>
       <CardBody className="gap-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold font-mono">{car.license_plate}</h2>
+          <h2 className="text-2xl font-bold font-mono">{car.licensePlate}</h2>
           <Chip color={getStatusColor(car.status)} variant="flat">
             {getStatusLabel(car.status)}
           </Chip>
@@ -57,11 +57,11 @@ export function CarDetail({ car }: CarDetailProps) {
           />
           <DetailItem
             label={FRENCH_LABELS.greyCardNumber}
-            value={car.grey_card_number}
+            value={car.greyCardNumber}
           />
           <DetailItem
             label={FRENCH_LABELS.rentalStartDate}
-            value={formatDate(car.rental_start_date)}
+            value={formatDate(car.rentalStartDate)}
           />
         </div>
 
@@ -71,31 +71,31 @@ export function CarDetail({ car }: CarDetailProps) {
           <h3 className="text-lg font-semibold mb-2">
             {FRENCH_LABELS.insuranceCompany}
           </h3>
-          {car.insurance_company && (
+          {car.insuranceCompany && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-default-100 p-4 rounded-lg">
               <DetailItem
                 label="Nom"
-                value={car.insurance_company.name}
+                value={car.insuranceCompany.name}
               />
               <DetailItem
                 label="Contact"
-                value={car.insurance_company.contact_person}
+                value={car.insuranceCompany.contactPerson}
               />
               <DetailItem
                 label="Téléphone"
-                value={car.insurance_company.phone}
+                value={car.insuranceCompany.phone}
               />
               <DetailItem
                 label="Email"
-                value={car.insurance_company.email}
+                value={car.insuranceCompany.email}
               />
               <DetailItem
                 label="Numéro de police"
-                value={car.insurance_company.policy_number}
+                value={car.insuranceCompany.policyNumber}
               />
               <DetailItem
                 label="Adresse"
-                value={car.insurance_company.address}
+                value={car.insuranceCompany.address}
               />
             </div>
           )}
@@ -106,11 +106,11 @@ export function CarDetail({ car }: CarDetailProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-default-500">
           <DetailItem
             label={FRENCH_LABELS.createdAt}
-            value={formatDate(car.created_at)}
+            value={formatDate(car.createdAt)}
           />
           <DetailItem
             label={FRENCH_LABELS.updatedAt}
-            value={formatDate(car.updated_at)}
+            value={formatDate(car.updatedAt)}
           />
         </div>
       </CardBody>

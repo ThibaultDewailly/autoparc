@@ -62,12 +62,12 @@ describe('validateRequired', () => {
 
 describe('validateCarForm', () => {
   const validData = {
-    license_plate: 'AA-123-BB',
+    licensePlate: 'AA-123-BB',
     brand: 'Renault',
     model: 'Clio',
-    grey_card_number: 'GC123456',
-    insurance_company_id: 'ins-123',
-    rental_start_date: '2024-01-01',
+    greyCardNumber: 'GC123456',
+    insuranceCompanyId: 'ins-123',
+    rentalStartDate: '2024-01-01',
     status: 'active' as const,
   }
 
@@ -77,13 +77,13 @@ describe('validateCarForm', () => {
   })
 
   it('should return error for missing license plate', () => {
-    const errors = validateCarForm({ ...validData, license_plate: '' })
-    expect(errors.license_plate).toBeDefined()
+    const errors = validateCarForm({ ...validData, licensePlate: '' })
+    expect(errors.licensePlate).toBeDefined()
   })
 
   it('should return error for invalid license plate format', () => {
-    const errors = validateCarForm({ ...validData, license_plate: 'INVALID' })
-    expect(errors.license_plate).toContain('Format invalide')
+    const errors = validateCarForm({ ...validData, licensePlate: 'INVALID' })
+    expect(errors.licensePlate).toContain('Format invalide')
   })
 
   it('should return error for missing brand', () => {
@@ -97,18 +97,18 @@ describe('validateCarForm', () => {
   })
 
   it('should return error for missing grey card number', () => {
-    const errors = validateCarForm({ ...validData, grey_card_number: '' })
-    expect(errors.grey_card_number).toBeDefined()
+    const errors = validateCarForm({ ...validData, greyCardNumber: '' })
+    expect(errors.greyCardNumber).toBeDefined()
   })
 
   it('should return error for missing insurance company', () => {
-    const errors = validateCarForm({ ...validData, insurance_company_id: '' })
-    expect(errors.insurance_company_id).toBeDefined()
+    const errors = validateCarForm({ ...validData, insuranceCompanyId: '' })
+    expect(errors.insuranceCompanyId).toBeDefined()
   })
 
   it('should return error for missing rental start date', () => {
-    const errors = validateCarForm({ ...validData, rental_start_date: '' })
-    expect(errors.rental_start_date).toBeDefined()
+    const errors = validateCarForm({ ...validData, rentalStartDate: '' })
+    expect(errors.rentalStartDate).toBeDefined()
   })
 
   it('should return error for missing status', () => {
@@ -118,7 +118,7 @@ describe('validateCarForm', () => {
 
   it('should return multiple errors for multiple issues', () => {
     const errors = validateCarForm({
-      license_plate: '',
+      licensePlate: '',
       brand: '',
     })
     expect(Object.keys(errors).length).toBeGreaterThan(1)
@@ -128,13 +128,13 @@ describe('validateCarForm', () => {
     const dataWithoutLicensePlate = {
       brand: 'Renault',
       model: 'Clio',
-      grey_card_number: 'GC123456',
-      insurance_company_id: 'ins-123',
-      rental_start_date: '2024-01-01',
+      greyCardNumber: 'GC123456',
+      insuranceCompanyId: 'ins-123',
+      rentalStartDate: '2024-01-01',
       status: 'active' as const,
     }
     const errors = validateCarForm(dataWithoutLicensePlate, true)
-    expect(errors.license_plate).toBeUndefined()
+    expect(errors.licensePlate).toBeUndefined()
     expect(Object.keys(errors)).toHaveLength(0)
   })
 
@@ -142,32 +142,32 @@ describe('validateCarForm', () => {
     const dataWithoutLicensePlate = {
       brand: 'Renault',
       model: 'Clio',
-      grey_card_number: 'GC123456',
-      insurance_company_id: 'ins-123',
-      rental_start_date: '2024-01-01',
+      greyCardNumber: 'GC123456',
+      insuranceCompanyId: 'ins-123',
+      rentalStartDate: '2024-01-01',
       status: 'active' as const,
     }
     const errors = validateCarForm(dataWithoutLicensePlate, false)
-    expect(errors.license_plate).toBeDefined()
+    expect(errors.licensePlate).toBeDefined()
   })
 
   it('should validate all fields except license plate during update', () => {
     const invalidUpdateData = {
-      license_plate: '', // Should be ignored
+      licensePlate: '', // Should be ignored
       brand: '',
       model: '',
-      grey_card_number: '',
-      insurance_company_id: '',
-      rental_start_date: '',
+      greyCardNumber: '',
+      insuranceCompanyId: '',
+      rentalStartDate: '',
       status: '',
     }
     const errors = validateCarForm(invalidUpdateData, true)
-    expect(errors.license_plate).toBeUndefined()
+    expect(errors.licensePlate).toBeUndefined()
     expect(errors.brand).toBeDefined()
     expect(errors.model).toBeDefined()
-    expect(errors.grey_card_number).toBeDefined()
-    expect(errors.insurance_company_id).toBeDefined()
-    expect(errors.rental_start_date).toBeDefined()
+    expect(errors.greyCardNumber).toBeDefined()
+    expect(errors.insuranceCompanyId).toBeDefined()
+    expect(errors.rentalStartDate).toBeDefined()
     expect(errors.status).toBeDefined()
   })
 })

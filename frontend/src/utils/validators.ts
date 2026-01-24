@@ -23,20 +23,30 @@ export interface ValidationErrors {
 
 export function validateCarForm(data: {
   license_plate?: string
+  licensePlate?: string
   brand?: string
   model?: string
   grey_card_number?: string
+  greyCardNumber?: string
   insurance_company_id?: string
+  insuranceCompanyId?: string
   rental_start_date?: string
+  rentalStartDate?: string
   status?: string
 }, isUpdate: boolean = false): ValidationErrors {
   const errors: ValidationErrors = {}
   
+  // Support both snake_case and camelCase
+  const licensePlate = data.license_plate || data.licensePlate
+  const greyCardNumber = data.grey_card_number || data.greyCardNumber
+  const insuranceCompanyId = data.insurance_company_id || data.insuranceCompanyId
+  const rentalStartDate = data.rental_start_date || data.rentalStartDate
+  
   if (!isUpdate) {
-    if (!validateRequired(data.license_plate)) {
-      errors.license_plate = 'La plaque d\'immatriculation est requise'
-    } else if (!validateLicensePlate(data.license_plate!)) {
-      errors.license_plate = 'Format invalide (ex: AA-123-BB)'
+    if (!validateRequired(licensePlate)) {
+      errors.licensePlate = 'La plaque d\'immatriculation est requise'
+    } else if (!validateLicensePlate(licensePlate!)) {
+      errors.licensePlate = 'Format invalide (ex: AA-123-BB)'
     }
   }
   
@@ -48,16 +58,16 @@ export function validateCarForm(data: {
     errors.model = 'Le modèle est requis'
   }
   
-  if (!validateRequired(data.grey_card_number)) {
-    errors.grey_card_number = 'Le numéro de carte grise est requis'
+  if (!validateRequired(greyCardNumber)) {
+    errors.greyCardNumber = 'Le numéro de carte grise est requis'
   }
   
-  if (!validateRequired(data.insurance_company_id)) {
-    errors.insurance_company_id = 'La compagnie d\'assurance est requise'
+  if (!validateRequired(insuranceCompanyId)) {
+    errors.insuranceCompanyId = 'La compagnie d\'assurance est requise'
   }
   
-  if (!validateRequired(data.rental_start_date)) {
-    errors.rental_start_date = 'La date de début est requise'
+  if (!validateRequired(rentalStartDate)) {
+    errors.rentalStartDate = 'La date de début est requise'
   }
   
   if (!validateRequired(data.status)) {

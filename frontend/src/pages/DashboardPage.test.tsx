@@ -14,12 +14,12 @@ const queryClient = new QueryClient({
 const mockUser = {
   id: '123',
   email: 'test@example.com',
-  first_name: 'John',
-  last_name: 'Doe',
+  firstName: 'John',
+  lastName: 'Doe',
   role: 'admin',
-  is_active: true,
-  created_at: '2024-01-01T00:00:00Z',
-  updated_at: '2024-01-01T00:00:00Z',
+  isActive: true,
+  createdAt: '2024-01-01T00:00:00Z',
+  updatedAt: '2024-01-01T00:00:00Z',
 }
 
 vi.mock('@/contexts/AuthContext', async () => {

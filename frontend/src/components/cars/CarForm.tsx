@@ -17,13 +17,13 @@ interface CarFormProps {
 export function CarForm({ car, onSubmit, onCancel, isLoading }: CarFormProps) {
   const { data: insuranceCompanies } = useInsuranceCompanies()
   const [formData, setFormData] = useState({
-    license_plate: car?.license_plate || '',
+    licensePlate: car?.licensePlate || '',
     brand: car?.brand || '',
     model: car?.model || '',
-    grey_card_number: car?.grey_card_number || '',
-    insurance_company_id: car?.insurance_company_id || '',
-    rental_start_date: car
-      ? formatDateForInput(car.rental_start_date)
+    greyCardNumber: car?.greyCardNumber || '',
+    insuranceCompanyId: car?.insuranceCompanyId || '',
+    rentalStartDate: car
+      ? formatDateForInput(car.rentalStartDate)
       : '',
     status: (car?.status || 'active') as CarStatus,
   })
@@ -33,12 +33,12 @@ export function CarForm({ car, onSubmit, onCancel, isLoading }: CarFormProps) {
   useEffect(() => {
     if (car) {
       setFormData({
-        license_plate: car.license_plate,
+        licensePlate: car.licensePlate,
         brand: car.brand,
         model: car.model,
-        grey_card_number: car.grey_card_number,
-        insurance_company_id: car.insurance_company_id,
-        rental_start_date: formatDateForInput(car.rental_start_date),
+        greyCardNumber: car.greyCardNumber,
+        insuranceCompanyId: car.insuranceCompanyId,
+        rentalStartDate: formatDateForInput(car.rentalStartDate),
         status: car.status,
       })
     }
@@ -74,20 +74,20 @@ export function CarForm({ car, onSubmit, onCancel, isLoading }: CarFormProps) {
         const updateData: UpdateCarData = {
           brand: formData.brand,
           model: formData.model,
-          greyCardNumber: formData.grey_card_number,
-          insuranceCompanyId: formData.insurance_company_id,
-          rentalStartDate: new Date(formData.rental_start_date).toISOString(),
+          greyCardNumber: formData.greyCardNumber,
+          insuranceCompanyId: formData.insuranceCompanyId,
+          rentalStartDate: new Date(formData.rentalStartDate).toISOString(),
           status: formData.status,
         }
         await onSubmit(updateData)
       } else {
         const createData: CreateCarData = {
-          licensePlate: formData.license_plate.toUpperCase(),
+          licensePlate: formData.licensePlate.toUpperCase(),
           brand: formData.brand,
           model: formData.model,
-          greyCardNumber: formData.grey_card_number,
-          insuranceCompanyId: formData.insurance_company_id,
-          rentalStartDate: new Date(formData.rental_start_date).toISOString(),
+          greyCardNumber: formData.greyCardNumber,
+          insuranceCompanyId: formData.insuranceCompanyId,
+          rentalStartDate: new Date(formData.rentalStartDate).toISOString(),
           status: formData.status,
         }
         await onSubmit(createData)
@@ -104,10 +104,10 @@ export function CarForm({ car, onSubmit, onCancel, isLoading }: CarFormProps) {
       <Input
         label={FRENCH_LABELS.licensePlate}
         placeholder="AA-123-BB"
-        value={formData.license_plate}
-        onChange={(e) => handleChange('license_plate', e.target.value)}
-        isInvalid={!!errors.license_plate}
-        errorMessage={errors.license_plate}
+        value={formData.licensePlate}
+        onChange={(e) => handleChange('licensePlate', e.target.value)}
+        isInvalid={!!errors.licensePlate}
+        errorMessage={errors.licensePlate}
         isDisabled={!!car}
         isRequired
         classNames={{
@@ -135,10 +135,10 @@ export function CarForm({ car, onSubmit, onCancel, isLoading }: CarFormProps) {
 
       <Input
         label={FRENCH_LABELS.greyCardNumber}
-        value={formData.grey_card_number}
-        onChange={(e) => handleChange('grey_card_number', e.target.value)}
-        isInvalid={!!errors.grey_card_number}
-        errorMessage={errors.grey_card_number}
+        value={formData.greyCardNumber}
+        onChange={(e) => handleChange('greyCardNumber', e.target.value)}
+        isInvalid={!!errors.greyCardNumber}
+        errorMessage={errors.greyCardNumber}
         isRequired
       />
 
@@ -146,11 +146,11 @@ export function CarForm({ car, onSubmit, onCancel, isLoading }: CarFormProps) {
         label={FRENCH_LABELS.insuranceCompany}
         placeholder={FRENCH_LABELS.selectInsurance}
         selectedKeys={
-          formData.insurance_company_id ? [formData.insurance_company_id] : []
+          formData.insuranceCompanyId ? [formData.insuranceCompanyId] : []
         }
-        onChange={(e) => handleChange('insurance_company_id', e.target.value)}
-        isInvalid={!!errors.insurance_company_id}
-        errorMessage={errors.insurance_company_id}
+        onChange={(e) => handleChange('insuranceCompanyId', e.target.value)}
+        isInvalid={!!errors.insuranceCompanyId}
+        errorMessage={errors.insuranceCompanyId}
         isRequired
       >
         {(insuranceCompanies || []).map((insurance) => (
@@ -163,10 +163,10 @@ export function CarForm({ car, onSubmit, onCancel, isLoading }: CarFormProps) {
       <Input
         type="date"
         label={FRENCH_LABELS.rentalStartDate}
-        value={formData.rental_start_date}
-        onChange={(e) => handleChange('rental_start_date', e.target.value)}
-        isInvalid={!!errors.rental_start_date}
-        errorMessage={errors.rental_start_date}
+        value={formData.rentalStartDate}
+        onChange={(e) => handleChange('rentalStartDate', e.target.value)}
+        isInvalid={!!errors.rentalStartDate}
+        errorMessage={errors.rentalStartDate}
         isRequired
       />
 

@@ -26,7 +26,7 @@ export function FilterPanel({ status, onStatusChange }: FilterPanelProps) {
         className="max-w-xs"
       >
         {CAR_STATUSES.map((item) => (
-          <SelectItem key={item.value} value={item.value}>
+          <SelectItem key={item.value} value={item.value} className="text-foreground">
             {item.label}
           </SelectItem>
         ))}

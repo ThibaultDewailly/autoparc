@@ -75,7 +75,7 @@ export function CarTable({ cars, onDelete, isLoading }: CarTableProps) {
         {(car) => (
           <TableRow key={car.id}>
             <TableCell>
-              <span className="font-mono">{car.license_plate}</span>
+              <span className="font-mono">{car.licensePlate}</span>
             </TableCell>
             <TableCell>{car.brand}</TableCell>
             <TableCell>{car.model}</TableCell>
@@ -84,7 +84,7 @@ export function CarTable({ cars, onDelete, isLoading }: CarTableProps) {
                 {getStatusLabel(car.status)}
               </Chip>
             </TableCell>
-            <TableCell>{formatDate(car.rental_start_date)}</TableCell>
+            <TableCell>{formatDate(car.rentalStartDate)}</TableCell>
             <TableCell>
               <div className="flex gap-2">
                 <Tooltip content={FRENCH_LABELS.view}>

@@ -22,16 +22,16 @@ vi.mock('@/hooks/useCars')
 
 const mockCar: Car = {
   id: '1',
-  license_plate: 'AB-123-CD',
+  licensePlate: 'AB-123-CD',
   brand: 'Toyota',
   model: 'Corolla',
-  grey_card_number: 'GC123',
-  insurance_company_id: '1',
-  rental_start_date: '2024-01-01',
+  greyCardNumber: 'GC123',
+  insuranceCompanyId: '1',
+  rentalStartDate: '2024-01-01',
   status: 'active',
-  created_at: '2024-01-01T00:00:00Z',
-  updated_at: '2024-01-01T00:00:00Z',
-  created_by: 'user-1',
+  createdAt: '2024-01-01T00:00:00Z',
+  updatedAt: '2024-01-01T00:00:00Z',
+  createdBy: 'user-1',
 }
 
 function createWrapper(initialRoute = '/cars/new') {

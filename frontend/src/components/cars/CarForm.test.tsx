@@ -10,21 +10,21 @@ import type { Car } from '@/types'
 vi.mock('@/hooks/useInsuranceCompanies')
 
 const mockInsuranceCompanies = [
-  { id: '1', name: 'Assurance A', contact_person: 'John', phone: '123', email: 'a@test.com', policy_number: 'P1', address: 'Addr 1', created_at: '', updated_at: '' },
+  { id: '1', name: 'Assurance A', contactPerson: 'John', phone: '123', email: 'a@test.com', policyNumber: 'P1', address: 'Addr 1', createdAt: '', updatedAt: '' },
 ]
 
 const mockCar: Car = {
   id: '1',
-  license_plate: 'AB-123-CD',
+  licensePlate: 'AB-123-CD',
   brand: 'Toyota',
   model: 'Corolla',
-  grey_card_number: 'GC123',
-  insurance_company_id: '1',
-  rental_start_date: '2024-01-01',
+  greyCardNumber: 'GC123',
+  insuranceCompanyId: '1',
+  rentalStartDate: '2024-01-01',
   status: 'active',
-  created_at: '2024-01-01T00:00:00Z',
-  updated_at: '2024-01-01T00:00:00Z',
-  created_by: 'user-1',
+  createdAt: '2024-01-01T00:00:00Z',
+  updatedAt: '2024-01-01T00:00:00Z',
+  createdBy: 'user-1',
 }
 
 function createWrapper() {

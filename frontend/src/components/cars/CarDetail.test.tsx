@@ -5,26 +5,26 @@ import type { Car } from '@/types'
 
 const mockCar: Car = {
   id: '1',
-  license_plate: 'AB-123-CD',
+  licensePlate: 'AB-123-CD',
   brand: 'Toyota',
   model: 'Corolla',
-  grey_card_number: 'GC123',
-  insurance_company_id: '1',
-  insurance_company: {
+  greyCardNumber: 'GC123',
+  insuranceCompanyId: '1',
+  insuranceCompany: {
     id: '1',
     name: 'Assurance Test',
-    contact_person: 'John Doe',
+    contactPerson: 'John Doe',
     phone: '0123456789',
     email: 'contact@assurance.com',
-    policy_number: 'POL123',
-    address: '123 Rue de Test',    is_active: true,    created_at: '2024-01-01T00:00:00Z',
-    updated_at: '2024-01-01T00:00:00Z',
+    policyNumber: 'POL123',
+    address: '123 Rue de Test',    isActive: true,    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
   },
-  rental_start_date: '2024-01-01',
+  rentalStartDate: '2024-01-01',
   status: 'active',
-  created_at: '2024-01-01T00:00:00Z',
-  updated_at: '2024-01-02T00:00:00Z',
-  created_by: 'user-1',
+  createdAt: '2024-01-01T00:00:00Z',
+  updatedAt: '2024-01-02T00:00:00Z',
+  createdBy: 'user-1',
 }
 
 describe('CarDetail', () => {
@@ -87,7 +87,7 @@ describe('CarDetail', () => {
   it('should render car without insurance company', () => {
     const carWithoutInsurance = {
       ...mockCar,
-      insurance_company: undefined,
+      insuranceCompany: undefined,
     }
     render(<CarDetail car={carWithoutInsurance} />)
 

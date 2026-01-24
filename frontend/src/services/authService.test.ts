@@ -12,14 +12,32 @@ describe('authService', () => {
   describe('login', () => {
     it('should call apiPost with correct parameters', async () => {
       const credentials = { email: 'test@test.com', password: 'password123' }
-      const mockResponse = { user: { id: '1', email: credentials.email } }
+      const mockBackendResponse = { 
+        user: { 
+          id: '1', 
+          email: credentials.email,
+          first_name: 'Test',
+          last_name: 'User',
+          role: 'admin',
+          is_active: true
+        },
+        session: {
+          id: 'session-1',
+          user_id: '1',
+          session_token: 'token123',
+          expires_at: '2024-12-31T23:59:59Z',
+          created_at: '2024-01-01T00:00:00Z'
+        }
+      }
       
-      vi.mocked(api.apiPost).mockResolvedValue(mockResponse)
+      vi.mocked(api.apiPost).mockResolvedValue(mockBackendResponse)
 
       const result = await authService.login(credentials)
 
       expect(api.apiPost).toHaveBeenCalledWith('/auth/login', credentials)
-      expect(result).toEqual(mockResponse)
+      expect(result.user.firstName).toBe('Test')
+      expect(result.user.lastName).toBe('User')
+      expect(result.session.userId).toBe('1')
     })
   })
 
@@ -35,23 +53,23 @@ describe('authService', () => {
 
   describe('getCurrentUser', () => {
     it('should call apiGet to fetch current user', async () => {
-      const mockUser = { 
+      const mockBackendUser = { 
         id: '1', 
         email: 'test@test.com',
         first_name: 'Test',
         last_name: 'User',
         role: 'admin',
         is_active: true,
-        created_at: '2024-01-01T00:00:00Z',
-        updated_at: '2024-01-01T00:00:00Z',
       }
       
-      vi.mocked(api.apiGet).mockResolvedValue(mockUser)
+      vi.mocked(api.apiGet).mockResolvedValue(mockBackendUser)
 
       const result = await authService.getCurrentUser()
 
       expect(api.apiGet).toHaveBeenCalledWith('/auth/me')
-      expect(result).toEqual(mockUser)
+      expect(result.firstName).toBe('Test')
+      expect(result.lastName).toBe('User')
+      expect(result.isActive).toBe(true)
     })
   })
 })

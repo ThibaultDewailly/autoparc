@@ -1,46 +1,46 @@
 export interface User {
   id: string
   email: string
-  first_name: string
-  last_name: string
+  firstName: string
+  lastName: string
   role: string
-  is_active: boolean
+  isActive: boolean
 }
 
 export interface Session {
   id: string
-  user_id: string
-  session_token: string
-  expires_at: string
-  created_at: string
+  userId: string
+  sessionToken: string
+  expiresAt: string
+  createdAt: string
 }
 
 export interface InsuranceCompany {
   id: string
   name: string
-  contact_person: string
+  contactPerson: string
   phone: string
   email: string
   address: string
-  policy_number: string
-  is_active: boolean
-  created_at: string
-  updated_at: string
+  policyNumber: string
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
 }
 
 export interface Car {
   id: string
-  license_plate: string
+  licensePlate: string
   brand: string
   model: string
-  grey_card_number: string
-  insurance_company_id: string
-  insurance_company?: InsuranceCompany
-  rental_start_date: string
+  greyCardNumber: string
+  insuranceCompanyId: string
+  insuranceCompany?: InsuranceCompany
+  rentalStartDate: string
   status: CarStatus
-  created_at: string
-  updated_at: string
-  created_by: string
+  createdAt: string
+  updatedAt: string
+  createdBy: string
 }
 
 export type CarStatus = 'active' | 'maintenance' | 'retired'

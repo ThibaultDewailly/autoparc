@@ -77,7 +77,7 @@ describe('carService', () => {
     it('should fetch a single car by id', async () => {
       const mockCar = {
         id: '123',
-        license_plate: 'AB-123-CD',
+        licensePlate: 'AB-123-CD',
         brand: 'Toyota',
         model: 'Corolla',
         status: 'active' as const,

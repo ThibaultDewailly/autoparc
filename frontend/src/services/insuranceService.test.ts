@@ -15,20 +15,20 @@ describe('insuranceService', () => {
         {
           id: '1',
           name: 'AXA Assurance',
-          contact_person: 'Jean Dupont',
+          contactPerson: 'Jean Dupont',
           phone: '0123456789',
           email: 'contact@axa.fr',
-          policy_number: 'POL123',
-          is_active: true,
+          policyNumber: 'POL123',
+          isActive: true,
         },
         {
           id: '2',
           name: 'Allianz France',
-          contact_person: 'Marie Martin',
+          contactPerson: 'Marie Martin',
           phone: '0987654321',
           email: 'contact@allianz.fr',
-          policy_number: 'POL456',
-          is_active: true,
+          policyNumber: 'POL456',
+          isActive: true,
         },
       ]
       

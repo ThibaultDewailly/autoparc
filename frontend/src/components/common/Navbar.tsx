@@ -50,7 +50,7 @@ export function Navbar() {
             <Avatar
               as="button"
               className="transition-transform"
-              name={user ? `${user.first_name} ${user.last_name}` : ''}
+              name={user ? `${user.firstName} ${user.lastName}` : ''}
               size="sm"
               color="primary"
             />
@@ -59,7 +59,7 @@ export function Navbar() {
             <DropdownItem key="profile" className="h-14 gap-2">
               <p className="font-semibold">{user?.email}</p>
               <p className="text-sm">
-                {user?.first_name} {user?.last_name}
+                {user?.firstName} {user?.lastName}
               </p>
             </DropdownItem>
             <DropdownItem key="logout" color="danger" onClick={handleLogout}>
