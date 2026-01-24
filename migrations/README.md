@@ -9,7 +9,12 @@ This folder contains all database migrations for the AutoParc application.
 3. **000003_create_insurance_companies_table**: Creates the insurance companies table
 4. **000004_create_cars_table**: Creates the cars table with license plate validation
 5. **000005_create_action_logs_table**: Creates the audit logging table
-6. **000006_seed_data**: Seeds initial data (admin user and sample insurance companies)
+
+## Seed Data
+
+**⚠️ Seed data has been moved to `migrations/seeds/` folder.**
+
+Seed data migrations are separate from schema migrations and should only be run in development and CI/CD environments. See [migrations/seeds/README.md](./seeds/README.md) for details.
 
 ## Prerequisites
 
@@ -26,8 +31,14 @@ go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@lat
 # Start the database
 make docker-up
 
-# Run all migrations
+# Run schema migrations
 make migrate-up
+
+# Run seed data (development/CI only)
+make seed-up
+
+# Or reset database with seeds in one command
+make db-reset-with-seeds
 
 # Rollback last migration
 make migrate-down
@@ -46,6 +57,9 @@ make db-reset
 
 # Create a new migration
 make migrate-create NAME=add_some_feature
+
+# Create a new seed migration
+make migrate-create-seed NAME=add_sample_data
 
 # Open database shell
 make db-shell
@@ -69,16 +83,22 @@ migrate -path ./migrations -database "$DB_URL" down
 # Check current version
 migrate -path ./migrations -database "$DB_URL" version
 
+# Run seed data (dev/CI only)
+DB_URL="postgresql://autoparc:autoparc_dev_password@localhost:5436/autoparc_dev?sslmode=disable"
+migrate -path ./migrations/seeds -database "$DB_URL" up
+
 # Force version (use with caution!)
 migrate -path ./migrations -database "$DB_URL" force VERSION_NUMBER
 ```
 
 ## Default Credentials
 
-After running migrations with seed data:
+After running seed data migrations (`make seed-up`):
 
 - **Admin Email**: admin@autoparc.fr
 - **Admin Password**: Admin123!
+
+**Note:** Seed data is only for development and CI/CD environments. Do not use in production.
 
 ## Database Schema
 
@@ -112,13 +132,18 @@ All tables include appropriate indexes for performance:
 ## Development Workflow
 
 1. Start the database: `make docker-up`
-2. Run migrations: `make migrate-up`
-3. Make changes to your application
-4. When schema changes are needed:
+2. Run schema migrations: `make migrate-up`
+3. Run seed data (dev only): `make seed-up`
+4. Make changes to your application
+5. When schema changes are needed:
    - Create new migration: `make migrate-create NAME=descriptive_name`
    - Edit the generated `.up.sql` and `.down.sql` files
    - Test: `make migrate-up` and `make migrate-down`
-5. Commit the migration files to version control
+6. When seed data changes are needed:
+   - Create new seed: `make migrate-create-seed NAME=seed_description`
+   - Edit files in `migrations/seeds/`
+   - Test: `make seed-up` and `make seed-down`
+7. Commit the migration files to version control
 
 ## Troubleshooting
 

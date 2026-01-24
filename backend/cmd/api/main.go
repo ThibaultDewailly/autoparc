@@ -97,7 +97,7 @@ func main() {
 	handler := middleware.Logger(middleware.CORS(cfg.Server.AllowedOrigins)(mux))
 
 	// Create server
-	addr := fmt.Sprintf(":%s", cfg.Server.Port)
+	addr := fmt.Sprintf("127.0.0.1:%s", cfg.Server.Port)
 	server := &http.Server{
 		Addr:         addr,
 		Handler:      handler,

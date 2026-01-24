@@ -117,6 +117,7 @@ jobs:
           DB_URL: postgresql://autoparc_test:autoparc_test_password@localhost:5432/autoparc_test?sslmode=disable
         run: |
           migrate -path ./migrations -database "$DB_URL" up
+          migrate -path ./migrations/seeds -database "$DB_URL" up
 
       - name: Install dependencies
         run: |

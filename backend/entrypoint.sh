@@ -18,5 +18,11 @@ fi
 # Run migrations
 migrate -path /migrations -database "postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable" up
 
+# Run seed data for development environments
+if [ "${ENVIRONMENT}" = "development" ] || [ "${ENVIRONMENT}" = "dev" ] || [ "${ENVIRONMENT}" = "test" ]; then
+    echo "Running seed data migrations (environment: ${ENVIRONMENT})..."
+    migrate -path /migrations/seeds -database "postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable" up
+fi
+
 echo "Migrations completed - starting API server"
 exec ./api

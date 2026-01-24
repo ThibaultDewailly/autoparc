@@ -4,8 +4,9 @@
 DB_DEV_URL := postgresql://autoparc:autoparc_dev_password@localhost:5436/autoparc_dev?sslmode=disable
 DB_TEST_URL := postgresql://autoparc_test:autoparc_test_password@localhost:5437/autoparc_test?sslmode=disable
 
-# Migration path
+# Migration paths
 MIGRATIONS_PATH := ./migrations
+SEEDS_PATH := ./migrations/seeds
 
 # Migrate tool
 MIGRATE := $(shell which migrate || echo ~/go/bin/migrate)
@@ -45,11 +46,29 @@ migrate-version: ## Show current migration version
 migrate-create: ## Create new migration (usage: make migrate-create NAME=migration_name)
 	@$(MIGRATE) create -ext sql -dir $(MIGRATIONS_PATH) -seq $(NAME)
 
+.PHONY: migrate-create-seed
+migrate-create-seed: ## Create new seed migration (usage: make migrate-create-seed NAME=seed_name)
+	@$(MIGRATE) create -ext sql -dir $(SEEDS_PATH) -seq $(NAME)
+
+.PHONY: seed-up
+seed-up: ## Run seed data migrations (dev/CI only)
+	@echo "Running seed data migrations..."
+	@$(MIGRATE) -path $(SEEDS_PATH) -database "$(DB_DEV_URL)" up
+
+.PHONY: seed-down
+seed-down: ## Rollback seed data migrations
+	@echo "Rolling back seed data..."
+	@$(MIGRATE) -path $(SEEDS_PATH) -database "$(DB_DEV_URL)" down -all
+
 .PHONY: db-reset
 db-reset: ## Reset database (down all, then up all)
 	@echo "Resetting database..."
 	@$(MIGRATE) -path $(MIGRATIONS_PATH) -database "$(DB_DEV_URL)" down -all || true
 	@$(MIGRATE) -path $(MIGRATIONS_PATH) -database "$(DB_DEV_URL)" up
+
+.PHONY: db-reset-with-seeds
+db-reset-with-seeds: db-reset seed-up ## Reset database and apply seeds (dev/CI only)
+	@echo "Database reset complete with seed data"
 
 .PHONY: db-status
 db-status: ## Show database status
