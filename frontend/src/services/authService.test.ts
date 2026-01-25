@@ -37,7 +37,7 @@ describe('authService', () => {
       expect(api.apiPost).toHaveBeenCalledWith('/auth/login', credentials)
       expect(result.user.firstName).toBe('Test')
       expect(result.user.lastName).toBe('User')
-      expect(result.session.userId).toBe('1')
+      // Session is stored in httpOnly cookie, not returned in login response
     })
   })
 

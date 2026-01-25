@@ -47,6 +47,11 @@ build/
 coverage/
 *.coverprofile
 
+# Playwright
+test-results/
+playwright-report/
+e2e/.auth/
+
 # Temporary files
 tmp/
 temp/

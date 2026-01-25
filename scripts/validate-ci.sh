@@ -204,7 +204,7 @@ else
     # Wait for backend to be ready
     echo "Waiting for backend to be ready..."
     WAIT_COUNT=0
-    MAX_WAIT=30
+    MAX_WAIT=60
     while [ $WAIT_COUNT -lt $MAX_WAIT ]; do
         if curl -s http://localhost:8080/health > /dev/null 2>&1; then
             print_success "Backend is ready"
@@ -221,21 +221,106 @@ else
         docker compose logs backend
         docker compose down
     else
-        # Run E2E tests
+        # Give backend extra time to complete migrations and seed data
+        echo "Waiting for database migrations and seed data..."
+        sleep 5
+        
+        # Verify backend is responding correctly
+        echo "Verifying backend API..."
+        if curl -s http://localhost:8080/health | grep -q "ok"; then
+            print_success "Backend API is responding correctly"
+        else
+            print_warning "Backend health check returned unexpected response"
+            echo "Response:"
+            curl -s http://localhost:8080/health
+        fi
+        
+        # Test login endpoint with admin credentials
+        echo "Testing login endpoint..."
+        LOGIN_RESPONSE=$(curl -s -X POST http://localhost:8080/api/v1/auth/login \
+            -H "Content-Type: application/json" \
+            -d '{"email":"admin@autoparc.fr","password":"Admin123!"}')
+        
+        if echo "$LOGIN_RESPONSE" | grep -q "admin@autoparc.fr"; then
+            print_success "Login endpoint is working"
+        else
+            print_error "Login endpoint failed"
+            echo "Response: $LOGIN_RESPONSE"
+            echo ""
+            echo "Backend logs:"
+            docker compose logs --tail=100 backend
+            docker compose down
+            exit 1
+        fi
+        # Wait for frontend to be ready
+        echo "Waiting for frontend dev server to be ready..."
         cd frontend
         
+        # Check if frontend is already running
+        if ! curl -s http://localhost:5173 > /dev/null 2>&1; then
+            echo "Starting frontend dev server..."
+            npm run dev > /dev/null 2>&1 &
+            FRONTEND_PID=$!
+            
+            WAIT_COUNT=0
+            MAX_WAIT=30
+            while [ $WAIT_COUNT -lt $MAX_WAIT ]; do
+                if curl -s http://localhost:5173 > /dev/null 2>&1; then
+                    print_success "Frontend dev server is ready"
+                    break
+                fi
+                echo "Waiting for frontend... ($WAIT_COUNT/$MAX_WAIT)"
+                sleep 2
+                WAIT_COUNT=$((WAIT_COUNT + 1))
+            done
+            
+            if [ $WAIT_COUNT -eq $MAX_WAIT ]; then
+                print_error "Frontend dev server failed to start within timeout"
+                kill $FRONTEND_PID 2>/dev/null || true
+                cd ..
+                docker compose down
+                exit 1
+            fi
+        else
+            print_success "Frontend dev server is already running"
+            FRONTEND_PID=""
+        fi
+        
         echo "Installing Playwright browsers..."
-        if npx playwright install chromium; then
+        if npx playwright install chromium > /dev/null 2>&1; then
             print_success "Playwright browsers installed"
         else
             print_warning "Failed to install Playwright browsers (may already be installed)"
         fi
         
+        # Create auth directory for playwright storage state
+        mkdir -p e2e/.auth
+        
         echo "Running E2E tests..."
-        if npm run test:e2e; then
+        if npm run test:e2e -- --reporter=list; then
             print_success "E2E tests passed"
         else
             print_error "E2E tests failed"
+            
+            # Show Playwright report details
+            echo ""
+            echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+            echo -e "${YELLOW}Playwright Test Report${NC}"
+            echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+            echo ""
+            echo "HTML report available at: frontend/playwright-report/index.html"
+            echo ""
+            echo "To view the interactive report, run:"
+            echo "  cd frontend && npx playwright show-report"
+            echo ""
+            echo "Backend logs:"
+            docker compose logs --tail=50 backend
+        fi
+        
+        # Stop frontend dev server if we started it
+        if [ -n "$FRONTEND_PID" ]; then
+            echo "Stopping frontend dev server..."
+            kill $FRONTEND_PID 2>/dev/null || true
         fi
         
         cd ..

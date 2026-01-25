@@ -1,7 +1,7 @@
-import type { User, Session } from '@/types'
+import type { User, Session, BackendUser, BackendSession, BackendLoginResponse } from '@/types'
 
 // Transform backend User response to frontend format
-export function transformUser(backendUser: any): User {
+export function transformUser(backendUser: BackendUser): User {
   return {
     id: backendUser.id,
     email: backendUser.email,
@@ -13,7 +13,7 @@ export function transformUser(backendUser: any): User {
 }
 
 // Transform backend Session response to frontend format
-export function transformSession(backendSession: any): Session {
+export function transformSession(backendSession: BackendSession): Session {
   return {
     id: backendSession.id,
     userId: backendSession.user_id,
@@ -24,9 +24,9 @@ export function transformSession(backendSession: any): Session {
 }
 
 // Transform backend LoginResponse to frontend format
-export function transformLoginResponse(backendResponse: any): { user: User; session: Session } {
+// Note: Backend login only returns user, session is stored in httpOnly cookie
+export function transformLoginResponse(backendResponse: BackendLoginResponse): { user: User } {
   return {
     user: transformUser(backendResponse.user),
-    session: transformSession(backendResponse.session),
   }
 }

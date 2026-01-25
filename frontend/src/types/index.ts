@@ -73,5 +73,28 @@ export interface LoginCredentials {
 
 export interface LoginResponse {
   user: User
-  session: Session
+  // Session is stored in httpOnly cookie, not returned in response
+}
+
+// Backend API response types (snake_case)
+export interface BackendUser {
+  id: string
+  email: string
+  first_name: string
+  last_name: string
+  role: string
+  is_active: boolean
+}
+
+export interface BackendSession {
+  id: string
+  user_id: string
+  session_token: string
+  expires_at: string
+  created_at: string
+}
+
+export interface BackendLoginResponse {
+  user: BackendUser
+  session: BackendSession
 }

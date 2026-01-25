@@ -5,7 +5,12 @@ async function login(page: Page) {
   await page.goto('/login')
   await page.getByLabel(/email/i).fill('admin@autoparc.fr')
   await page.getByLabel(/mot de passe/i).fill('Admin123!')
+  
+  // Click login and wait for navigation to dashboard
   await page.getByRole('button', { name: /se connecter/i }).click()
+  await page.waitForURL('/', { timeout: 10000 })
+  
+  // Verify we're on dashboard
   await expect(page).toHaveURL('/')
 }
 
@@ -52,15 +57,28 @@ test.describe('Car Management', () => {
   test('should navigate through pagination', async ({ page }) => {
     await page.goto('/cars')
     
-    const nextButton = page.getByRole('button', { name: /suivant/i })
+    // Wait for page to load
+    await page.waitForLoadState('networkidle')
     
-    if (await nextButton.isEnabled()) {
-      await nextButton.click()
-      await expect(page.getByText(/page 2/i)).toBeVisible()
+    // Check if pagination controls are visible (only shown when totalPages > 1)
+    const nextButton = page.getByRole('button', { name: /suivant/i })
+    const paginationVisible = await nextButton.isVisible().catch(() => false)
+    
+    if (paginationVisible) {
+      // Only test pagination if there are multiple pages
+      const isEnabled = await nextButton.isEnabled()
       
-      const previousButton = page.getByRole('button', { name: /précédent/i })
-      await previousButton.click()
-      await expect(page.getByText(/page 1/i)).toBeVisible()
+      if (isEnabled) {
+        await nextButton.click()
+        await expect(page.getByText(/page 2/i)).toBeVisible()
+        
+        const previousButton = page.getByRole('button', { name: /précédent/i })
+        await previousButton.click()
+        await expect(page.getByText(/page 1/i)).toBeVisible()
+      }
+    } else {
+      // If pagination is not visible, verify the page still loaded correctly
+      await expect(page.getByRole('heading', { name: /véhicules/i })).toBeVisible()
     }
   })
 

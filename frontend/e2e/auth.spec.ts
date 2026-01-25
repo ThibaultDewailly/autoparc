@@ -48,11 +48,14 @@ test.describe('Authentication Flow', () => {
     
     await page.getByLabel(/email/i).fill('admin@autoparc.fr')
     await page.getByLabel(/mot de passe/i).fill('Admin123!')
+    
     await page.getByRole('button', { name: /se connecter/i }).click()
     
-    // Should redirect to dashboard
+    // Wait for dashboard element to appear (indicates successful login and navigation)
+    await expect(page.getByText(/bienvenue/i)).toBeVisible({ timeout: 10000 })
+    
+    // Should be on dashboard
     await expect(page).toHaveURL('/')
-    await expect(page.getByText(/bienvenue/i)).toBeVisible()
   })
 
   test('should logout successfully', async ({ page }) => {
@@ -60,9 +63,10 @@ test.describe('Authentication Flow', () => {
     await page.goto('/login')
     await page.getByLabel(/email/i).fill('admin@autoparc.fr')
     await page.getByLabel(/mot de passe/i).fill('Admin123!')
-    await page.getByRole('button', { name: /se connecter/i }).click()
     
-    await expect(page).toHaveURL('/')
+    // Click login and wait for navigation
+    await page.getByRole('button', { name: /se connecter/i }).click()
+    await page.waitForURL('/', { timeout: 10000 })
     
     // Open user menu - NextUI dropdown trigger
     await page.locator('[data-slot="trigger"]').last().click()

@@ -41,7 +41,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
   async function login(credentials: LoginCredentials) {
     const response = await authService.login(credentials)
     setUser(response.user)
-    navigate(ROUTES.dashboard)
+    // Force navigation after state update
+    setTimeout(() => navigate(ROUTES.dashboard), 0)
   }
 
   async function logout() {
