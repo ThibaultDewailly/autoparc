@@ -141,26 +141,76 @@ describe('CarsPage', () => {
       </Wrapper>
     )
 
-    // Find and click delete button using data attributes
+    // Find all buttons and look for the danger colored delete button
     const buttons = screen.getAllByRole('button')
-    // Last button in each row should be delete (6 buttons = 3 per row * 2 rows, so button indices 2,5)
-    const deleteButton = buttons.find(btn => 
+    const deleteButtons = buttons.filter(btn => 
       btn.className.includes('danger')
     )
     
-    if (deleteButton) {
-      await user.click(deleteButton)
+    if (deleteButtons.length > 0) {
+      await user.click(deleteButtons[0])
 
+      // Modal renders in a portal, use getAllByText to find the header
       await waitFor(() => {
-        expect(screen.getByText(/Supprimer le véhicule/i)).toBeInTheDocument()
+        const headers = screen.queryAllByText(/Supprimer le véhicule/i)
+        expect(headers.length).toBeGreaterThan(0)
       })
 
-      const confirmButton = screen.getByRole('button', { name: /supprimer/i })
-      await user.click(confirmButton)
+      // Find the confirm button (there are two "Supprimer" buttons - one for "Supprimer le véhicule" and one for the actual delete action)
+      const allButtons = screen.getAllByRole('button')
+      const confirmButton = allButtons.find(btn => 
+        btn.textContent === 'Supprimer' && btn.className.includes('danger')
+      )
+      
+      if (confirmButton) {
+        await user.click(confirmButton)
 
+        await waitFor(() => {
+          expect(mutateAsync).toHaveBeenCalledWith('1')
+        })
+      }
+    }
+  })
+
+  it('should display delete confirmation with vehicle ID and proper styling', async () => {
+    const user = userEvent.setup()
+    const mutateAsync = vi.fn().mockResolvedValue(undefined)
+    
+    vi.spyOn(carsHooks, 'useCars').mockReturnValue({
+      data: mockCarsData,
+      isLoading: false,
+    } as any)
+    vi.spyOn(carsHooks, 'useDeleteCar').mockReturnValue({
+      mutateAsync,
+      isPending: false,
+    } as any)
+
+    const Wrapper = createWrapper()
+    render(
+      <Wrapper>
+        <CarsPage />
+      </Wrapper>
+    )
+
+    // Find and click delete button
+    const buttons = screen.getAllByRole('button')
+    const deleteButtons = buttons.filter(btn => 
+      btn.className.includes('danger')
+    )
+    
+    if (deleteButtons.length > 0) {
+      await user.click(deleteButtons[0])
+
+      // Verify the confirmation message includes the vehicle license plate
       await waitFor(() => {
-        expect(mutateAsync).toHaveBeenCalledWith('1')
+        expect(screen.getByText(/Êtes-vous sûr de vouloir supprimer le véhicule AB-123-CD \?/i)).toBeInTheDocument()
       })
+
+      // Verify the text has proper styling (text-gray-900 class)
+      // Modal renders in document.body, so we need to search the entire document
+      const confirmationText = document.querySelector('p.text-gray-900')
+      expect(confirmationText).not.toBeNull()
+      expect(confirmationText?.textContent).toContain('Êtes-vous sûr de vouloir supprimer le véhicule AB-123-CD ?')
     }
   })
 

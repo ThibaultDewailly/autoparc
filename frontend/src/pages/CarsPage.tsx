@@ -109,7 +109,9 @@ export function CarsPage() {
         <ModalContent>
           <ModalHeader>{FRENCH_LABELS.deleteCar}</ModalHeader>
           <ModalBody>
-            <p>{FRENCH_LABELS.confirmDelete}</p>
+            <p className="text-gray-900">
+              Êtes-vous sûr de vouloir supprimer le véhicule {carsData?.cars?.find(car => car.id === carToDelete)?.licensePlate || carsData?.data?.find(car => car.id === carToDelete)?.licensePlate} ?
+            </p>
           </ModalBody>
           <ModalFooter>
             <Button
