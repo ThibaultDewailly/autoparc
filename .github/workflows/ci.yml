@@ -62,16 +62,21 @@ jobs:
       )
     uses: ./.github/workflows/e2e.yml
 
+  # Run full validation script
+  validate:
+    name: Full CI Validation
+    uses: ./.github/workflows/validate.yml
+
   # Status check for required checks
   status:
     name: CI Status
     runs-on: ubuntu-latest
-    needs: [changes, backend-ci, frontend-ci]
+    needs: [changes, backend-ci, frontend-ci, validate]
     if: always()
     steps:
       - name: Check CI status
         run: |
-          if [ "${{ needs.backend-ci.result }}" == "failure" ] || [ "${{ needs.frontend-ci.result }}" == "failure" ]; then
+          if [ "${{ needs.backend-ci.result }}" == "failure" ] || [ "${{ needs.frontend-ci.result }}" == "failure" ] || [ "${{ needs.validate.result }}" == "failure" ]; then
             echo "CI checks failed"
             exit 1
           fi
