@@ -26,7 +26,7 @@ func NewCarHandler(carService *service.CarService) *CarHandler {
 func (h *CarHandler) GetCars(w http.ResponseWriter, r *http.Request) {
 	// Parse query parameters
 	query := r.URL.Query()
-	
+
 	filters := &models.CarFilters{
 		Search:    query.Get("search"),
 		Page:      parseIntQuery(query.Get("page"), 1),
@@ -53,7 +53,7 @@ func (h *CarHandler) GetCars(w http.ResponseWriter, r *http.Request) {
 // GetCar handles GET /api/v1/cars/{id}
 func (h *CarHandler) GetCar(w http.ResponseWriter, r *http.Request) {
 	id := strings.TrimPrefix(r.URL.Path, "/api/v1/cars/")
-	
+
 	car, err := h.carService.GetCar(r.Context(), id)
 	if err != nil {
 		respondJSON(w, http.StatusNotFound, map[string]string{"error": "Car not found"})

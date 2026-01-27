@@ -109,7 +109,7 @@ func cleanupDB(t *testing.T) {
 	_, _ = testDB.Exec("DELETE FROM cars")
 	_, _ = testDB.Exec("DELETE FROM insurance_companies")
 	_, _ = testDB.Exec("DELETE FROM administrative_employees")
-	
+
 	// Reseed the required data
 	seedTestData(t)
 }
