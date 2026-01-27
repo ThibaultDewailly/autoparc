@@ -3,7 +3,6 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
-	"strconv"
 	"strings"
 
 	"github.com/goldenkiwi/autoparc/internal/middleware"
@@ -116,16 +115,4 @@ func (h *CarHandler) DeleteCar(w http.ResponseWriter, r *http.Request) {
 	}
 
 	respondJSON(w, http.StatusOK, map[string]string{"message": "Car deleted successfully"})
-}
-
-// parseIntQuery parses an integer from query string with default value
-func parseIntQuery(s string, defaultValue int) int {
-	if s == "" {
-		return defaultValue
-	}
-	v, err := strconv.Atoi(s)
-	if err != nil {
-		return defaultValue
-	}
-	return v
 }

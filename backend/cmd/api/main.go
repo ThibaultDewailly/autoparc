@@ -44,11 +44,13 @@ func main() {
 	authService := service.NewAuthService(userRepo, sessionRepo)
 	carService := service.NewCarService(carRepo, insuranceRepo, actionLogRepo)
 	insuranceService := service.NewInsuranceService(insuranceRepo)
+	employeeService := service.NewEmployeeService(userRepo, actionLogRepo)
 
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(authService, &cfg.Session)
 	carHandler := handlers.NewCarHandler(carService)
 	insuranceHandler := handlers.NewInsuranceHandler(insuranceService)
+	employeeHandler := handlers.NewEmployeeHandler(employeeService)
 
 	// Create router
 	mux := http.NewServeMux()
@@ -86,12 +88,22 @@ func main() {
 	// Protected routes - Insurance
 	authMux.HandleFunc("GET /api/v1/insurance-companies", insuranceHandler.GetInsuranceCompanies)
 
+	// Protected routes - Employees
+	authMux.HandleFunc("GET /api/v1/employees", employeeHandler.GetEmployees)
+	authMux.HandleFunc("POST /api/v1/employees", employeeHandler.CreateEmployee)
+	authMux.HandleFunc("GET /api/v1/employees/{id}", employeeHandler.GetEmployee)
+	authMux.HandleFunc("PUT /api/v1/employees/{id}", employeeHandler.UpdateEmployee)
+	authMux.HandleFunc("POST /api/v1/employees/{id}/change-password", employeeHandler.ChangePassword)
+	authMux.HandleFunc("DELETE /api/v1/employees/{id}", employeeHandler.DeleteEmployee)
+
 	// Apply auth middleware to protected routes
 	mux.Handle("/api/v1/auth/me", middleware.AuthMiddleware(authService, cfg.Session.CookieName)(authMux))
 	mux.Handle("/api/v1/auth/logout", middleware.AuthMiddleware(authService, cfg.Session.CookieName)(authMux))
 	mux.Handle("/api/v1/cars", middleware.AuthMiddleware(authService, cfg.Session.CookieName)(authMux))
 	mux.Handle("/api/v1/cars/", middleware.AuthMiddleware(authService, cfg.Session.CookieName)(authMux))
 	mux.Handle("/api/v1/insurance-companies", middleware.AuthMiddleware(authService, cfg.Session.CookieName)(authMux))
+	mux.Handle("/api/v1/employees", middleware.AuthMiddleware(authService, cfg.Session.CookieName)(authMux))
+	mux.Handle("/api/v1/employees/", middleware.AuthMiddleware(authService, cfg.Session.CookieName)(authMux))
 
 	// Apply global middleware
 	handler := middleware.Logger(middleware.CORS(cfg.Server.AllowedOrigins)(mux))

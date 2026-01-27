@@ -1,6 +1,7 @@
 package integration
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -144,10 +145,10 @@ func TestCarIntegration(t *testing.T) {
 		// Create multiple cars
 		for i := 0; i < 5; i++ {
 			req := &models.CreateCarRequest{
-				LicensePlate:       "DD-" + string(rune(100+i)) + string(rune(100+i)) + string(rune(100+i)) + "-EE",
+				LicensePlate:       fmt.Sprintf("AA-%03d-BB", 100+i),
 				Brand:              "TestBrand",
 				Model:              "TestModel",
-				GreyCardNumber:     "GC" + string(rune(900000+i)),
+				GreyCardNumber:     fmt.Sprintf("GC%d", 900000+i),
 				InsuranceCompanyID: insuranceCompanyID,
 				RentalStartDate:    time.Now(),
 				Status:             models.CarStatusActive,

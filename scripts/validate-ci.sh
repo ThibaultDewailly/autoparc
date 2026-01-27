@@ -180,6 +180,7 @@ if ! docker info > /dev/null 2>&1; then
     print_warning "Docker is not running. Skipping integration tests."
 else
     # Run integration tests (requires database)
+    docker compose up -d
     if docker ps | grep -q autoparc_postgres; then
         echo "Running backend integration tests..."
         if go test -v -race ./tests/integration/...; then
