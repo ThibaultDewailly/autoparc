@@ -67,6 +67,7 @@ export const FRENCH_LABELS = {
   // Stats
   totalCars: 'Total de véhicules',
   activeCars: 'Véhicules actifs',
+  maintenanceCars: 'Véhicules en maintenance',
   
   // Placeholders
   searchPlaceholder: 'Rechercher par plaque, marque ou modèle...',
