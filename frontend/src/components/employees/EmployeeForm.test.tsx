@@ -45,20 +45,24 @@ describe('EmployeeForm', () => {
     it('shows password field in create mode', () => {
       renderForm()
       
-      expect(screen.getByLabelText(/mot de passe/i)).toBeInTheDocument()
+      expect(screen.getByLabelText('Mot de passe')).toBeInTheDocument()
+      expect(screen.getByLabelText('Confirmer le mot de passe')).toBeInTheDocument()
     })
 
     it('toggles password visibility', async () => {
       renderForm()
       const user = userEvent.setup()
       
-      const passwordInput = screen.getByLabelText(/mot de passe/i)
+      const passwordInput = screen.getByLabelText('Mot de passe')
+      const confirmPasswordInput = screen.getByLabelText('Confirmer le mot de passe')
       expect(passwordInput).toHaveAttribute('type', 'password')
+      expect(confirmPasswordInput).toHaveAttribute('type', 'password')
       
       const toggleButton = screen.getByRole('button', { name: '' })
       await user.click(toggleButton)
       
       expect(passwordInput).toHaveAttribute('type', 'text')
+      expect(confirmPasswordInput).toHaveAttribute('type', 'text')
     })
 
     it('validates required fields', async () => {
@@ -71,7 +75,7 @@ describe('EmployeeForm', () => {
       
       await waitFor(() => {
         expect(screen.getByText(/email.*requis/i)).toBeInTheDocument()
-        expect(screen.getByText(/mot de passe.*requis/i)).toBeInTheDocument()
+        expect(screen.getByText('Le mot de passe est requis')).toBeInTheDocument()
         expect(screen.getByText('Le prénom est requis')).toBeInTheDocument()
         expect(screen.getByText('Le nom est requis')).toBeInTheDocument()
       })
@@ -111,6 +115,41 @@ describe('EmployeeForm', () => {
       })
     })
 
+    it('validates password confirmation is required', async () => {
+      renderForm()
+      const user = userEvent.setup()
+      
+      await user.type(screen.getByLabelText('Email'), 'test@example.com')
+      await user.type(screen.getByLabelText('Mot de passe'), 'Password123')
+      await user.type(screen.getByLabelText('Prénom'), 'John')
+      await user.type(screen.getByLabelText('Nom'), 'Doe')
+      
+      const submitButton = screen.getByRole('button', { name: /enregistrer/i })
+      await user.click(submitButton)
+      
+      await waitFor(() => {
+        expect(screen.getByText(/confirmation du mot de passe est requise/i)).toBeInTheDocument()
+      })
+    })
+
+    it('validates passwords match', async () => {
+      renderForm()
+      const user = userEvent.setup()
+      
+      await user.type(screen.getByLabelText('Email'), 'test@example.com')
+      await user.type(screen.getByLabelText('Mot de passe'), 'Password123')
+      await user.type(screen.getByLabelText('Confirmer le mot de passe'), 'Password456')
+      await user.type(screen.getByLabelText('Prénom'), 'John')
+      await user.type(screen.getByLabelText('Nom'), 'Doe')
+      
+      const submitButton = screen.getByRole('button', { name: /enregistrer/i })
+      await user.click(submitButton)
+      
+      await waitFor(() => {
+        expect(screen.getByText(/mots de passe ne correspondent pas/i)).toBeInTheDocument()
+      })
+    })
+
     it('submits valid form data', async () => {
       const onSubmit = vi.fn().mockResolvedValue(undefined)
       renderForm({ onSubmit })
@@ -118,6 +157,7 @@ describe('EmployeeForm', () => {
       
       await user.type(screen.getByLabelText('Email'), 'test@example.com')
       await user.type(screen.getByLabelText('Mot de passe'), 'Password123')
+      await user.type(screen.getByLabelText('Confirmer le mot de passe'), 'Password123')
       await user.type(screen.getByLabelText('Prénom'), 'John')
       await user.type(screen.getByLabelText('Nom'), 'Doe')
       
@@ -224,6 +264,7 @@ describe('EmployeeForm', () => {
     
     await user.type(screen.getByLabelText('Email'), 'test@example.com')
     await user.type(screen.getByLabelText('Mot de passe'), 'Password123')
+    await user.type(screen.getByLabelText('Confirmer le mot de passe'), 'Password123')
     await user.type(screen.getByLabelText('Prénom'), 'John')
     await user.type(screen.getByLabelText('Nom'), 'Doe')
     

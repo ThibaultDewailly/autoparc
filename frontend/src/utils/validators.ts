@@ -102,6 +102,7 @@ export function validatePassword(password: string): boolean {
 export function validateEmployeeForm(data: {
   email?: string
   password?: string
+  confirmPassword?: string
   firstName?: string
   lastName?: string
   role?: string
@@ -120,6 +121,12 @@ export function validateEmployeeForm(data: {
       errors.password = 'Le mot de passe est requis'
     } else if (!validatePassword(data.password!)) {
       errors.password = 'Le mot de passe doit contenir au moins 8 caractères, 1 majuscule, 1 minuscule et 1 chiffre'
+    }
+    
+    if (!validateRequired(data.confirmPassword)) {
+      errors.confirmPassword = 'La confirmation du mot de passe est requise'
+    } else if (data.password !== data.confirmPassword) {
+      errors.confirmPassword = 'Les mots de passe ne correspondent pas'
     }
   }
   

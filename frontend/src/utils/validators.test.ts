@@ -281,6 +281,7 @@ describe('validateEmployeeForm', () => {
       const errors = validateEmployeeForm({
         email: 'test@example.com',
         password: 'Password123',
+        confirmPassword: 'Password123',
         firstName: 'John',
         lastName: 'Doe',
         role: 'admin',
