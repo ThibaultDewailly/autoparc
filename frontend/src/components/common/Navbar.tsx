@@ -42,6 +42,11 @@ export function Navbar() {
             {FRENCH_LABELS.cars}
           </Link>
         </NavbarItem>
+        <NavbarItem>
+          <Link to={ROUTES.employees} className="text-foreground hover:text-primary">
+            {FRENCH_LABELS.employees}
+          </Link>
+        </NavbarItem>
       </NavbarContent>
 
       <NavbarContent justify="end">

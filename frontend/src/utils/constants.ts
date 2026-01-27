@@ -10,6 +10,8 @@ export const FRENCH_LABELS = {
   dashboard: 'Tableau de bord',
   cars: 'Véhicules',
   carManagement: 'Gestion des Véhicules',
+  employees: 'Employés',
+  employeeManagement: 'Gestion des Employés',
   
   // Car fields
   licensePlate: 'Plaque d\'immatriculation',
@@ -42,6 +44,25 @@ export const FRENCH_LABELS = {
   carDetails: 'Détails du véhicule',
   newCar: 'Nouveau véhicule',
   
+  // Employee fields
+  firstName: 'Prénom',
+  lastName: 'Nom',
+  role: 'Rôle',
+  isActive: 'Actif',
+  inactive: 'Inactif',
+  lastLogin: 'Dernière connexion',
+  currentPassword: 'Mot de passe actuel',
+  newPassword: 'Nouveau mot de passe',
+  confirmPassword: 'Confirmer le mot de passe',
+  
+  // Employee operations
+  addEmployee: 'Ajouter un employé',
+  editEmployee: 'Modifier l\'employé',
+  deleteEmployee: 'Supprimer l\'employé',
+  employeeDetails: 'Détails de l\'employé',
+  newEmployee: 'Nouvel employé',
+  changePassword: 'Changer le mot de passe',
+  
   // Status values
   active: 'Actif',
   maintenance: 'En maintenance',
@@ -57,12 +78,18 @@ export const FRENCH_LABELS = {
   loading: 'Chargement...',
   noData: 'Aucune donnée',
   noCarsFound: 'Aucun véhicule trouvé',
+  noEmployeesFound: 'Aucun employé trouvé',
   error: 'Erreur',
   success: 'Succès',
   confirmDelete: 'Êtes-vous sûr de vouloir supprimer ce véhicule ?',
+  confirmDeleteEmployee: 'Êtes-vous sûr de vouloir supprimer cet employé ?',
   carCreated: 'Véhicule créé avec succès',
   carUpdated: 'Véhicule mis à jour avec succès',
   carDeleted: 'Véhicule supprimé avec succès',
+  employeeCreated: 'Employé créé avec succès',
+  employeeUpdated: 'Employé mis à jour avec succès',
+  employeeDeleted: 'Employé supprimé avec succès',
+  passwordChanged: 'Mot de passe changé avec succès',
   
   // Stats
   totalCars: 'Total de véhicules',
@@ -93,6 +120,11 @@ export const ROUTES = {
   carNew: '/cars/new',
   carDetail: (id: string) => `/cars/${id}`,
   carEdit: (id: string) => `/cars/${id}/edit`,
+  employees: '/employees',
+  employeeNew: '/employees/new',
+  employeeDetail: (id: string) => `/employees/${id}`,
+  employeeEdit: (id: string) => `/employees/${id}/edit`,
+  employeeChangePassword: (id: string) => `/employees/${id}/change-password`,
 }
 
 export const DEFAULT_PAGE_SIZE = 20

@@ -7,6 +7,57 @@ export interface User {
   isActive: boolean
 }
 
+export interface Employee {
+  id: string
+  email: string
+  firstName: string
+  lastName: string
+  role: string
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+  lastLoginAt?: string
+}
+
+export interface CreateEmployeeRequest {
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  role: string
+}
+
+export interface UpdateEmployeeRequest {
+  email?: string
+  firstName?: string
+  lastName?: string
+  role?: string
+  isActive?: boolean
+}
+
+export interface ChangePasswordRequest {
+  currentPassword: string
+  newPassword: string
+}
+
+export interface EmployeeFilters {
+  page?: number
+  limit?: number
+  search?: string
+  isActive?: boolean
+  role?: string
+  sortBy?: string
+  order?: string
+}
+
+export interface PaginatedEmployeesResponse {
+  employees: Employee[]
+  totalCount: number
+  page: number
+  limit: number
+  totalPages: number
+}
+
 export interface Session {
   id: string
   userId: string

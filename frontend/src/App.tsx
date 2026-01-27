@@ -6,6 +6,11 @@ import { DashboardPage } from '@/pages/DashboardPage'
 import { CarsPage } from '@/pages/CarsPage'
 import { CarDetailPage } from '@/pages/CarDetailPage'
 import { CarFormPage } from '@/pages/CarFormPage'
+import { EmployeesPage } from '@/pages/EmployeesPage'
+import { EmployeeDetailPage } from '@/pages/EmployeeDetailPage'
+import { EmployeeCreatePage } from '@/pages/EmployeeCreatePage'
+import { EmployeeEditPage } from '@/pages/EmployeeEditPage'
+import { ChangePasswordPage } from '@/pages/ChangePasswordPage'
 import { ROUTES } from '@/utils/constants'
 
 function App() {
@@ -55,6 +60,51 @@ function App() {
           element={
             <ProtectedRoute>
               <CarFormPage />
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path={ROUTES.employees}
+          element={
+            <ProtectedRoute>
+              <EmployeesPage />
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path={ROUTES.employeeNew}
+          element={
+            <ProtectedRoute>
+              <EmployeeCreatePage />
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path="/employees/:id"
+          element={
+            <ProtectedRoute>
+              <EmployeeDetailPage />
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path="/employees/:id/edit"
+          element={
+            <ProtectedRoute>
+              <EmployeeEditPage />
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path="/employees/:id/change-password"
+          element={
+            <ProtectedRoute>
+              <ChangePasswordPage />
             </ProtectedRoute>
           }
         />

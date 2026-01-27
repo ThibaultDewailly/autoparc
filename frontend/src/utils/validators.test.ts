@@ -5,6 +5,9 @@ import {
   validateRequired,
   validateCarForm,
   validateLoginForm,
+  validatePassword,
+  validateEmployeeForm,
+  validatePasswordChange,
 } from './validators'
 
 describe('validateLicensePlate', () => {
@@ -202,5 +205,177 @@ describe('validateLoginForm', () => {
   it('should return multiple errors for multiple issues', () => {
     const errors = validateLoginForm({})
     expect(Object.keys(errors).length).toBeGreaterThanOrEqual(2)
+  })
+})
+
+describe('validatePassword', () => {
+  it('returns false for passwords shorter than 8 characters', () => {
+    expect(validatePassword('Pass1')).toBe(false)
+    expect(validatePassword('Pass12')).toBe(false)
+    expect(validatePassword('Pass123')).toBe(false)
+  })
+
+  it('returns false for passwords without uppercase', () => {
+    expect(validatePassword('password123')).toBe(false)
+  })
+
+  it('returns false for passwords without lowercase', () => {
+    expect(validatePassword('PASSWORD123')).toBe(false)
+  })
+
+  it('returns false for passwords without numbers', () => {
+    expect(validatePassword('PasswordABC')).toBe(false)
+  })
+
+  it('returns true for valid passwords', () => {
+    expect(validatePassword('Password1')).toBe(true)
+    expect(validatePassword('MyPass123')).toBe(true)
+    expect(validatePassword('Secure1234')).toBe(true)
+  })
+
+  it('returns false for empty or undefined passwords', () => {
+    expect(validatePassword('')).toBe(false)
+    expect(validatePassword(undefined as unknown as string)).toBe(false)
+  })
+})
+
+describe('validateEmployeeForm', () => {
+  describe('create mode', () => {
+    it('validates all required fields', () => {
+      const errors = validateEmployeeForm({}, false)
+      
+      expect(errors.email).toBeDefined()
+      expect(errors.password).toBeDefined()
+      expect(errors.firstName).toBeDefined()
+      expect(errors.lastName).toBeDefined()
+      expect(errors.role).toBeDefined()
+    })
+
+    it('validates email format', () => {
+      const errors = validateEmployeeForm({
+        email: 'invalid-email',
+        password: 'Password123',
+        firstName: 'John',
+        lastName: 'Doe',
+        role: 'admin',
+      }, false)
+      
+      expect(errors.email).toBeDefined()
+      expect(errors.email).toContain('invalide')
+    })
+
+    it('validates password strength', () => {
+      const errors = validateEmployeeForm({
+        email: 'test@example.com',
+        password: 'weak',
+        firstName: 'John',
+        lastName: 'Doe',
+        role: 'admin',
+      }, false)
+      
+      expect(errors.password).toBeDefined()
+      expect(errors.password).toContain('8 caractères')
+    })
+
+    it('returns no errors for valid data', () => {
+      const errors = validateEmployeeForm({
+        email: 'test@example.com',
+        password: 'Password123',
+        firstName: 'John',
+        lastName: 'Doe',
+        role: 'admin',
+      }, false)
+      
+      expect(Object.keys(errors)).toHaveLength(0)
+    })
+  })
+
+  describe('update mode', () => {
+    it('does not require password', () => {
+      const errors = validateEmployeeForm({
+        email: 'test@example.com',
+        firstName: 'John',
+        lastName: 'Doe',
+        role: 'admin',
+      }, true)
+      
+      expect(errors.password).toBeUndefined()
+    })
+
+    it('still validates other required fields', () => {
+      const errors = validateEmployeeForm({}, true)
+      
+      expect(errors.email).toBeDefined()
+      expect(errors.firstName).toBeDefined()
+      expect(errors.lastName).toBeDefined()
+      expect(errors.role).toBeDefined()
+      expect(errors.password).toBeUndefined()
+    })
+
+    it('returns no errors for valid update data', () => {
+      const errors = validateEmployeeForm({
+        email: 'test@example.com',
+        firstName: 'John',
+        lastName: 'Doe',
+        role: 'admin',
+        isActive: true,
+      }, true)
+      
+      expect(Object.keys(errors)).toHaveLength(0)
+    })
+  })
+})
+
+describe('validatePasswordChange', () => {
+  it('validates all required fields', () => {
+    const errors = validatePasswordChange({})
+    
+    expect(errors.currentPassword).toBeDefined()
+    expect(errors.newPassword).toBeDefined()
+    expect(errors.confirmPassword).toBeDefined()
+  })
+
+  it('validates new password strength', () => {
+    const errors = validatePasswordChange({
+      currentPassword: 'OldPassword123',
+      newPassword: 'weak',
+      confirmPassword: 'weak',
+    })
+    
+    expect(errors.newPassword).toBeDefined()
+    expect(errors.newPassword).toContain('8 caractères')
+  })
+
+  it('validates password confirmation match', () => {
+    const errors = validatePasswordChange({
+      currentPassword: 'OldPassword123',
+      newPassword: 'NewPassword123',
+      confirmPassword: 'DifferentPassword123',
+    })
+    
+    expect(errors.confirmPassword).toBeDefined()
+    expect(errors.confirmPassword).toContain('ne correspondent pas')
+  })
+
+  it('returns no errors for valid password change', () => {
+    const errors = validatePasswordChange({
+      currentPassword: 'OldPassword123',
+      newPassword: 'NewPassword123',
+      confirmPassword: 'NewPassword123',
+    })
+    
+    expect(Object.keys(errors)).toHaveLength(0)
+  })
+
+  it('validates empty strings as missing', () => {
+    const errors = validatePasswordChange({
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: '',
+    })
+    
+    expect(errors.currentPassword).toBeDefined()
+    expect(errors.newPassword).toBeDefined()
+    expect(errors.confirmPassword).toBeDefined()
   })
 })
