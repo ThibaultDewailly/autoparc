@@ -12,9 +12,79 @@ RED='\033[0;31m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
+# Default: run all tests
+RUN_BACKEND=false
+RUN_FRONTEND=false
+RUN_E2E=false
+RUN_ALL=false
+
+# Parse command-line options
+show_usage() {
+    echo "Usage: $0 [OPTIONS]"
+    echo ""
+    echo "Options:"
+    echo "  -b, --backend    Run backend tests (Go)"
+    echo "  -f, --frontend   Run frontend tests (unit and integration)"
+    echo "  -e, --e2e        Run E2E tests"
+    echo "  --all            Run all tests (default if no options specified)"
+    echo "  -h, --help       Show this help message"
+    echo ""
+    echo "Examples:"
+    echo "  $0               # Run all tests"
+    echo "  $0 --backend     # Run only backend tests"
+    echo "  $0 -f -e         # Run frontend and E2E tests"
+    echo "  $0 --all         # Run all tests"
+    exit 0
+}
+
+# Parse arguments
+if [ $# -eq 0 ]; then
+    RUN_ALL=true
+fi
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -b|--backend)
+            RUN_BACKEND=true
+            shift
+            ;;
+        -f|--frontend)
+            RUN_FRONTEND=true
+            shift
+            ;;
+        -e|--e2e)
+            RUN_E2E=true
+            shift
+            ;;
+        --all)
+            RUN_ALL=true
+            shift
+            ;;
+        -h|--help)
+            show_usage
+            ;;
+        *)
+            echo "Unknown option: $1"
+            show_usage
+            ;;
+    esac
+done
+
+# If --all is specified, enable all tests
+if [ "$RUN_ALL" = true ]; then
+    RUN_BACKEND=true
+    RUN_FRONTEND=true
+    RUN_E2E=true
+fi
+
 echo -e "${CYAN}╔══════════════════════════════════════════════════════════╗${NC}"
 echo -e "${CYAN}║     AutoParc CI/CD Local Validation Script              ║${NC}"
 echo -e "${CYAN}╚══════════════════════════════════════════════════════════╝${NC}"
+echo ""
+echo "Test selection:"
+[ "$RUN_BACKEND" = true ] && echo -e "${CYAN}  • Backend tests enabled${NC}"
+[ "$RUN_FRONTEND" = true ] && echo -e "${CYAN}  • Frontend tests enabled${NC}"
+[ "$RUN_E2E" = true ] && echo -e "${CYAN}  • E2E tests enabled${NC}"
 echo ""
 
 # Track failures
@@ -48,12 +118,21 @@ print_warning() {
 # Check if required tools are installed
 print_section "Checking Prerequisites"
 
-command -v go >/dev/null 2>&1 && print_success "Go installed" || print_error "Go not found"
-command -v node >/dev/null 2>&1 && print_success "Node.js installed" || print_error "Node.js not found"
-command -v npm >/dev/null 2>&1 && print_success "npm installed" || print_error "npm not found"
-command -v docker >/dev/null 2>&1 && print_success "Docker installed" || print_error "Docker not found"
+if [ "$RUN_BACKEND" = true ]; then
+    command -v go >/dev/null 2>&1 && print_success "Go installed" || print_error "Go not found"
+fi
+
+if [ "$RUN_FRONTEND" = true ] || [ "$RUN_E2E" = true ]; then
+    command -v node >/dev/null 2>&1 && print_success "Node.js installed" || print_error "Node.js not found"
+    command -v npm >/dev/null 2>&1 && print_success "npm installed" || print_error "npm not found"
+fi
+
+if [ "$RUN_BACKEND" = true ] || [ "$RUN_E2E" = true ]; then
+    command -v docker >/dev/null 2>&1 && print_success "Docker installed" || print_error "Docker not found"
+fi
 
 # Backend checks
+if [ "$RUN_BACKEND" = true ]; then
 print_section "Backend Checks"
 
 cd backend
@@ -124,7 +203,10 @@ fi
 
 cd ..
 
+fi # End of Backend checks
+
 # Frontend checks
+if [ "$RUN_FRONTEND" = true ]; then
 print_section "Frontend Checks"
 
 cd frontend
@@ -190,9 +272,12 @@ fi
 
 cd ..
 
+fi # End of Frontend checks
+
 # ═══════════════════════════════════════════════════════════
 # E2E Tests
 # ═══════════════════════════════════════════════════════════
+if [ "$RUN_E2E" = true ]; then
 print_section "E2E Tests"
 
 echo "Starting Docker Compose services..."
@@ -331,6 +416,8 @@ else
         print_success "Docker Compose services stopped"
     fi
 fi
+
+fi # End of E2E tests
 
 # Summary
 print_section "Summary"
