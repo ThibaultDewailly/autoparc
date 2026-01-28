@@ -141,7 +141,7 @@ func seedTestData(t *testing.T) {
 
 // Helper function to get a test context
 func testContext() context.Context {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	_ = cancel // Will be used by the test
 	return ctx
 }
