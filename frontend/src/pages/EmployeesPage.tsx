@@ -7,6 +7,7 @@ import { Pagination } from '@/components/common/Pagination'
 import { EmployeeTable } from '@/components/employees/EmployeeTable'
 import { useEmployees, useDeleteEmployee } from '@/hooks/useEmployees'
 import { FRENCH_LABELS, ROUTES, DEFAULT_PAGE_SIZE } from '@/utils/constants'
+import type { Employee } from '@/types'
 
 export function EmployeesPage() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -14,7 +15,7 @@ export function EmployeesPage() {
   const [page, setPage] = useState(
     parseInt(searchParams.get('page') || '1', 10)
   )
-  const [employeeToDelete, setEmployeeToDelete] = useState<string | null>(null)
+  const [employeeToDelete, setEmployeeToDelete] = useState<Employee | null>(null)
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   const { data: employeesData, isLoading } = useEmployees({
@@ -33,13 +34,16 @@ export function EmployeesPage() {
   }, [search, page, setSearchParams])
 
   function handleDeleteClick(id: string) {
-    setEmployeeToDelete(id)
-    onOpen()
+    const employee = employeesData?.employees.find(emp => emp.id === id)
+    if (employee) {
+      setEmployeeToDelete(employee)
+      onOpen()
+    }
   }
 
   async function handleDeleteConfirm() {
     if (employeeToDelete) {
-      await deleteMutation.mutateAsync(employeeToDelete)
+      await deleteMutation.mutateAsync(employeeToDelete.id)
       onClose()
       setEmployeeToDelete(null)
     }
@@ -98,7 +102,9 @@ export function EmployeesPage() {
           <ModalContent>
             <ModalHeader>{FRENCH_LABELS.deleteEmployee}</ModalHeader>
             <ModalBody>
-              <p>{FRENCH_LABELS.confirmDeleteEmployee}</p>
+              <p className="text-gray-900">
+                Êtes-vous sûr de vouloir supprimer {employeeToDelete?.firstName} {employeeToDelete?.lastName} ?
+              </p>
             </ModalBody>
             <ModalFooter>
               <Button variant="flat" onPress={onClose}>
