@@ -1,0 +1,3 @@
+-- No table changes needed, just documentation
+-- The action_logs table already supports 'operator' entity_type
+-- and 'assign'/'unassign' action_types as defined in CHECK constraints
