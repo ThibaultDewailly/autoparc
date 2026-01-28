@@ -11,6 +11,9 @@ import { EmployeeDetailPage } from '@/pages/EmployeeDetailPage'
 import { EmployeeCreatePage } from '@/pages/EmployeeCreatePage'
 import { EmployeeEditPage } from '@/pages/EmployeeEditPage'
 import { ChangePasswordPage } from '@/pages/ChangePasswordPage'
+import { OperatorsPage } from '@/pages/OperatorsPage'
+import { OperatorDetailPage } from '@/pages/OperatorDetailPage'
+import { OperatorFormPage } from '@/pages/OperatorFormPage'
 import { ROUTES } from '@/utils/constants'
 
 function App() {
@@ -105,6 +108,42 @@ function App() {
           element={
             <ProtectedRoute>
               <ChangePasswordPage />
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path={ROUTES.operators}
+          element={
+            <ProtectedRoute>
+              <OperatorsPage />
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path={ROUTES.operatorNew}
+          element={
+            <ProtectedRoute>
+              <OperatorFormPage />
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path="/operators/:id"
+          element={
+            <ProtectedRoute>
+              <OperatorDetailPage />
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path="/operators/:id/edit"
+          element={
+            <ProtectedRoute>
+              <OperatorFormPage />
             </ProtectedRoute>
           }
         />

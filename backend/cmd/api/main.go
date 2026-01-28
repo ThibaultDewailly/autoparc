@@ -39,18 +39,21 @@ func main() {
 	carRepo := repository.NewCarRepository(db.DB)
 	insuranceRepo := repository.NewInsuranceRepository(db.DB)
 	actionLogRepo := repository.NewActionLogRepository(db.DB)
+	operatorRepo := repository.NewOperatorRepository(db.DB)
 
 	// Initialize services
 	authService := service.NewAuthService(userRepo, sessionRepo)
 	carService := service.NewCarService(carRepo, insuranceRepo, actionLogRepo)
 	insuranceService := service.NewInsuranceService(insuranceRepo)
 	employeeService := service.NewEmployeeService(userRepo, actionLogRepo)
+	operatorService := service.NewOperatorService(operatorRepo, carRepo, actionLogRepo)
 
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(authService, &cfg.Session)
 	carHandler := handlers.NewCarHandler(carService)
 	insuranceHandler := handlers.NewInsuranceHandler(insuranceService)
 	employeeHandler := handlers.NewEmployeeHandler(employeeService)
+	operatorHandler := handlers.NewOperatorHandler(operatorService)
 
 	// Create router
 	mux := http.NewServeMux()
@@ -84,6 +87,9 @@ func main() {
 	authMux.HandleFunc("GET /api/v1/cars/{id}", carHandler.GetCar)
 	authMux.HandleFunc("PUT /api/v1/cars/{id}", carHandler.UpdateCar)
 	authMux.HandleFunc("DELETE /api/v1/cars/{id}", carHandler.DeleteCar)
+	authMux.HandleFunc("POST /api/v1/cars/{id}/assign", operatorHandler.AssignOperator)
+	authMux.HandleFunc("POST /api/v1/cars/{id}/unassign", operatorHandler.UnassignOperator)
+	authMux.HandleFunc("GET /api/v1/cars/{id}/assignment-history", operatorHandler.GetCarAssignmentHistory)
 
 	// Protected routes - Insurance
 	authMux.HandleFunc("GET /api/v1/insurance-companies", insuranceHandler.GetInsuranceCompanies)
@@ -96,6 +102,14 @@ func main() {
 	authMux.HandleFunc("POST /api/v1/employees/{id}/change-password", employeeHandler.ChangePassword)
 	authMux.HandleFunc("DELETE /api/v1/employees/{id}", employeeHandler.DeleteEmployee)
 
+	// Protected routes - Operators
+	authMux.HandleFunc("GET /api/v1/operators", operatorHandler.GetOperators)
+	authMux.HandleFunc("POST /api/v1/operators", operatorHandler.CreateOperator)
+	authMux.HandleFunc("GET /api/v1/operators/{id}", operatorHandler.GetOperator)
+	authMux.HandleFunc("PUT /api/v1/operators/{id}", operatorHandler.UpdateOperator)
+	authMux.HandleFunc("DELETE /api/v1/operators/{id}", operatorHandler.DeleteOperator)
+	authMux.HandleFunc("GET /api/v1/operators/{id}/assignment-history", operatorHandler.GetOperatorAssignmentHistory)
+
 	// Apply auth middleware to protected routes
 	mux.Handle("/api/v1/auth/me", middleware.AuthMiddleware(authService, cfg.Session.CookieName)(authMux))
 	mux.Handle("/api/v1/auth/logout", middleware.AuthMiddleware(authService, cfg.Session.CookieName)(authMux))
@@ -104,6 +118,8 @@ func main() {
 	mux.Handle("/api/v1/insurance-companies", middleware.AuthMiddleware(authService, cfg.Session.CookieName)(authMux))
 	mux.Handle("/api/v1/employees", middleware.AuthMiddleware(authService, cfg.Session.CookieName)(authMux))
 	mux.Handle("/api/v1/employees/", middleware.AuthMiddleware(authService, cfg.Session.CookieName)(authMux))
+	mux.Handle("/api/v1/operators", middleware.AuthMiddleware(authService, cfg.Session.CookieName)(authMux))
+	mux.Handle("/api/v1/operators/", middleware.AuthMiddleware(authService, cfg.Session.CookieName)(authMux))
 
 	// Apply global middleware
 	handler := middleware.Logger(middleware.CORS(cfg.Server.AllowedOrigins)(mux))

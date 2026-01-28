@@ -43,6 +43,11 @@ export function Navbar() {
           </Link>
         </NavbarItem>
         <NavbarItem>
+          <Link to={ROUTES.operators} className="text-foreground hover:text-primary">
+            {FRENCH_LABELS.operators}
+          </Link>
+        </NavbarItem>
+        <NavbarItem>
           <Link to={ROUTES.employees} className="text-foreground hover:text-primary">
             {FRENCH_LABELS.employees}
           </Link>

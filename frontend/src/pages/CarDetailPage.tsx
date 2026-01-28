@@ -1,19 +1,53 @@
 import { useNavigate, useParams } from 'react-router-dom'
-import { Button, Card, CardBody, Spinner } from '@nextui-org/react'
+import {
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Spinner,
+  Divider,
+  useDisclosure,
+} from '@nextui-org/react'
 import { Navbar } from '@/components/common/Navbar'
 import { CarDetail } from '@/components/cars/CarDetail'
+import { AssignmentDialog } from '@/components/operators/AssignmentDialog'
+import { UnassignmentDialog } from '@/components/operators/UnassignmentDialog'
+import { AssignmentHistoryTable } from '@/components/operators/AssignmentHistoryTable'
 import { useCar, useDeleteCar } from '@/hooks/useCars'
+import {
+  useCarAssignmentHistory,
+  useAssignOperatorToCar,
+  useUnassignOperatorFromCar,
+} from '@/hooks/useOperators'
 import { FRENCH_LABELS, ROUTES } from '@/utils/constants'
+import { formatDate } from '@/utils/formatters'
+import type { AssignOperatorRequest, UnassignOperatorRequest } from '@/types/operator'
 
 export function CarDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { data: car, isLoading } = useCar(id)
+  const { data: assignmentHistory = [] } = useCarAssignmentHistory(id)
   const deleteMutation = useDeleteCar()
+  const assignMutation = useAssignOperatorToCar()
+  const unassignMutation = useUnassignOperatorFromCar()
+
+  const {
+    isOpen: isAssignOpen,
+    onOpen: onAssignOpen,
+    onClose: onAssignClose,
+  } = useDisclosure()
+  const {
+    isOpen: isUnassignOpen,
+    onOpen: onUnassignOpen,
+    onClose: onUnassignClose,
+  } = useDisclosure()
+
+  const currentAssignment = assignmentHistory.find((a) => !a.end_date)
 
   async function handleDelete() {
     if (!id) return
-    
+
     if (window.confirm(FRENCH_LABELS.confirmDelete)) {
       await deleteMutation.mutateAsync(id)
       navigate(ROUTES.cars)
@@ -24,6 +58,16 @@ export function CarDetailPage() {
     if (id) {
       navigate(ROUTES.carEdit(id))
     }
+  }
+
+  async function handleAssign(data: AssignOperatorRequest) {
+    if (!id) return
+    await assignMutation.mutateAsync({ carId: id, data })
+  }
+
+  async function handleUnassign(data: UnassignOperatorRequest) {
+    if (!id) return
+    await unassignMutation.mutateAsync({ carId: id, data })
   }
 
   if (isLoading) {
@@ -107,7 +151,90 @@ export function CarDetailPage() {
         </div>
 
         <CarDetail car={car} />
+
+        <div className="mt-6 space-y-6">
+          <Card>
+            <CardHeader className="flex justify-between items-center">
+              <h2 className="text-xl font-semibold">
+                {FRENCH_LABELS.currentOperator}
+              </h2>
+              {currentAssignment ? (
+                <Button
+                  color="warning"
+                  variant="flat"
+                  size="sm"
+                  onClick={onUnassignOpen}
+                >
+                  {FRENCH_LABELS.unassignCar}
+                </Button>
+              ) : (
+                <Button
+                  color="primary"
+                  variant="flat"
+                  size="sm"
+                  onClick={onAssignOpen}
+                >
+                  {FRENCH_LABELS.assignOperator}
+                </Button>
+              )}
+            </CardHeader>
+            <Divider />
+            <CardBody>
+              {currentAssignment ? (
+                <div className="space-y-2">
+                  <p className="text-sm text-gray-600">
+                    <span className="font-semibold">
+                      {FRENCH_LABELS.operator}:
+                    </span>{' '}
+                    Opérateur assigné
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    <span className="font-semibold">{FRENCH_LABELS.since}:</span>{' '}
+                    {formatDate(currentAssignment.start_date)}
+                  </p>
+                  {currentAssignment.notes && (
+                    <p className="text-sm text-gray-600">
+                      <span className="font-semibold">{FRENCH_LABELS.notes}:</span>{' '}
+                      {currentAssignment.notes}
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <p className="text-center text-default-500">
+                  {FRENCH_LABELS.noAssignment}
+                </p>
+              )}
+            </CardBody>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <h2 className="text-xl font-semibold">
+                {FRENCH_LABELS.assignmentHistory}
+              </h2>
+            </CardHeader>
+            <Divider />
+            <CardBody>
+              <AssignmentHistoryTable assignments={assignmentHistory} />
+            </CardBody>
+          </Card>
+        </div>
       </main>
+
+      <AssignmentDialog
+        isOpen={isAssignOpen}
+        onClose={onAssignClose}
+        onSubmit={handleAssign}
+        isLoading={assignMutation.isPending}
+      />
+
+      <UnassignmentDialog
+        isOpen={isUnassignOpen}
+        onClose={onUnassignClose}
+        onSubmit={handleUnassign}
+        currentAssignment={currentAssignment}
+        isLoading={unassignMutation.isPending}
+      />
     </div>
   )
 }
