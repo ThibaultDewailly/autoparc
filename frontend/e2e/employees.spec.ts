@@ -432,9 +432,13 @@ test.describe('Employee Management', () => {
       if (await printButton.isVisible()) {
         // Set up listener for window.print() call
         await page.evaluate(() => {
-          (window as any).printCalled = false
+          interface WindowWithPrint extends Window {
+            printCalled?: boolean
+          }
+          const win = window as WindowWithPrint
+          win.printCalled = false
           window.print = () => {
-            (window as any).printCalled = true
+            win.printCalled = true
           }
         })
         
@@ -442,7 +446,12 @@ test.describe('Employee Management', () => {
         await page.waitForTimeout(500)
         
         // Verify print was triggered
-        const printWasCalled = await page.evaluate(() => (window as any).printCalled)
+        const printWasCalled = await page.evaluate(() => {
+          interface WindowWithPrint extends Window {
+            printCalled?: boolean
+          }
+          return (window as WindowWithPrint).printCalled
+        })
         expect(printWasCalled).toBeTruthy()
       }
     }
