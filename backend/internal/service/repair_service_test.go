@@ -16,7 +16,7 @@ func TestCreateRepairRequest_Validate(t *testing.T) {
 	cost := 1500.50
 	negativeCost := -100.0
 	accidentID := "accident-123"
-	
+
 	tests := []struct {
 		name    string
 		req     *models.CreateRepairRequest
@@ -179,7 +179,7 @@ func TestUpdateRepairRequest_Validate(t *testing.T) {
 	past := now.Add(-24 * time.Hour)
 	cost := 1500.50
 	negativeCost := -100.0
-	
+
 	tests := []struct {
 		name    string
 		req     *models.UpdateRepairRequest
@@ -370,34 +370,34 @@ func TestRepairType_Validation(t *testing.T) {
 
 func TestRepairStatus_Validation(t *testing.T) {
 	tests := []struct {
-		name   string
-		status models.RepairStatus
-		wantErr    bool
+		name    string
+		status  models.RepairStatus
+		wantErr bool
 	}{
 		{
-			name:   "valid - scheduled",
-			status: models.RepairStatusScheduled,
-			wantErr:    false,
+			name:    "valid - scheduled",
+			status:  models.RepairStatusScheduled,
+			wantErr: false,
 		},
 		{
-			name:   "valid - in_progress",
-			status: models.RepairStatusInProgress,
-			wantErr:    false,
+			name:    "valid - in_progress",
+			status:  models.RepairStatusInProgress,
+			wantErr: false,
 		},
 		{
-			name:   "valid - completed",
-			status: models.RepairStatusCompleted,
-			wantErr:    false,
+			name:    "valid - completed",
+			status:  models.RepairStatusCompleted,
+			wantErr: false,
 		},
 		{
-			name:   "valid - cancelled",
-			status: models.RepairStatusCancelled,
-			wantErr:    false,
+			name:    "valid - cancelled",
+			status:  models.RepairStatusCancelled,
+			wantErr: false,
 		},
 		{
-			name:   "invalid status",
-			status: models.RepairStatus("pending"),
-			wantErr:    true,
+			name:    "invalid status",
+			status:  models.RepairStatus("pending"),
+			wantErr: true,
 		},
 	}
 

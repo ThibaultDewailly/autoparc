@@ -17,34 +17,34 @@ const (
 
 // Accident represents a vehicle accident
 type Accident struct {
-	ID                   string         `json:"id"`
-	CarID                string         `json:"carId"`
-	AccidentDate         time.Time      `json:"accidentDate"`
-	Location             string         `json:"location"`
-	Description          string         `json:"description"`
-	DamagesDescription   *string        `json:"damagesDescription,omitempty"`
-	ResponsibleParty     *string        `json:"responsibleParty,omitempty"`
-	PoliceReportNumber   *string        `json:"policeReportNumber,omitempty"`
-	InsuranceClaimNumber *string        `json:"insuranceClaimNumber,omitempty"`
-	Status               AccidentStatus `json:"status"`
-	CreatedAt            time.Time      `json:"createdAt"`
-	UpdatedAt            time.Time      `json:"updatedAt"`
-	CreatedBy            *string        `json:"createdBy,omitempty"`
-	Car                  *Car           `json:"car,omitempty"`
+	ID                   string          `json:"id"`
+	CarID                string          `json:"carId"`
+	AccidentDate         time.Time       `json:"accidentDate"`
+	Location             string          `json:"location"`
+	Description          string          `json:"description"`
+	DamagesDescription   *string         `json:"damagesDescription,omitempty"`
+	ResponsibleParty     *string         `json:"responsibleParty,omitempty"`
+	PoliceReportNumber   *string         `json:"policeReportNumber,omitempty"`
+	InsuranceClaimNumber *string         `json:"insuranceClaimNumber,omitempty"`
+	Status               AccidentStatus  `json:"status"`
+	CreatedAt            time.Time       `json:"createdAt"`
+	UpdatedAt            time.Time       `json:"updatedAt"`
+	CreatedBy            *string         `json:"createdBy,omitempty"`
+	Car                  *Car            `json:"car,omitempty"`
 	Photos               []AccidentPhoto `json:"photos,omitempty"`
-	Repairs              []Repair       `json:"repairs,omitempty"`
+	Repairs              []Repair        `json:"repairs,omitempty"`
 }
 
 // CreateAccidentRequest represents the request to create a new accident
 type CreateAccidentRequest struct {
-	CarID                string         `json:"carId" binding:"required"`
-	AccidentDate         time.Time      `json:"accidentDate" binding:"required"`
-	Location             string         `json:"location" binding:"required"`
-	Description          string         `json:"description" binding:"required"`
-	DamagesDescription   *string        `json:"damagesDescription,omitempty"`
-	ResponsibleParty     *string        `json:"responsibleParty,omitempty"`
-	PoliceReportNumber   *string        `json:"policeReportNumber,omitempty"`
-	InsuranceClaimNumber *string        `json:"insuranceClaimNumber,omitempty"`
+	CarID                string          `json:"carId" binding:"required"`
+	AccidentDate         time.Time       `json:"accidentDate" binding:"required"`
+	Location             string          `json:"location" binding:"required"`
+	Description          string          `json:"description" binding:"required"`
+	DamagesDescription   *string         `json:"damagesDescription,omitempty"`
+	ResponsibleParty     *string         `json:"responsibleParty,omitempty"`
+	PoliceReportNumber   *string         `json:"policeReportNumber,omitempty"`
+	InsuranceClaimNumber *string         `json:"insuranceClaimNumber,omitempty"`
 	Status               *AccidentStatus `json:"status,omitempty"`
 }
 

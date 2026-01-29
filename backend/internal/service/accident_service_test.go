@@ -13,7 +13,7 @@ import (
 func TestCreateAccidentRequest_Validate(t *testing.T) {
 	now := time.Now()
 	future := now.Add(24 * time.Hour)
-	
+
 	tests := []struct {
 		name    string
 		req     *models.CreateAccidentRequest

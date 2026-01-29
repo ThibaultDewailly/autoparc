@@ -149,3 +149,172 @@ export interface BackendLoginResponse {
   user: BackendUser
   session: BackendSession
 }
+
+// Garage types
+export interface Garage {
+  id: string
+  name: string
+  contactPerson?: string
+  phone: string
+  email?: string
+  address: string
+  specialization?: string
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+  createdBy: string
+}
+
+export interface CreateGarageRequest {
+  name: string
+  contactPerson?: string
+  phone: string
+  email?: string
+  address: string
+  specialization?: string
+}
+
+export interface UpdateGarageRequest {
+  name?: string
+  contactPerson?: string
+  phone?: string
+  email?: string
+  address?: string
+  specialization?: string
+}
+
+export interface GarageFilters {
+  page?: number
+  limit?: number
+  search?: string
+  isActive?: boolean
+}
+
+// Accident types
+export type AccidentStatus = 'declared' | 'under_review' | 'approved' | 'closed'
+
+export interface Accident {
+  id: string
+  carId: string
+  car?: Car
+  accidentDate: string
+  location: string
+  description: string
+  damagesDescription?: string
+  responsibleParty?: string
+  policeReportNumber?: string
+  insuranceClaimNumber?: string
+  status: AccidentStatus
+  createdAt: string
+  updatedAt: string
+  createdBy: string
+  photos?: AccidentPhoto[]
+}
+
+export interface CreateAccidentRequest {
+  carId: string
+  accidentDate: string
+  location: string
+  description: string
+  damagesDescription?: string
+  responsibleParty?: string
+  policeReportNumber?: string
+  insuranceClaimNumber?: string
+}
+
+export interface UpdateAccidentRequest {
+  accidentDate?: string
+  location?: string
+  description?: string
+  damagesDescription?: string
+  responsibleParty?: string
+  policeReportNumber?: string
+  insuranceClaimNumber?: string
+}
+
+export interface AccidentFilters {
+  page?: number
+  limit?: number
+  carId?: string
+  status?: AccidentStatus
+  startDate?: string
+  endDate?: string
+}
+
+// Accident Photo types
+export interface AccidentPhoto {
+  id: string
+  accidentId: string
+  filename: string
+  fileSize: number
+  mimeType: string
+  compressionType?: string
+  description?: string
+  uploadedAt: string
+  uploadedBy: string
+}
+
+export interface UploadPhotoRequest {
+  file: File
+  description?: string
+}
+
+// Repair types
+export type RepairType = 'accident' | 'maintenance' | 'inspection'
+export type RepairStatus = 'scheduled' | 'in_progress' | 'completed' | 'cancelled'
+
+export interface Repair {
+  id: string
+  carId: string
+  car?: Car
+  accidentId?: string
+  accident?: Accident
+  garageId: string
+  garage?: Garage
+  repairType: RepairType
+  description: string
+  startDate: string
+  endDate?: string
+  cost?: number
+  status: RepairStatus
+  invoiceNumber?: string
+  notes?: string
+  createdAt: string
+  updatedAt: string
+  createdBy: string
+}
+
+export interface CreateRepairRequest {
+  carId: string
+  accidentId?: string
+  garageId: string
+  repairType: RepairType
+  description: string
+  startDate: string
+  endDate?: string
+  cost?: number
+  invoiceNumber?: string
+  notes?: string
+}
+
+export interface UpdateRepairRequest {
+  garageId?: string
+  description?: string
+  startDate?: string
+  endDate?: string
+  cost?: number
+  invoiceNumber?: string
+  notes?: string
+}
+
+export interface RepairFilters {
+  page?: number
+  limit?: number
+  carId?: string
+  accidentId?: string
+  garageId?: string
+  repairType?: RepairType
+  status?: RepairStatus
+  startDate?: string
+  endDate?: string
+}

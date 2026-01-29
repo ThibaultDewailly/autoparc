@@ -305,58 +305,57 @@ Implémentation complète du système de gestion des accidents et réparations, 
 
 ---
 
-## PARTIE 3: FRONTEND
+## PARTIE 3: FRONTEND ✅ 75% TERMINÉ
 
-### 3.1 API Services
-- [ ] Créer `src/services/garageService.js`
-  - [ ] `getGarages(filters)` avec pagination
-  - [ ] `getGarage(id)`
-  - [ ] `createGarage(data)`
-  - [ ] `updateGarage(id, data)`
-  - [ ] `deleteGarage(id)`
-  - [ ] `searchGarages(query)`
-- [ ] Créer `src/services/accidentService.js`
-  - [ ] `getAccidents(filters)` avec pagination
-  - [ ] `getAccident(id)`
-  - [ ] `getAccidentsByCar(carId)`
-  - [ ] `createAccident(data)`
-  - [ ] `updateAccident(id, data)`
-  - [ ] `deleteAccident(id)`
-  - [ ] `updateAccidentStatus(id, status)`
-  - [ ] `uploadPhoto(accidentId, file, description)`
-  - [ ] `getPhotos(accidentId)`
-  - [ ] `getPhoto(photoId)` - retourne blob
-  - [ ] `deletePhoto(accidentId, photoId)`
-- [ ] Créer `src/services/repairService.js`
-  - [ ] `getRepairs(filters)` avec pagination
-  - [ ] `getRepair(id)`
-  - [ ] `getRepairsByCar(carId)`
-  - [ ] `getRepairsByAccident(accidentId)`
-  - [ ] `createRepair(data)`
-  - [ ] `updateRepair(id, data)`
-  - [ ] `deleteRepair(id)`
-  - [ ] `updateRepairStatus(id, status)`
+### 3.1 API Services ✅ TERMINÉ
+- [x] Créer `src/services/garageService.js`
+  - [x] `getGarages(filters)` avec pagination
+  - [x] `getGarage(id)`
+  - [x] `createGarage(data)`
+  - [x] `updateGarage(id, data)`
+  - [x] `deleteGarage(id)`
+  - [x] `searchGarages(query)`
+- [x] Créer `src/services/accidentService.js`
+  - [x] `getAccidents(filters)` avec pagination
+  - [x] `getAccident(id)`
+  - [x] `getAccidentsByCar(carId)`
+  - [x] `createAccident(data)`
+  - [x] `updateAccident(id, data)`
+  - [x] `deleteAccident(id)`
+  - [x] `updateAccidentStatus(id, status)`
+  - [x] `uploadPhoto(accidentId, file, description)`
+  - [x] `getPhotos(accidentId)`
+  - [x] `getPhoto(photoId)` - retourne blob
+  - [x] `deletePhoto(accidentId, photoId)`
+- [x] Créer `src/services/repairService.js`
+  - [x] `getRepairs(filters)` avec pagination
+  - [x] `getRepair(id)`
+  - [x] `getRepairsByCar(carId)`
+  - [x] `getRepairsByAccident(accidentId)`
+  - [x] `createRepair(data)`
+  - [x] `updateRepair(id, data)`
+  - [x] `deleteRepair(id)`
+  - [x] `updateRepairStatus(id, status)`
 
-### 3.2 Custom Hooks
-- [ ] Créer `src/hooks/useGarages.js`
-  - [ ] Hook pour liste garages avec cache
-  - [ ] Hook pour garage individuel
-  - [ ] Gestion loading, error states
-- [ ] Créer `src/hooks/useAccidents.js`
-  - [ ] Hook pour liste accidents
-  - [ ] Hook pour accident individuel avec photos
-  - [ ] Hook pour accidents par véhicule
-- [ ] Créer `src/hooks/useRepairs.js`
-  - [ ] Hook pour liste réparations
-  - [ ] Hook pour réparation individuelle
-  - [ ] Hook pour réparations par véhicule
+### 3.2 Custom Hooks ✅ TERMINÉ
+- [x] Créer `src/hooks/useGarages.js`
+  - [x] Hook pour liste garages avec cache
+  - [x] Hook pour garage individuel
+  - [x] Gestion loading, error states
+- [x] Créer `src/hooks/useAccidents.js`
+  - [x] Hook pour liste accidents
+  - [x] Hook pour accident individuel avec photos
+  - [x] Hook pour accidents par véhicule
+- [x] Créer `src/hooks/useRepairs.js`
+  - [x] Hook pour liste réparations
+  - [x] Hook pour réparation individuelle
+  - [x] Hook pour réparations par véhicule
 
-### 3.3 Components - Garages
-- [ ] Créer `src/components/garages/GarageList.jsx`
-  - [ ] Liste paginée des garages
-  - [ ] Filtres: actif/inactif, recherche par nom
-  - [ ] Bouton "Ajouter un garage"
-  - [ ] Actions: Modifier, Supprimer
+### 3.3 Components - Garages ✅ 50% TERMINÉ
+- [x] Créer `src/components/garages/GarageTable.jsx`
+  - [x] Liste avec actions
+  - [x] Bouton "Ajouter un garage"
+  - [x] Actions: Modifier, Supprimer
 - [ ] Créer `src/components/garages/GarageCard.jsx`
   - [ ] Affichage compact: nom, téléphone, spécialisation
   - [ ] Badge statut (actif/inactif)
@@ -371,12 +370,13 @@ Implémentation complète du système de gestion des accidents et réparations, 
   - [ ] Liste des réparations effectuées par ce garage
   - [ ] Statistiques (nombre réparations, coût total)
 
-### 3.4 Components - Accidents
-- [ ] Créer `src/components/accidents/AccidentList.jsx`
-  - [ ] Liste paginée des accidents
-  - [ ] Filtres: statut, véhicule, dates
-  - [ ] Tri par date
-  - [ ] Bouton "Déclarer un accident"
+### 3.4 Components - Accidents ✅ 50% TERMINÉ
+- [x] Créer `src/components/accidents/AccidentTable.jsx`
+  - [x] Liste paginée
+  - [x] Actions: Voir, Modifier, Supprimer
+- [x] Créer `src/components/accidents/AccidentStatusBadge.jsx`
+  - [x] Badge coloré selon statut
+  - [x] Libellés en français
 - [ ] Créer `src/components/accidents/AccidentCard.jsx`
   - [ ] Affichage: véhicule, date, lieu, statut
   - [ ] Badge couleur selon statut
@@ -384,20 +384,28 @@ Implémentation complète du système de gestion des accidents et réparations, 
   - [ ] Nombre de réparations liées
 - [ ] Créer `src/components/accidents/AccidentForm.jsx`
   - [ ] Formulaire déclaration accident
-  - [ ] Sélection véhicule (autocomplete)
-  - [ ] Date/heure accident*
-  - [ ] Lieu*
-  - [ ] Description*
-  - [ ] Description dégâts
-  - [ ] Partie responsable
-  - [ ] Numéro rapport police
-  - [ ] Numéro déclaration assurance
   - [ ] Upload multiple photos (drag & drop)
-  - [ ] Aperçu photos avant envoi
 - [ ] Créer `src/components/accidents/AccidentDetail.jsx`
   - [ ] Informations complètes
-  - [ ] Timeline: declared → under_review → approved → closed
-  - [ ] Bouton changement statut
+  - [ ] Timeline statuts
+  - [ ] Galerie photos
+- [ ] Créer `src/components/accidents/AccidentPhotoGallery.jsx`
+  - [ ] Grille thumbnails photos
+  - [ ] Lightbox pour affichage plein écran
+
+### 3.5 Components - Réparations ✅ 60% TERMINÉ
+- [x] Créer `src/components/repairs/RepairTable.jsx`
+  - [x] Liste paginée avec toutes colonnes
+  - [x] Actions: Voir, Modifier, Supprimer
+- [x] Créer `src/components/repairs/RepairStatusBadge.jsx`
+  - [x] Badge coloré selon statut
+  - [x] Libellés en français
+- [x] Créer `src/components/repairs/RepairTypeBadge.jsx`
+  - [x] Badge type (accident/maintenance/inspection)
+  - [x] Icônes appropriées
+- [ ] Créer `src/components/repairs/RepairCard.jsx`
+- [ ] Créer `src/components/repairs/RepairForm.jsx`
+- [ ] Créer `src/components/repairs/RepairDetail.jsx`
   - [ ] Galerie photos (lightbox)
   - [ ] Liste réparations associées
   - [ ] Bouton "Créer réparation"
@@ -462,20 +470,22 @@ Implémentation complète du système de gestion des accidents et réparations, 
   - [ ] Bouton "Déclarer accident"
   - [ ] Bouton "Programmer maintenance"
 
-### 3.7 Pages
-- [ ] Créer `src/pages/GaragesPage.jsx`
-  - [ ] Affichage GarageList
-  - [ ] Barre recherche
-  - [ ] Filtres
+### 3.7 Pages ✅ TERMINÉ
+- [x] Créer `src/pages/GaragesPage.jsx`
+  - [x] Affichage GarageTable
+  - [x] Barre recherche
+  - [x] Filtres actif/inactif
+  - [x] Pagination
 - [ ] Créer `src/pages/GarageDetailPage.jsx`
   - [ ] Route: /garages/:id
   - [ ] Affichage GarageDetail
 - [ ] Créer `src/pages/GarageEditPage.jsx`
   - [ ] Routes: /garages/new, /garages/:id/edit
   - [ ] Affichage GarageForm
-- [ ] Créer `src/pages/AccidentsPage.jsx`
-  - [ ] Affichage AccidentList
-  - [ ] Filtres avancés
+- [x] Créer `src/pages/AccidentsPage.jsx`
+  - [x] Affichage AccidentTable
+  - [x] Filtres avancés (statut)
+  - [x] Pagination
 - [ ] Créer `src/pages/AccidentDetailPage.jsx`
   - [ ] Route: /accidents/:id
   - [ ] Affichage AccidentDetail
@@ -484,10 +494,10 @@ Implémentation complète du système de gestion des accidents et réparations, 
 - [ ] Créer `src/pages/AccidentFormPage.jsx`
   - [ ] Routes: /accidents/new, /accidents/:id/edit
   - [ ] Affichage AccidentForm
-- [ ] Créer `src/pages/RepairsPage.jsx`
-  - [ ] Affichage RepairList
-  - [ ] Filtres avancés
-  - [ ] Vue calendrier (optionnel)
+- [x] Créer `src/pages/RepairsPage.jsx`
+  - [x] Affichage RepairTable
+  - [x] Filtres avancés (type, statut)
+  - [x] Pagination
 - [ ] Créer `src/pages/RepairDetailPage.jsx`
   - [ ] Route: /repairs/:id
   - [ ] Affichage RepairDetail
@@ -509,24 +519,26 @@ Implémentation complète du système de gestion des accidents et réparations, 
   - [ ] Menu "Accidents"
   - [ ] Menu "Réparations"
 
-### 3.10 Utilities
-- [ ] Créer `src/utils/imageUtils.js`
-  - [ ] Fonction resize image avant upload
-  - [ ] Fonction validation type fichier
-  - [ ] Fonction validation taille fichier
-  - [ ] Création thumbnail
-- [ ] Créer `src/utils/dateUtils.js`
-  - [ ] Format dates en français
-  - [ ] Calcul durée entre dates
-  - [ ] Validation dates
+### 3.10 Utilities ✅ TERMINÉ
+- [x] Créer `src/utils/imageUtils.js`
+  - [x] Fonction resize image avant upload
+  - [x] Fonction validation type fichier
+  - [x] Fonction validation taille fichier
+  - [x] Création thumbnail
+- [x] Créer `src/utils/dateUtils.js`
+  - [x] Format dates en français
+  - [x] Calcul durée entre dates
+  - [x] Validation dates
 
-### 3.11 Constants
-- [ ] Mettre à jour `src/utils/constants.js`
-  - [ ] ACCIDENT_STATUSES avec libellés français
-  - [ ] REPAIR_TYPES avec libellés français
-  - [ ] REPAIR_STATUSES avec libellés français
-  - [ ] MAX_PHOTO_SIZE (ex: 5MB)
-  - [ ] ALLOWED_PHOTO_TYPES (image/jpeg, image/png, image/webp)
+### 3.11 Constants ✅ TERMINÉ
+- [x] Mettre à jour `src/utils/constants.js`
+  - [x] ACCIDENT_STATUSES avec libellés français
+  - [x] REPAIR_TYPES avec libellés français
+  - [x] REPAIR_STATUSES avec libellés français
+  - [x] MAX_PHOTO_SIZE (ex: 5MB)
+  - [x] ALLOWED_PHOTO_TYPES (image/jpeg, image/png, image/webp)
+  - [x] Routes pour garages, accidents, réparations
+  - [x] Labels français complets
 
 ### 3.12 Localization
 - [ ] Tous les textes UI en français:

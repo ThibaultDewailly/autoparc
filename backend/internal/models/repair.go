@@ -26,24 +26,24 @@ const (
 
 // Repair represents a vehicle repair
 type Repair struct {
-	ID            string        `json:"id"`
-	CarID         string        `json:"carId"`
-	AccidentID    *string       `json:"accidentId,omitempty"`
-	GarageID      string        `json:"garageId"`
-	RepairType    RepairType    `json:"repairType"`
-	Description   string        `json:"description"`
-	StartDate     time.Time     `json:"startDate"`
-	EndDate       *time.Time    `json:"endDate,omitempty"`
-	Cost          *float64      `json:"cost,omitempty"`
-	Status        RepairStatus  `json:"status"`
-	InvoiceNumber *string       `json:"invoiceNumber,omitempty"`
-	Notes         *string       `json:"notes,omitempty"`
-	CreatedAt     time.Time     `json:"createdAt"`
-	UpdatedAt     time.Time     `json:"updatedAt"`
-	CreatedBy     *string       `json:"createdBy,omitempty"`
-	Car           *Car          `json:"car,omitempty"`
-	Accident      *Accident     `json:"accident,omitempty"`
-	Garage        *Garage       `json:"garage,omitempty"`
+	ID            string       `json:"id"`
+	CarID         string       `json:"carId"`
+	AccidentID    *string      `json:"accidentId,omitempty"`
+	GarageID      string       `json:"garageId"`
+	RepairType    RepairType   `json:"repairType"`
+	Description   string       `json:"description"`
+	StartDate     time.Time    `json:"startDate"`
+	EndDate       *time.Time   `json:"endDate,omitempty"`
+	Cost          *float64     `json:"cost,omitempty"`
+	Status        RepairStatus `json:"status"`
+	InvoiceNumber *string      `json:"invoiceNumber,omitempty"`
+	Notes         *string      `json:"notes,omitempty"`
+	CreatedAt     time.Time    `json:"createdAt"`
+	UpdatedAt     time.Time    `json:"updatedAt"`
+	CreatedBy     *string      `json:"createdBy,omitempty"`
+	Car           *Car         `json:"car,omitempty"`
+	Accident      *Accident    `json:"accident,omitempty"`
+	Garage        *Garage      `json:"garage,omitempty"`
 }
 
 // CreateRepairRequest represents the request to create a new repair

@@ -14,11 +14,11 @@ import (
 
 // CarService handles car business logic
 type CarService struct {
-	carRepo         *repository.CarRepository
-	insuranceRepo   *repository.InsuranceRepository
-	actionLogRepo   *repository.ActionLogRepository
-	accidentRepo    *repository.AccidentRepository
-	repairRepo      *repository.RepairRepository
+	carRepo       *repository.CarRepository
+	insuranceRepo *repository.InsuranceRepository
+	actionLogRepo *repository.ActionLogRepository
+	accidentRepo  *repository.AccidentRepository
+	repairRepo    *repository.RepairRepository
 }
 
 // NewCarService creates a new car service
@@ -66,9 +66,9 @@ func (s *CarService) CreateCar(ctx context.Context, req *models.CreateCarRequest
 	}
 
 	// Validate status
-	if req.Status != models.CarStatusActive && 
-	   req.Status != models.CarStatusMaintenance && 
-	   req.Status != models.CarStatusRetired {
+	if req.Status != models.CarStatusActive &&
+		req.Status != models.CarStatusMaintenance &&
+		req.Status != models.CarStatusRetired {
 		return nil, fmt.Errorf("invalid status. Must be: active, maintenance, or retired")
 	}
 
@@ -230,9 +230,9 @@ func (s *CarService) UpdateCar(ctx context.Context, id string, req *models.Updat
 	}
 
 	if req.Status != nil && *req.Status != existingCar.Status {
-		if *req.Status != models.CarStatusActive && 
-		   *req.Status != models.CarStatusMaintenance && 
-		   *req.Status != models.CarStatusRetired {
+		if *req.Status != models.CarStatusActive &&
+			*req.Status != models.CarStatusMaintenance &&
+			*req.Status != models.CarStatusRetired {
 			return nil, fmt.Errorf("invalid status. Must be: active, maintenance, or retired")
 		}
 		updates["status"] = *req.Status

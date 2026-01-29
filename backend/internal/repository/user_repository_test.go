@@ -11,7 +11,7 @@ import (
 
 func TestUserRepository_Create(t *testing.T) {
 	cleanupDB(t)
-	
+
 	repo := NewUserRepository(testDB)
 	ctx := testContext()
 
@@ -223,7 +223,6 @@ func TestUserRepository_GetAll_EmptyResult(t *testing.T) {
 
 	repo := NewUserRepository(testDB)
 
-	
 	ctx := testContext()
 
 	filters := EmployeeFilters{

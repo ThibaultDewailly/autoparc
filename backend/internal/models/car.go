@@ -54,12 +54,12 @@ type UpdateCarRequest struct {
 
 // CarFilters represents filters for car queries
 type CarFilters struct {
-	Status       *CarStatus
-	Search       string
-	Page         int
-	Limit        int
-	SortBy       string
-	SortOrder    string
+	Status    *CarStatus
+	Search    string
+	Page      int
+	Limit     int
+	SortBy    string
+	SortOrder string
 }
 
 // CarListResponse represents a paginated list of cars

@@ -465,7 +465,7 @@ func (h *AccidentHandler) GetPhotos(w http.ResponseWriter, r *http.Request) {
 // GetPhoto handles GET /api/v1/accidents/{id}/photos/{photo_id}
 func (h *AccidentHandler) GetPhoto(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	
+
 	// Extract photo ID from path like /api/v1/accidents/{id}/photos/{photo_id}
 	parts := strings.Split(strings.TrimPrefix(r.URL.Path, "/api/v1/accidents/"), "/")
 	if len(parts) < 3 {
@@ -525,7 +525,7 @@ func (h *AccidentHandler) GetPhoto(w http.ResponseWriter, r *http.Request) {
 // DeletePhoto handles DELETE /api/v1/accidents/{id}/photos/{photo_id}
 func (h *AccidentHandler) DeletePhoto(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	
+
 	// Extract photo ID from path
 	parts := strings.Split(strings.TrimPrefix(r.URL.Path, "/api/v1/accidents/"), "/")
 	if len(parts) < 3 {
