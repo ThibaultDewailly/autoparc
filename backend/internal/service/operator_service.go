@@ -141,8 +141,8 @@ func (s *OperatorService) GetOperators(ctx context.Context, filters *models.Oper
 	totalPages := (totalCount + filters.Limit - 1) / filters.Limit
 
 	return &models.OperatorListResponse{
-		Operators:  operators,
-		TotalCount: totalCount,
+		Data:       operators,
+		Total:      totalCount,
 		Page:       filters.Page,
 		Limit:      filters.Limit,
 		TotalPages: totalPages,

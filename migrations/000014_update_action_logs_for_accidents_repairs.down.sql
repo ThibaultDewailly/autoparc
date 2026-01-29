@@ -1,0 +1,3 @@
+-- No changes needed to revert
+-- The action_logs table structure remains unchanged
+-- This rollback is a no-op as the up migration only added documentation

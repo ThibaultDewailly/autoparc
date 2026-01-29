@@ -190,10 +190,8 @@ test.describe('Operator Management', () => {
       // Verify detail page elements
       await expect(page.getByText(/informations générales/i)).toBeVisible()
       await expect(page.getByText(/attribution actuelle|historique/i)).toBeVisible()
-    } else {
-      // No operators to test with
-      console.log('No operators available for testing')
     }
+    // Skip test if no operators available
   })
 
   test('should navigate to edit page', async ({ page }) => {
@@ -218,10 +216,8 @@ test.describe('Operator Management', () => {
       // Verify edit page elements
       await expect(page.getByRole('heading', { name: /modifier.*opérateur/i })).toBeVisible()
       await expect(page.getByRole('button', { name: /enregistrer/i })).toBeVisible()
-    } else {
-      // No operators to test with
-      console.log('No operators available for testing')
     }
+    // Skip test if no operators available
   })
 
   test('should show delete confirmation dialog', async ({ page }) => {
@@ -248,10 +244,8 @@ test.describe('Operator Management', () => {
       
       // Dialog should close
       await expect(page.getByText(/êtes-vous sûr.*désactiver/i)).not.toBeVisible()
-    } else {
-      // No operators to test with
-      console.log('No operators available for testing')
     }
+    // Skip test if no operators available
   })
 
   test('should navigate from navbar', async ({ page }) => {

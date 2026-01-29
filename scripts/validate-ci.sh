@@ -183,7 +183,7 @@ else
     docker compose up -d
     if docker ps | grep -q autoparc_postgres; then
         echo "Running backend integration tests..."
-        if go test -v -race ./tests/integration/...; then
+        if go test -v -race ./...; then
             print_success "Backend integration tests passed"
         else
             print_error "Backend integration tests failed"

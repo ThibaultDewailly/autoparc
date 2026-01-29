@@ -269,8 +269,8 @@ test.describe('Car-Operator Assignments', () => {
       const hasOperator = await page.getByText(/depuis/i).isVisible({ timeout: 1000 }).catch(() => false)
       
       if (hasOperator) {
-        // Get the start date text
-        const startDateText = await page.locator('text=/depuis.*\\d{2}\\/\\d{2}\\/\\d{4}/i').textContent()
+        // Get the start date text (for verification if needed)
+        const _startDateText = await page.locator('text=/depuis.*\\d{2}\\/\\d{2}\\/\\d{4}/i').textContent()
         
         // Click unassign button
         const unassignButton = page.getByRole('button', { name: /désattribuer/i })

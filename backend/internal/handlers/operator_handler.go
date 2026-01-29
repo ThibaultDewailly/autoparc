@@ -32,12 +32,16 @@ func (h *OperatorHandler) GetOperators(w http.ResponseWriter, r *http.Request) {
 		Department: query.Get("department"),
 		Page:       parseIntQuery(query.Get("page"), 1),
 		Limit:      parseIntQuery(query.Get("limit"), 20),
-		SortBy:     query.Get("sortBy"),
-		SortOrder:  query.Get("sortOrder"),
+		SortBy:     query.Get("sort_by"),
+		SortOrder:  query.Get("order"),
 	}
 
-	// Parse isActive filter
-	if isActiveStr := query.Get("isActive"); isActiveStr != "" {
+	// Parse isActive filter (support both snake_case and camelCase)
+	isActiveStr := query.Get("is_active")
+	if isActiveStr == "" {
+		isActiveStr = query.Get("isActive")
+	}
+	if isActiveStr != "" {
 		isActive := isActiveStr == "true"
 		filters.IsActive = &isActive
 	}

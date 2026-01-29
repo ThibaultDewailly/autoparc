@@ -171,12 +171,12 @@ func TestOperatorIntegration(t *testing.T) {
 			t.Fatalf("GetOperators failed: %v", err)
 		}
 
-		if len(response.Operators) == 0 {
+		if len(response.Data) == 0 {
 			t.Error("Expected operators")
 		}
 
-		if response.TotalCount < 5 {
-			t.Errorf("Expected at least 5 operators, got %d", response.TotalCount)
+		if response.Total < 5 {
+			t.Errorf("Expected at least 5 operators, got %d", response.Total)
 		}
 	})
 
@@ -208,7 +208,7 @@ func TestOperatorIntegration(t *testing.T) {
 		}
 
 		found := false
-		for _, op := range response.Operators {
+		for _, op := range response.Data {
 			if op.FirstName == "SearchableFirst" {
 				found = true
 				break
@@ -261,7 +261,7 @@ func TestOperatorIntegration(t *testing.T) {
 			t.Fatalf("GetOperators failed: %v", err)
 		}
 
-		for _, op := range response.Operators {
+		for _, op := range response.Data {
 			if op.Department != nil && *op.Department != "Engineering" {
 				t.Errorf("Expected only Engineering department, got %s", *op.Department)
 			}
@@ -841,7 +841,7 @@ func TestOperatorIntegration(t *testing.T) {
 		}
 
 		found := false
-		for _, op := range response.Operators {
+		for _, op := range response.Data {
 			if op.ID == operator.ID {
 				found = true
 				if op.CurrentCar == nil {
