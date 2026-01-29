@@ -10,20 +10,33 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// Helper function to create a test car
+func createTestCar(t *testing.T, ctx context.Context, carID string) {
+	query := `
+		INSERT INTO cars (id, license_plate, brand, model, status, created_at, updated_at)
+		VALUES ($1, $2, $3, $4, $5, $6, $7)
+	`
+	_, err := testDB.ExecContext(ctx, query, carID, "AB-123-CD", "Toyota", "Corolla", "active", time.Now(), time.Now())
+	require.NoError(t, err, "Failed to create test car")
+}
+
 func TestAccidentRepository_Create(t *testing.T) {
-	db := setupTestDB(t)
-	defer db.Close()
+	cleanupDB(t)
 
-	repo := NewAccidentRepository(db)
-	ctx := context.Background()
+	repo := NewAccidentRepository(testDB)
+	ctx := testContext()
 
-	createdBy := "admin-id"
+	// Create test car first
+	carID := "550e8400-e29b-41d4-a716-446655440100"
+	createTestCar(t, ctx, carID)
+
+	accidentID := "550e8400-e29b-41d4-a716-446655440101"
 	damagesDesc := "Front bumper damaged"
 	responsibleParty := "Third party"
 
 	accident := &models.Accident{
-		ID:                   "accident-1",
-		CarID:                "car-1",
+		ID:                   accidentID,
+		CarID:                carID,
 		AccidentDate:         time.Now(),
 		Location:             "Highway A1",
 		Description:          "Rear-end collision",
@@ -34,7 +47,7 @@ func TestAccidentRepository_Create(t *testing.T) {
 		Status:               models.AccidentStatusDeclared,
 		CreatedAt:            time.Now(),
 		UpdatedAt:            time.Now(),
-		CreatedBy:            &createdBy,
+		CreatedBy:            nil,
 	}
 
 	err := repo.Create(ctx, accident)
@@ -42,24 +55,76 @@ func TestAccidentRepository_Create(t *testing.T) {
 }
 
 func TestAccidentRepository_FindByID(t *testing.T) {
-	db := setupTestDB(t)
-	defer db.Close()
+	cleanupDB(t)
 
-	repo := NewAccidentRepository(db)
-	ctx := context.Background()
+	repo := NewAccidentRepository(testDB)
+	ctx := testContext()
 
-	accident, err := repo.FindByID(ctx, "accident-1")
+	// Create test car and accident
+	carID := "550e8400-e29b-41d4-a716-446655440110"
+	accidentID := "550e8400-e29b-41d4-a716-446655440111"
+	createTestCar(t, ctx, carID)
+
+	damagesDesc := "Front bumper damaged"
+	accident := &models.Accident{
+		ID:                 accidentID,
+		CarID:              carID,
+		AccidentDate:       time.Now(),
+		Location:           "Highway A1",
+		Description:        "Rear-end collision",
+		DamagesDescription: &damagesDesc,
+		Status:             models.AccidentStatusDeclared,
+		CreatedAt:          time.Now(),
+		UpdatedAt:          time.Now(),
+	}
+	err := repo.Create(ctx, accident)
 	require.NoError(t, err)
-	assert.NotNil(t, accident)
-	assert.Equal(t, "accident-1", accident.ID)
+
+	// Find by ID
+	found, err := repo.FindByID(ctx, accidentID)
+	require.NoError(t, err)
+	assert.NotNil(t, found)
+	assert.Equal(t, accidentID, found.ID)
 }
 
 func TestAccidentRepository_FindAll(t *testing.T) {
-	db := setupTestDB(t)
-	defer db.Close()
+	cleanupDB(t)
 
-	repo := NewAccidentRepository(db)
-	ctx := context.Background()
+	repo := NewAccidentRepository(testDB)
+	ctx := testContext()
+
+	// Create test car and accidents
+	carID := "550e8400-e29b-41d4-a716-446655440120"
+	createTestCar(t, ctx, carID)
+
+	// Create test accidents
+	accidents := []*models.Accident{
+		{
+			ID:           "550e8400-e29b-41d4-a716-446655440121",
+			CarID:        carID,
+			AccidentDate: time.Now(),
+			Location:     "Highway A1",
+			Description:  "Rear-end collision",
+			Status:       models.AccidentStatusDeclared,
+			CreatedAt:    time.Now(),
+			UpdatedAt:    time.Now(),
+		},
+		{
+			ID:           "550e8400-e29b-41d4-a716-446655440122",
+			CarID:        carID,
+			AccidentDate: time.Now(),
+			Location:     "City center",
+			Description:  "Minor scratch",
+			Status:       models.AccidentStatusUnderReview,
+			CreatedAt:    time.Now(),
+			UpdatedAt:    time.Now(),
+		},
+	}
+
+	for _, acc := range accidents {
+		err := repo.Create(ctx, acc)
+		require.NoError(t, err)
+	}
 
 	tests := []struct {
 		name    string
@@ -74,7 +139,7 @@ func TestAccidentRepository_FindAll(t *testing.T) {
 		{
 			name: "filter by car",
 			filters: map[string]interface{}{
-				"car_id": "car-1",
+				"car_id": carID,
 			},
 			wantErr: false,
 		},
@@ -104,35 +169,69 @@ func TestAccidentRepository_FindAll(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			accidents, err := repo.FindAll(ctx, tt.filters)
+			result, err := repo.FindAll(ctx, tt.filters)
 			if tt.wantErr {
 				assert.Error(t, err)
 			} else {
 				assert.NoError(t, err)
-				assert.NotNil(t, accidents)
+				assert.NotNil(t, result)
 			}
 		})
 	}
 }
 
 func TestAccidentRepository_FindByCarID(t *testing.T) {
-	db := setupTestDB(t)
-	defer db.Close()
+	cleanupDB(t)
 
-	repo := NewAccidentRepository(db)
-	ctx := context.Background()
+	repo := NewAccidentRepository(testDB)
+	ctx := testContext()
 
-	accidents, err := repo.FindByCarID(ctx, "car-1")
+	// Create test car and accident
+	carID := "550e8400-e29b-41d4-a716-446655440130"
+	createTestCar(t, ctx, carID)
+
+	accident := &models.Accident{
+		ID:           "550e8400-e29b-41d4-a716-446655440131",
+		CarID:        carID,
+		AccidentDate: time.Now(),
+		Location:     "Highway A1",
+		Description:  "Test accident",
+		Status:       models.AccidentStatusDeclared,
+		CreatedAt:    time.Now(),
+		UpdatedAt:    time.Now(),
+	}
+	err := repo.Create(ctx, accident)
+	require.NoError(t, err)
+
+	accidents, err := repo.FindByCarID(ctx, carID)
 	assert.NoError(t, err)
 	assert.NotNil(t, accidents)
+	assert.Len(t, accidents, 1)
 }
 
 func TestAccidentRepository_Update(t *testing.T) {
-	db := setupTestDB(t)
-	defer db.Close()
+	cleanupDB(t)
 
-	repo := NewAccidentRepository(db)
-	ctx := context.Background()
+	repo := NewAccidentRepository(testDB)
+	ctx := testContext()
+
+	// Create test car and accident
+	carID := "550e8400-e29b-41d4-a716-446655440140"
+	accidentID := "550e8400-e29b-41d4-a716-446655440141"
+	createTestCar(t, ctx, carID)
+
+	accident := &models.Accident{
+		ID:           accidentID,
+		CarID:        carID,
+		AccidentDate: time.Now(),
+		Location:     "Original location",
+		Description:  "Test accident",
+		Status:       models.AccidentStatusDeclared,
+		CreatedAt:    time.Now(),
+		UpdatedAt:    time.Now(),
+	}
+	err := repo.Create(ctx, accident)
+	require.NoError(t, err)
 
 	policeReport := "PR-2025-001"
 	updates := map[string]interface{}{
@@ -140,16 +239,40 @@ func TestAccidentRepository_Update(t *testing.T) {
 		"location":             "Updated location",
 	}
 
-	err := repo.Update(ctx, "accident-1", updates)
+	err = repo.Update(ctx, accidentID, updates)
 	assert.NoError(t, err)
+
+	// Verify update
+	updated, err := repo.FindByID(ctx, accidentID)
+	require.NoError(t, err)
+	assert.Equal(t, "Updated location", updated.Location)
+	assert.NotNil(t, updated.PoliceReportNumber)
+	assert.Equal(t, policeReport, *updated.PoliceReportNumber)
 }
 
 func TestAccidentRepository_UpdateStatus(t *testing.T) {
-	db := setupTestDB(t)
-	defer db.Close()
+	cleanupDB(t)
 
-	repo := NewAccidentRepository(db)
-	ctx := context.Background()
+	repo := NewAccidentRepository(testDB)
+	ctx := testContext()
+
+	// Create test car and accident
+	carID := "550e8400-e29b-41d4-a716-446655440150"
+	accidentID := "550e8400-e29b-41d4-a716-446655440151"
+	createTestCar(t, ctx, carID)
+
+	accident := &models.Accident{
+		ID:           accidentID,
+		CarID:        carID,
+		AccidentDate: time.Now(),
+		Location:     "Test location",
+		Description:  "Test accident",
+		Status:       models.AccidentStatusDeclared,
+		CreatedAt:    time.Now(),
+		UpdatedAt:    time.Now(),
+	}
+	err := repo.Create(ctx, accident)
+	require.NoError(t, err)
 
 	tests := []struct {
 		name    string
@@ -175,33 +298,57 @@ func TestAccidentRepository_UpdateStatus(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := repo.UpdateStatus(ctx, "accident-1", tt.status)
+			err := repo.UpdateStatus(ctx, accidentID, tt.status)
 			if tt.wantErr {
 				assert.Error(t, err)
 			} else {
 				assert.NoError(t, err)
+				// Verify status was updated
+				updated, err := repo.FindByID(ctx, accidentID)
+				require.NoError(t, err)
+				assert.Equal(t, tt.status, updated.Status)
 			}
 		})
 	}
 }
 
 func TestAccidentRepository_Delete(t *testing.T) {
-	db := setupTestDB(t)
-	defer db.Close()
+	cleanupDB(t)
 
-	repo := NewAccidentRepository(db)
-	ctx := context.Background()
+	repo := NewAccidentRepository(testDB)
+	ctx := testContext()
 
-	err := repo.Delete(ctx, "accident-1")
+	// Create test car and accident
+	carID := "550e8400-e29b-41d4-a716-446655440160"
+	accidentID := "550e8400-e29b-41d4-a716-446655440161"
+	createTestCar(t, ctx, carID)
+
+	accident := &models.Accident{
+		ID:           accidentID,
+		CarID:        carID,
+		AccidentDate: time.Now(),
+		Location:     "Test location",
+		Description:  "Test accident",
+		Status:       models.AccidentStatusDeclared,
+		CreatedAt:    time.Now(),
+		UpdatedAt:    time.Now(),
+	}
+	err := repo.Create(ctx, accident)
+	require.NoError(t, err)
+
+	err = repo.Delete(ctx, accidentID)
 	assert.NoError(t, err)
+
+	// Verify deletion (should return error when trying to find)
+	_, err = repo.FindByID(ctx, accidentID)
+	assert.Error(t, err)
 }
 
 func TestAccidentRepository_Count(t *testing.T) {
-	db := setupTestDB(t)
-	defer db.Close()
+	cleanupDB(t)
 
-	repo := NewAccidentRepository(db)
-	ctx := context.Background()
+	repo := NewAccidentRepository(testDB)
+	ctx := testContext()
 
 	count, err := repo.Count(ctx, map[string]interface{}{})
 	assert.NoError(t, err)

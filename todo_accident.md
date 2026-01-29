@@ -149,17 +149,17 @@ Implémentation complète du système de gestion des accidents et réparations, 
   - [ ] Tests pagination et filtres
   - [ ] Tests recherche
 
-### 2.3 Repository - Accidents
-- [ ] Créer `internal/repository/accident_repository.go`
-  - [ ] Interface `AccidentRepository`
-  - [ ] Méthode `GetAll(ctx, filters)` avec pagination
-  - [ ] Méthode `GetByID(ctx, id)` avec photos
-  - [ ] Méthode `GetByCarID(ctx, carID)` - historique par véhicule
-  - [ ] Méthode `Create(ctx, accident)`
-  - [ ] Méthode `Update(ctx, id, accident)`
-  - [ ] Méthode `Delete(ctx, id)`
-  - [ ] Méthode `UpdateStatus(ctx, id, status)`
-- [ ] Créer tests `internal/repository/accident_repository_test.go`
+### 2.3 Repository - Accidents ✅ TERMINÉ
+- [x] Créer `internal/repository/accident_repository.go`
+  - [x] Interface `AccidentRepository`
+  - [x] Méthode `GetAll(ctx, filters)` avec pagination
+  - [x] Méthode `GetByID(ctx, id)` avec photos
+  - [x] Méthode `GetByCarID(ctx, carID)` - historique par véhicule
+  - [x] Méthode `Create(ctx, accident)`
+  - [x] Méthode `Update(ctx, id, accident)`
+  - [x] Méthode `Delete(ctx, id)`
+  - [x] Méthode `UpdateStatus(ctx, id, status)`
+- [x] Créer tests `internal/repository/accident_repository_test.go`
 
 ### 2.4 Repository - Photos d'Accidents ✅ TERMINÉ
 - [x] Créer `internal/repository/accident_photo_repository.go`
@@ -171,68 +171,68 @@ Implémentation complète du système de gestion des accidents et réparations, 
   - [x] Méthode `GetPhotoMetadata(ctx, accidentID)` - sans données binaires
 - [ ] Créer tests `internal/repository/accident_photo_repository_test.go`
 
-### 2.5 Repository - Réparations
-- [ ] Créer `internal/repository/repair_repository.go`
-  - [ ] Interface `RepairRepository`
-  - [ ] Méthode `GetAll(ctx, filters)` avec pagination
-  - [ ] Méthode `GetByID(ctx, id)`
-  - [ ] Méthode `GetByCarID(ctx, carID)` - historique par véhicule
-  - [ ] Méthode `GetByAccidentID(ctx, accidentID)` - réparations liées
-  - [ ] Méthode `GetByGarageID(ctx, garageID)`
-  - [ ] Méthode `Create(ctx, repair)`
-  - [ ] Méthode `Update(ctx, id, repair)`
-  - [ ] Méthode `Delete(ctx, id)`
-  - [ ] Méthode `UpdateStatus(ctx, id, status)`
-- [ ] Créer tests `internal/repository/repair_repository_test.go`
+### 2.5 Repository - Réparations ✅ TERMINÉ
+- [x] Créer `internal/repository/repair_repository.go`
+  - [x] Interface `RepairRepository`
+  - [x] Méthode `GetAll(ctx, filters)` avec pagination
+  - [x] Méthode `GetByID(ctx, id)`
+  - [x] Méthode `GetByCarID(ctx, carID)` - historique par véhicule
+  - [x] Méthode `GetByAccidentID(ctx, accidentID)` - réparations liées
+  - [x] Méthode `GetByGarageID(ctx, garageID)`
+  - [x] Méthode `Create(ctx, repair)`
+  - [x] Méthode `Update(ctx, id, repair)`
+  - [x] Méthode `Delete(ctx, id)`
+  - [x] Méthode `UpdateStatus(ctx, id, status)`
+- [x] Créer tests `internal/repository/repair_repository_test.go`
 
-### 2.6 Service - Garages
-- [ ] Créer `internal/service/garage_service.go`
-  - [ ] Interface `GarageService`
-  - [ ] Méthode `ListGarages(ctx, filters)` avec business logic
-  - [ ] Méthode `GetGarage(ctx, id)`
-  - [ ] Méthode `CreateGarage(ctx, req, userID)` avec validation
-  - [ ] Méthode `UpdateGarage(ctx, id, req, userID)`
-  - [ ] Méthode `DeleteGarage(ctx, id, userID)` avec vérifications
-  - [ ] Validation: téléphone requis, email format
-  - [ ] Vérifier si garage utilisé par réparations avant suppression
-- [ ] Créer tests `internal/service/garage_service_test.go`
-  - [ ] Tests avec mocks repository
-  - [ ] Tests validation métier
+### 2.6 Service - Garages ✅ TERMINÉ
+- [x] Créer `internal/service/garage_service.go`
+  - [x] Interface `GarageService`
+  - [x] Méthode `ListGarages(ctx, filters)` avec business logic
+  - [x] Méthode `GetGarage(ctx, id)`
+  - [x] Méthode `CreateGarage(ctx, req, userID)` avec validation
+  - [x] Méthode `UpdateGarage(ctx, id, req, userID)`
+  - [x] Méthode `DeleteGarage(ctx, id, userID)` avec vérifications
+  - [x] Validation: téléphone requis, email format
+  - [x] Vérifier si garage utilisé par réparations avant suppression
+- [x] Créer tests `internal/service/garage_service_test.go`
+  - [x] Tests avec mocks repository
+  - [x] Tests validation métier
 
-### 2.7 Service - Accidents
-- [ ] Créer `internal/service/accident_service.go`
-  - [ ] Interface `AccidentService`
-  - [ ] Méthode `ListAccidents(ctx, filters)`
-  - [ ] Méthode `GetAccident(ctx, id)` avec photos et réparations
-  - [ ] Méthode `GetAccidentsByCar(ctx, carID)`
-  - [ ] Méthode `CreateAccident(ctx, req, userID)` avec validation
-  - [ ] Méthode `UpdateAccident(ctx, id, req, userID)`
-  - [ ] Méthode `DeleteAccident(ctx, id, userID)`
-  - [ ] Méthode `UpdateAccidentStatus(ctx, id, status, userID)`
-  - [ ] Méthode `UploadPhoto(ctx, accidentID, file, userID)` avec compression
-  - [ ] Méthode `GetPhotos(ctx, accidentID)`
-  - [ ] Méthode `GetPhoto(ctx, photoID)` avec décompression
-  - [ ] Méthode `DeletePhoto(ctx, photoID, userID)`
-  - [ ] Validation: date accident <= aujourd'hui, car_id valide
-  - [ ] Compression image avec gzip avant stockage
-- [ ] Créer tests `internal/service/accident_service_test.go`
+### 2.7 Service - Accidents ✅ TERMINÉ
+- [x] Créer `internal/service/accident_service.go`
+  - [x] Interface `AccidentService`
+  - [x] Méthode `ListAccidents(ctx, filters)`
+  - [x] Méthode `GetAccident(ctx, id)` avec photos et réparations
+  - [x] Méthode `GetAccidentsByCar(ctx, carID)`
+  - [x] Méthode `CreateAccident(ctx, req, userID)` avec validation
+  - [x] Méthode `UpdateAccident(ctx, id, req, userID)`
+  - [x] Méthode `DeleteAccident(ctx, id, userID)`
+  - [x] Méthode `UpdateAccidentStatus(ctx, id, status, userID)`
+  - [x] Méthode `UploadPhoto(ctx, accidentID, file, userID)` avec compression
+  - [x] Méthode `GetPhotos(ctx, accidentID)`
+  - [x] Méthode `GetPhoto(ctx, photoID)` avec décompression
+  - [x] Méthode `DeletePhoto(ctx, photoID, userID)`
+  - [x] Validation: date accident <= aujourd'hui, car_id valide
+  - [x] Compression image avec gzip avant stockage
+- [x] Créer tests `internal/service/accident_service_test.go`
 
-### 2.8 Service - Réparations
-- [ ] Créer `internal/service/repair_service.go`
-  - [ ] Interface `RepairService`
-  - [ ] Méthode `ListRepairs(ctx, filters)`
-  - [ ] Méthode `GetRepair(ctx, id)`
-  - [ ] Méthode `GetRepairsByCar(ctx, carID)`
-  - [ ] Méthode `GetRepairsByAccident(ctx, accidentID)`
-  - [ ] Méthode `CreateRepair(ctx, req, userID)` avec validation
-  - [ ] Méthode `UpdateRepair(ctx, id, req, userID)`
-  - [ ] Méthode `DeleteRepair(ctx, id, userID)`
-  - [ ] Méthode `UpdateRepairStatus(ctx, id, status, userID)`
-  - [ ] Validation: start_date <= end_date si end_date fourni
-  - [ ] Validation: car_id, garage_id valides
-  - [ ] Si repair_type='accident', accident_id requis
-  - [ ] Calcul durée réparation automatique
-- [ ] Créer tests `internal/service/repair_service_test.go`
+### 2.8 Service - Réparations ✅ TERMINÉ
+- [x] Créer `internal/service/repair_service.go`
+  - [x] Interface `RepairService`
+  - [x] Méthode `ListRepairs(ctx, filters)`
+  - [x] Méthode `GetRepair(ctx, id)`
+  - [x] Méthode `GetRepairsByCar(ctx, carID)`
+  - [x] Méthode `GetRepairsByAccident(ctx, accidentID)`
+  - [x] Méthode `CreateRepair(ctx, req, userID)` avec validation
+  - [x] Méthode `UpdateRepair(ctx, id, req, userID)`
+  - [x] Méthode `DeleteRepair(ctx, id, userID)`
+  - [x] Méthode `UpdateRepairStatus(ctx, id, status, userID)`
+  - [x] Validation: start_date <= end_date si end_date fourni
+  - [x] Validation: car_id, garage_id valides
+  - [x] Si repair_type='accident', accident_id requis
+  - [x] Calcul durée réparation automatique
+- [x] Créer tests `internal/service/repair_service_test.go`
 
 ### 2.9 Handlers - Garages
 - [ ] Créer `internal/handlers/garage_handler.go`

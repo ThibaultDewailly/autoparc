@@ -123,3 +123,8 @@ func ValidateAccidentStatus(status AccidentStatus) error {
 		return errors.New("statut d'accident invalide")
 	}
 }
+
+// Validate validates the UpdateAccidentStatusRequest
+func (r *UpdateAccidentStatusRequest) Validate() error {
+	return ValidateAccidentStatus(r.Status)
+}

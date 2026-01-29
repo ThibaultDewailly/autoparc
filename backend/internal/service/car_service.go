@@ -17,6 +17,8 @@ type CarService struct {
 	carRepo         *repository.CarRepository
 	insuranceRepo   *repository.InsuranceRepository
 	actionLogRepo   *repository.ActionLogRepository
+	accidentRepo    *repository.AccidentRepository
+	repairRepo      *repository.RepairRepository
 }
 
 // NewCarService creates a new car service
@@ -24,11 +26,15 @@ func NewCarService(
 	carRepo *repository.CarRepository,
 	insuranceRepo *repository.InsuranceRepository,
 	actionLogRepo *repository.ActionLogRepository,
+	accidentRepo *repository.AccidentRepository,
+	repairRepo *repository.RepairRepository,
 ) *CarService {
 	return &CarService{
 		carRepo:       carRepo,
 		insuranceRepo: insuranceRepo,
 		actionLogRepo: actionLogRepo,
+		accidentRepo:  accidentRepo,
+		repairRepo:    repairRepo,
 	}
 }
 
@@ -105,7 +111,7 @@ func (s *CarService) CreateCar(ctx context.Context, req *models.CreateCarRequest
 	return s.carRepo.FindByID(ctx, car.ID)
 }
 
-// GetCar retrieves a car by ID
+// GetCar retrieves a car by ID with its accidents and repairs
 func (s *CarService) GetCar(ctx context.Context, id string) (*models.Car, error) {
 	if !utils.ValidateRequired(id) {
 		return nil, fmt.Errorf("car ID is required")
@@ -114,6 +120,26 @@ func (s *CarService) GetCar(ctx context.Context, id string) (*models.Car, error)
 	car, err := s.carRepo.FindByID(ctx, id)
 	if err != nil {
 		return nil, err
+	}
+
+	// Fetch accidents for this car
+	accidentFilters := map[string]interface{}{
+		"car_id": id,
+		"limit":  "100",
+	}
+	accidents, err := s.accidentRepo.FindAll(ctx, accidentFilters)
+	if err == nil && len(accidents) > 0 {
+		car.Accidents = accidents
+	}
+
+	// Fetch repairs for this car
+	repairFilters := map[string]interface{}{
+		"car_id": id,
+		"limit":  "100",
+	}
+	repairs, err := s.repairRepo.FindAll(ctx, repairFilters)
+	if err == nil && len(repairs) > 0 {
+		car.Repairs = repairs
 	}
 
 	return car, nil

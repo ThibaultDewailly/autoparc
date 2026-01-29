@@ -1,8 +1,6 @@
 package repository
 
 import (
-	"context"
-	"database/sql"
 	"testing"
 	"time"
 
@@ -11,27 +9,18 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func setupTestDB(t *testing.T) *sql.DB {
-	// This would normally connect to a test database
-	// For now, we'll skip actual DB tests and focus on structure
-	t.Skip("Integration test - requires database")
-	return nil
-}
-
 func TestGarageRepository_Create(t *testing.T) {
-	db := setupTestDB(t)
-	defer db.Close()
+	cleanupDB(t)
 
-	repo := NewGarageRepository(db)
-	ctx := context.Background()
+	repo := NewGarageRepository(testDB)
+	ctx := testContext()
 
 	contactPerson := "John Doe"
 	email := "test@garage.com"
 	specialization := "Body work"
-	createdBy := "admin-id"
 
 	garage := &models.Garage{
-		ID:             "garage-1",
+		ID:             "550e8400-e29b-41d4-a716-446655440000",
 		Name:           "Test Garage",
 		ContactPerson:  &contactPerson,
 		Phone:          "0123456789",
@@ -41,7 +30,7 @@ func TestGarageRepository_Create(t *testing.T) {
 		IsActive:       true,
 		CreatedAt:      time.Now(),
 		UpdatedAt:      time.Now(),
-		CreatedBy:      &createdBy,
+		CreatedBy:      nil, // No foreign key constraint issues
 	}
 
 	err := repo.Create(ctx, garage)
@@ -49,24 +38,67 @@ func TestGarageRepository_Create(t *testing.T) {
 }
 
 func TestGarageRepository_FindByID(t *testing.T) {
-	db := setupTestDB(t)
-	defer db.Close()
+	cleanupDB(t)
 
-	repo := NewGarageRepository(db)
-	ctx := context.Background()
+	repo := NewGarageRepository(testDB)
+	ctx := testContext()
 
-	garage, err := repo.FindByID(ctx, "garage-1")
+	// Create test garage first
+	garageID := "550e8400-e29b-41d4-a716-446655440010"
+	name := "Test Garage"
+	phone := "0123456789"
+	address := "123 Test St"
+	garage := &models.Garage{
+		ID:        garageID,
+		Name:      name,
+		Phone:     phone,
+		Address:   address,
+		IsActive:  true,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}
+	err := repo.Create(ctx, garage)
 	require.NoError(t, err)
-	assert.NotNil(t, garage)
-	assert.Equal(t, "garage-1", garage.ID)
+
+	// Now find it
+	found, err := repo.FindByID(ctx, garageID)
+	require.NoError(t, err)
+	assert.NotNil(t, found)
+	assert.Equal(t, garageID, found.ID)
+	assert.Equal(t, name, found.Name)
 }
 
 func TestGarageRepository_FindAll(t *testing.T) {
-	db := setupTestDB(t)
-	defer db.Close()
+	cleanupDB(t)
 
-	repo := NewGarageRepository(db)
-	ctx := context.Background()
+	repo := NewGarageRepository(testDB)
+	ctx := testContext()
+
+	// Create test garages
+	garages := []*models.Garage{
+		{
+			ID:        "550e8400-e29b-41d4-a716-446655440020",
+			Name:      "Test Garage A",
+			Phone:     "0123456789",
+			Address:   "123 Test St",
+			IsActive:  true,
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		},
+		{
+			ID:        "550e8400-e29b-41d4-a716-446655440021",
+			Name:      "Another Garage",
+			Phone:     "0987654321",
+			Address:   "456 Other St",
+			IsActive:  true,
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		},
+	}
+	for _, g := range garages {
+		err := repo.Create(ctx, g)
+		require.NoError(t, err)
+	}
 
 	tests := []struct {
 		name    string
@@ -81,7 +113,7 @@ func TestGarageRepository_FindAll(t *testing.T) {
 		{
 			name: "with search",
 			filters: map[string]interface{}{
-				"search": "test",
+				"search": "Test",
 			},
 			wantErr: false,
 		},
@@ -116,38 +148,76 @@ func TestGarageRepository_FindAll(t *testing.T) {
 }
 
 func TestGarageRepository_Update(t *testing.T) {
-	db := setupTestDB(t)
-	defer db.Close()
+	cleanupDB(t)
 
-	repo := NewGarageRepository(db)
-	ctx := context.Background()
+	repo := NewGarageRepository(testDB)
+	ctx := testContext()
 
+	// Create test garage first
+	garageID := "550e8400-e29b-41d4-a716-446655440030"
+	garage := &models.Garage{
+		ID:        garageID,
+		Name:      "Original Garage",
+		Phone:     "0123456789",
+		Address:   "123 Test St",
+		IsActive:  true,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}
+	err := repo.Create(ctx, garage)
+	require.NoError(t, err)
+
+	// Update it
 	updates := map[string]interface{}{
 		"name":  "Updated Garage",
 		"phone": "9876543210",
 	}
 
-	err := repo.Update(ctx, "garage-1", updates)
+	err = repo.Update(ctx, garageID, updates)
 	assert.NoError(t, err)
+
+	// Verify update
+	updated, err := repo.FindByID(ctx, garageID)
+	require.NoError(t, err)
+	assert.Equal(t, "Updated Garage", updated.Name)
+	assert.Equal(t, "9876543210", updated.Phone)
 }
 
 func TestGarageRepository_Delete(t *testing.T) {
-	db := setupTestDB(t)
-	defer db.Close()
+	cleanupDB(t)
 
-	repo := NewGarageRepository(db)
-	ctx := context.Background()
+	repo := NewGarageRepository(testDB)
+	ctx := testContext()
 
-	err := repo.Delete(ctx, "garage-1")
+	// Create test garage first
+	garageID := "550e8400-e29b-41d4-a716-446655440040"
+	garage := &models.Garage{
+		ID:        garageID,
+		Name:      "To Delete Garage",
+		Phone:     "0123456789",
+		Address:   "123 Test St",
+		IsActive:  true,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}
+	err := repo.Create(ctx, garage)
+	require.NoError(t, err)
+
+	// Delete it (soft delete sets is_active=false)
+	err = repo.Delete(ctx, garageID)
 	assert.NoError(t, err)
+
+	// Verify it's marked as inactive
+	deleted, err := repo.FindByID(ctx, garageID)
+	require.NoError(t, err)
+	assert.False(t, deleted.IsActive)
 }
 
 func TestGarageRepository_Count(t *testing.T) {
-	db := setupTestDB(t)
-	defer db.Close()
+	cleanupDB(t)
 
-	repo := NewGarageRepository(db)
-	ctx := context.Background()
+	repo := NewGarageRepository(testDB)
+	ctx := testContext()
 
 	count, err := repo.Count(ctx, map[string]interface{}{})
 	assert.NoError(t, err)
@@ -155,13 +225,27 @@ func TestGarageRepository_Count(t *testing.T) {
 }
 
 func TestGarageRepository_IsUsedByRepairs(t *testing.T) {
-	db := setupTestDB(t)
-	defer db.Close()
+	cleanupDB(t)
 
-	repo := NewGarageRepository(db)
-	ctx := context.Background()
+	repo := NewGarageRepository(testDB)
+	ctx := testContext()
 
-	isUsed, err := repo.IsUsedByRepairs(ctx, "garage-1")
+	// Create test garage first
+	garageID := "550e8400-e29b-41d4-a716-446655440050"
+	garage := &models.Garage{
+		ID:        garageID,
+		Name:      "Test Garage",
+		Phone:     "0123456789",
+		Address:   "123 Test St",
+		IsActive:  true,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}
+	err := repo.Create(ctx, garage)
+	require.NoError(t, err)
+
+	// Check if used (should be false since no repairs created)
+	isUsed, err := repo.IsUsedByRepairs(ctx, garageID)
 	assert.NoError(t, err)
 	assert.False(t, isUsed)
 }

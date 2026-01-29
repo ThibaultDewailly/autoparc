@@ -10,24 +10,59 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// Helper functions to create test data
+func createTestCarForRepair(t *testing.T, ctx context.Context, carID string) {
+	query := `
+		INSERT INTO cars (id, license_plate, brand, model, status, created_at, updated_at)
+		VALUES ($1, $2, $3, $4, $5, $6, $7)
+	`
+	_, err := testDB.ExecContext(ctx, query, carID, "AB-456-EF", "Honda", "Civic", "active", time.Now(), time.Now())
+	require.NoError(t, err, "Failed to create test car")
+}
+
+func createTestGarageForRepair(t *testing.T, ctx context.Context, garageID string) {
+	query := `
+		INSERT INTO garages (id, name, phone, address, is_active, created_at, updated_at)
+		VALUES ($1, $2, $3, $4, $5, $6, $7)
+	`
+	_, err := testDB.ExecContext(ctx, query, garageID, "Test Garage", "0123456789", "123 Test St", true, time.Now(), time.Now())
+	require.NoError(t, err, "Failed to create test garage")
+}
+
+func createTestAccidentForRepair(t *testing.T, ctx context.Context, accidentID, carID string) {
+	query := `
+		INSERT INTO accidents (id, car_id, accident_date, location, description, status, created_at, updated_at)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+	`
+	_, err := testDB.ExecContext(ctx, query, accidentID, carID, time.Now(), "Test location", "Test accident", string(models.AccidentStatusDeclared), time.Now(), time.Now())
+	require.NoError(t, err, "Failed to create test accident")
+}
+
 func TestRepairRepository_Create(t *testing.T) {
-	db := setupTestDB(t)
-	defer db.Close()
+	cleanupDB(t)
 
-	repo := NewRepairRepository(db)
-	ctx := context.Background()
+	repo := NewRepairRepository(testDB)
+	ctx := testContext()
 
-	accidentID := "accident-1"
+	// Create test data
+	carID := "550e8400-e29b-41d4-a716-446655440200"
+	garageID := "550e8400-e29b-41d4-a716-446655440201"
+	accidentID := "550e8400-e29b-41d4-a716-446655440202"
+	repairID := "550e8400-e29b-41d4-a716-446655440203"
+
+	createTestCarForRepair(t, ctx, carID)
+	createTestGarageForRepair(t, ctx, garageID)
+	createTestAccidentForRepair(t, ctx, accidentID, carID)
+
 	cost := 1500.50
 	invoiceNum := "INV-2025-001"
 	notes := "Front bumper replacement"
-	createdBy := "admin-id"
 
 	repair := &models.Repair{
-		ID:            "repair-1",
-		CarID:         "car-1",
+		ID:            repairID,
+		CarID:         carID,
 		AccidentID:    &accidentID,
-		GarageID:      "garage-1",
+		GarageID:      garageID,
 		RepairType:    models.RepairTypeAccident,
 		Description:   "Body work repair",
 		StartDate:     time.Now(),
@@ -38,7 +73,7 @@ func TestRepairRepository_Create(t *testing.T) {
 		Notes:         &notes,
 		CreatedAt:     time.Now(),
 		UpdatedAt:     time.Now(),
-		CreatedBy:     &createdBy,
+		CreatedBy:     nil,
 	}
 
 	err := repo.Create(ctx, repair)
@@ -46,24 +81,86 @@ func TestRepairRepository_Create(t *testing.T) {
 }
 
 func TestRepairRepository_FindByID(t *testing.T) {
-	db := setupTestDB(t)
-	defer db.Close()
+	cleanupDB(t)
 
-	repo := NewRepairRepository(db)
-	ctx := context.Background()
+	repo := NewRepairRepository(testDB)
+	ctx := testContext()
 
-	repair, err := repo.FindByID(ctx, "repair-1")
+	// Create test data
+	carID := "550e8400-e29b-41d4-a716-446655440210"
+	garageID := "550e8400-e29b-41d4-a716-446655440211"
+	repairID := "550e8400-e29b-41d4-a716-446655440212"
+
+	createTestCarForRepair(t, ctx, carID)
+	createTestGarageForRepair(t, ctx, garageID)
+
+	repair := &models.Repair{
+		ID:          repairID,
+		CarID:       carID,
+		GarageID:    garageID,
+		RepairType:  models.RepairTypeMaintenance,
+		Description: "Oil change",
+		StartDate:   time.Now(),
+		Status:      models.RepairStatusScheduled,
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+	}
+	err := repo.Create(ctx, repair)
 	require.NoError(t, err)
-	assert.NotNil(t, repair)
-	assert.Equal(t, "repair-1", repair.ID)
+
+	// Find by ID
+	found, err := repo.FindByID(ctx, repairID)
+	require.NoError(t, err)
+	assert.NotNil(t, found)
+	assert.Equal(t, repairID, found.ID)
 }
 
 func TestRepairRepository_FindAll(t *testing.T) {
-	db := setupTestDB(t)
-	defer db.Close()
+	cleanupDB(t)
 
-	repo := NewRepairRepository(db)
-	ctx := context.Background()
+	repo := NewRepairRepository(testDB)
+	ctx := testContext()
+
+	// Create test data
+	carID := "550e8400-e29b-41d4-a716-446655440220"
+	garageID := "550e8400-e29b-41d4-a716-446655440221"
+	accidentID := "550e8400-e29b-41d4-a716-446655440222"
+
+	createTestCarForRepair(t, ctx, carID)
+	createTestGarageForRepair(t, ctx, garageID)
+	createTestAccidentForRepair(t, ctx, accidentID, carID)
+
+	// Create test repairs
+	repairs := []*models.Repair{
+		{
+			ID:          "550e8400-e29b-41d4-a716-446655440223",
+			CarID:       carID,
+			GarageID:    garageID,
+			AccidentID:  &accidentID,
+			RepairType:  models.RepairTypeAccident,
+			Description: "Front bumper replacement",
+			StartDate:   time.Now(),
+			Status:      models.RepairStatusScheduled,
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		},
+		{
+			ID:          "550e8400-e29b-41d4-a716-446655440224",
+			CarID:       carID,
+			GarageID:    garageID,
+			RepairType:  models.RepairTypeMaintenance,
+			Description: "Oil change",
+			StartDate:   time.Now(),
+			Status:      models.RepairStatusInProgress,
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		},
+	}
+
+	for _, rep := range repairs {
+		err := repo.Create(ctx, rep)
+		require.NoError(t, err)
+	}
 
 	tests := []struct {
 		name    string
@@ -78,21 +175,21 @@ func TestRepairRepository_FindAll(t *testing.T) {
 		{
 			name: "filter by car",
 			filters: map[string]interface{}{
-				"car_id": "car-1",
+				"car_id": carID,
 			},
 			wantErr: false,
 		},
 		{
 			name: "filter by accident",
 			filters: map[string]interface{}{
-				"accident_id": "accident-1",
+				"accident_id": accidentID,
 			},
 			wantErr: false,
 		},
 		{
 			name: "filter by garage",
 			filters: map[string]interface{}{
-				"garage_id": "garage-1",
+				"garage_id": garageID,
 			},
 			wantErr: false,
 		},
@@ -129,55 +226,131 @@ func TestRepairRepository_FindAll(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			repairs, err := repo.FindAll(ctx, tt.filters)
+			result, err := repo.FindAll(ctx, tt.filters)
 			if tt.wantErr {
 				assert.Error(t, err)
 			} else {
 				assert.NoError(t, err)
-				assert.NotNil(t, repairs)
+				assert.NotNil(t, result)
 			}
 		})
 	}
 }
 
 func TestRepairRepository_FindByCarID(t *testing.T) {
-	db := setupTestDB(t)
-	defer db.Close()
+	cleanupDB(t)
 
-	repo := NewRepairRepository(db)
-	ctx := context.Background()
+	repo := NewRepairRepository(testDB)
+	ctx := testContext()
 
-	repairs, err := repo.FindByCarID(ctx, "car-1")
+	// Create test data
+	carID := "550e8400-e29b-41d4-a716-446655440230"
+	garageID := "550e8400-e29b-41d4-a716-446655440231"
+
+	createTestCarForRepair(t, ctx, carID)
+	createTestGarageForRepair(t, ctx, garageID)
+
+	repair := &models.Repair{
+		ID:          "550e8400-e29b-41d4-a716-446655440232",
+		CarID:       carID,
+		GarageID:    garageID,
+		RepairType:  models.RepairTypeMaintenance,
+		Description: "Test repair",
+		StartDate:   time.Now(),
+		Status:      models.RepairStatusScheduled,
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+	}
+	err := repo.Create(ctx, repair)
+	require.NoError(t, err)
+
+	repairs, err := repo.FindByCarID(ctx, carID)
 	assert.NoError(t, err)
 	assert.NotNil(t, repairs)
+	assert.Len(t, repairs, 1)
 }
 
 func TestRepairRepository_Update(t *testing.T) {
-	db := setupTestDB(t)
-	defer db.Close()
+	cleanupDB(t)
 
-	repo := NewRepairRepository(db)
-	ctx := context.Background()
+	repo := NewRepairRepository(testDB)
+	ctx := testContext()
+
+	// Create test data
+	carID := "550e8400-e29b-41d4-a716-446655440240"
+	garageID := "550e8400-e29b-41d4-a716-446655440241"
+	repairID := "550e8400-e29b-41d4-a716-446655440242"
+
+	createTestCarForRepair(t, ctx, carID)
+	createTestGarageForRepair(t, ctx, garageID)
+
+	cost := 1000.00
+	repair := &models.Repair{
+		ID:          repairID,
+		CarID:       carID,
+		GarageID:    garageID,
+		RepairType:  models.RepairTypeMaintenance,
+		Description: "Initial description",
+		StartDate:   time.Now(),
+		Cost:        &cost,
+		Status:      models.RepairStatusScheduled,
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+	}
+	err := repo.Create(ctx, repair)
+	require.NoError(t, err)
 
 	endDate := time.Now().Add(24 * time.Hour)
-	cost := 2000.00
+	newCost := 2000.00
 
 	updates := map[string]interface{}{
 		"end_date": endDate,
-		"cost":     cost,
+		"cost":     newCost,
 	}
 
-	err := repo.Update(ctx, "repair-1", updates)
+	err = repo.Update(ctx, repairID, updates)
 	assert.NoError(t, err)
+
+	// Verify update
+	updated, err := repo.FindByID(ctx, repairID)
+	require.NoError(t, err)
+	assert.NotNil(t, updated.EndDate)
+	assert.NotNil(t, updated.Cost)
+	assert.Equal(t, newCost, *updated.Cost)
 }
 
 func TestRepairRepository_Delete(t *testing.T) {
-	db := setupTestDB(t)
-	defer db.Close()
+	cleanupDB(t)
 
-	repo := NewRepairRepository(db)
-	ctx := context.Background()
+	repo := NewRepairRepository(testDB)
+	ctx := testContext()
 
-	err := repo.Delete(ctx, "repair-1")
+	// Create test data
+	carID := "550e8400-e29b-41d4-a716-446655440250"
+	garageID := "550e8400-e29b-41d4-a716-446655440251"
+	repairID := "550e8400-e29b-41d4-a716-446655440252"
+
+	createTestCarForRepair(t, ctx, carID)
+	createTestGarageForRepair(t, ctx, garageID)
+
+	repair := &models.Repair{
+		ID:          repairID,
+		CarID:       carID,
+		GarageID:    garageID,
+		RepairType:  models.RepairTypeMaintenance,
+		Description: "Test repair",
+		StartDate:   time.Now(),
+		Status:      models.RepairStatusScheduled,
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+	}
+	err := repo.Create(ctx, repair)
+	require.NoError(t, err)
+
+	err = repo.Delete(ctx, repairID)
 	assert.NoError(t, err)
+
+	// Verify deletion
+	_, err = repo.FindByID(ctx, repairID)
+	assert.Error(t, err)
 }

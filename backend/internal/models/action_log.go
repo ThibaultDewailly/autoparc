@@ -9,18 +9,24 @@ import (
 type ActionType string
 
 const (
-	ActionTypeCreate ActionType = "create"
-	ActionTypeUpdate ActionType = "update"
-	ActionTypeDelete ActionType = "delete"
+	ActionTypeCreate       ActionType = "create"
+	ActionTypeUpdate       ActionType = "update"
+	ActionTypeDelete       ActionType = "delete"
+	ActionTypeStatusChange ActionType = "status_change"
+	ActionTypePhotoUpload  ActionType = "photo_upload"
 )
 
 // EntityType represents the type of entity
 type EntityType string
 
 const (
-	EntityTypeCar               EntityType = "car"
-	EntityTypeInsuranceCompany  EntityType = "insurance_company"
+	EntityTypeCar                    EntityType = "car"
+	EntityTypeInsuranceCompany       EntityType = "insurance_company"
 	EntityTypeAdministrativeEmployee EntityType = "administrative_employee"
+	EntityTypeOperator               EntityType = "operator"
+	EntityTypeGarage                 EntityType = "garage"
+	EntityTypeAccident               EntityType = "accident"
+	EntityTypeRepair                 EntityType = "repair"
 )
 
 // ActionLog represents an audit log entry

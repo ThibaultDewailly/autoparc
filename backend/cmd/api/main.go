@@ -40,10 +40,14 @@ func main() {
 	insuranceRepo := repository.NewInsuranceRepository(db.DB)
 	actionLogRepo := repository.NewActionLogRepository(db.DB)
 	operatorRepo := repository.NewOperatorRepository(db.DB)
+	garageRepo := repository.NewGarageRepository(db.DB)
+	accidentRepo := repository.NewAccidentRepository(db.DB)
+	accidentPhotoRepo := repository.NewAccidentPhotoRepository(db.DB)
+	repairRepo := repository.NewRepairRepository(db.DB)
 
 	// Initialize services
 	authService := service.NewAuthService(userRepo, sessionRepo)
-	carService := service.NewCarService(carRepo, insuranceRepo, actionLogRepo)
+	carService := service.NewCarService(carRepo, insuranceRepo, actionLogRepo, accidentRepo, repairRepo)
 	insuranceService := service.NewInsuranceService(insuranceRepo)
 	employeeService := service.NewEmployeeService(userRepo, actionLogRepo)
 	operatorService := service.NewOperatorService(operatorRepo, carRepo, actionLogRepo)
@@ -54,6 +58,9 @@ func main() {
 	insuranceHandler := handlers.NewInsuranceHandler(insuranceService)
 	employeeHandler := handlers.NewEmployeeHandler(employeeService)
 	operatorHandler := handlers.NewOperatorHandler(operatorService)
+	garageHandler := handlers.NewGarageHandler(garageRepo)
+	accidentHandler := handlers.NewAccidentHandler(accidentRepo, accidentPhotoRepo)
+	repairHandler := handlers.NewRepairHandler(repairRepo)
 
 	// Create router
 	mux := http.NewServeMux()
@@ -110,6 +117,33 @@ func main() {
 	authMux.HandleFunc("DELETE /api/v1/operators/{id}", operatorHandler.DeleteOperator)
 	authMux.HandleFunc("GET /api/v1/operators/{id}/assignment-history", operatorHandler.GetOperatorAssignmentHistory)
 
+	// Protected routes - Garages
+	authMux.HandleFunc("GET /api/v1/garages", garageHandler.ListGarages)
+	authMux.HandleFunc("POST /api/v1/garages", garageHandler.CreateGarage)
+	authMux.HandleFunc("GET /api/v1/garages/{id}", garageHandler.GetGarage)
+	authMux.HandleFunc("PUT /api/v1/garages/{id}", garageHandler.UpdateGarage)
+	authMux.HandleFunc("DELETE /api/v1/garages/{id}", garageHandler.DeleteGarage)
+
+	// Protected routes - Accidents
+	authMux.HandleFunc("GET /api/v1/accidents", accidentHandler.ListAccidents)
+	authMux.HandleFunc("POST /api/v1/accidents", accidentHandler.CreateAccident)
+	authMux.HandleFunc("GET /api/v1/accidents/{id}", accidentHandler.GetAccident)
+	authMux.HandleFunc("PUT /api/v1/accidents/{id}", accidentHandler.UpdateAccident)
+	authMux.HandleFunc("DELETE /api/v1/accidents/{id}", accidentHandler.DeleteAccident)
+	authMux.HandleFunc("PATCH /api/v1/accidents/{id}/status", accidentHandler.UpdateAccidentStatus)
+	authMux.HandleFunc("POST /api/v1/accidents/{id}/photos", accidentHandler.UploadPhoto)
+	authMux.HandleFunc("GET /api/v1/accidents/{id}/photos", accidentHandler.GetPhotos)
+	authMux.HandleFunc("GET /api/v1/accidents/{id}/photos/{photo_id}", accidentHandler.GetPhoto)
+	authMux.HandleFunc("DELETE /api/v1/accidents/{id}/photos/{photo_id}", accidentHandler.DeletePhoto)
+
+	// Protected routes - Repairs
+	authMux.HandleFunc("GET /api/v1/repairs", repairHandler.ListRepairs)
+	authMux.HandleFunc("POST /api/v1/repairs", repairHandler.CreateRepair)
+	authMux.HandleFunc("GET /api/v1/repairs/{id}", repairHandler.GetRepair)
+	authMux.HandleFunc("PUT /api/v1/repairs/{id}", repairHandler.UpdateRepair)
+	authMux.HandleFunc("DELETE /api/v1/repairs/{id}", repairHandler.DeleteRepair)
+	authMux.HandleFunc("PATCH /api/v1/repairs/{id}/status", repairHandler.UpdateRepairStatus)
+
 	// Apply auth middleware to protected routes
 	mux.Handle("/api/v1/auth/me", middleware.AuthMiddleware(authService, cfg.Session.CookieName)(authMux))
 	mux.Handle("/api/v1/auth/logout", middleware.AuthMiddleware(authService, cfg.Session.CookieName)(authMux))
@@ -120,6 +154,12 @@ func main() {
 	mux.Handle("/api/v1/employees/", middleware.AuthMiddleware(authService, cfg.Session.CookieName)(authMux))
 	mux.Handle("/api/v1/operators", middleware.AuthMiddleware(authService, cfg.Session.CookieName)(authMux))
 	mux.Handle("/api/v1/operators/", middleware.AuthMiddleware(authService, cfg.Session.CookieName)(authMux))
+	mux.Handle("/api/v1/garages", middleware.AuthMiddleware(authService, cfg.Session.CookieName)(authMux))
+	mux.Handle("/api/v1/garages/", middleware.AuthMiddleware(authService, cfg.Session.CookieName)(authMux))
+	mux.Handle("/api/v1/accidents", middleware.AuthMiddleware(authService, cfg.Session.CookieName)(authMux))
+	mux.Handle("/api/v1/accidents/", middleware.AuthMiddleware(authService, cfg.Session.CookieName)(authMux))
+	mux.Handle("/api/v1/repairs", middleware.AuthMiddleware(authService, cfg.Session.CookieName)(authMux))
+	mux.Handle("/api/v1/repairs/", middleware.AuthMiddleware(authService, cfg.Session.CookieName)(authMux))
 
 	// Apply global middleware
 	handler := middleware.Logger(middleware.CORS(cfg.Server.AllowedOrigins)(mux))

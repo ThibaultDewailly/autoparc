@@ -1,8 +1,7 @@
 package repository
 
 import (
-	"context"
-	"database/sql"
+	"fmt"
 	"testing"
 
 	"github.com/goldenkiwi/autoparc/internal/models"
@@ -10,19 +9,11 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func setupUserTestDB(t *testing.T) *sql.DB {
-	// This would normally connect to a test database
-	// For now, we'll skip actual DB tests and focus on structure
-	t.Skip("Integration test - requires database")
-	return nil
-}
-
 func TestUserRepository_Create(t *testing.T) {
-	db := setupUserTestDB(t)
-	defer db.Close()
-
-	repo := NewUserRepository(db)
-	ctx := context.Background()
+	cleanupDB(t)
+	
+	repo := NewUserRepository(testDB)
+	ctx := testContext()
 
 	employee := &models.AdministrativeEmployee{
 		Email:        "test@example.com",
@@ -41,31 +32,46 @@ func TestUserRepository_Create(t *testing.T) {
 }
 
 func TestUserRepository_GetByID(t *testing.T) {
-	db := setupUserTestDB(t)
-	defer db.Close()
+	cleanupDB(t)
 
-	repo := NewUserRepository(db)
-	ctx := context.Background()
+	repo := NewUserRepository(testDB)
+	ctx := testContext()
 
-	id := "test-id"
-	employee, err := repo.GetByID(ctx, id)
+	// Create test employee
+	employee := &models.AdministrativeEmployee{
+		Email:        "test@example.com",
+		PasswordHash: "hashedpassword",
+		FirstName:    "John",
+		LastName:     "Doe",
+		Role:         "admin",
+		IsActive:     true,
+	}
+	err := repo.Create(ctx, employee)
 	require.NoError(t, err)
-	assert.NotNil(t, employee)
-	assert.Equal(t, id, employee.ID)
-	assert.Equal(t, "test@example.com", employee.Email)
-	assert.Equal(t, "John", employee.FirstName)
-	assert.Equal(t, "Doe", employee.LastName)
-	assert.NotNil(t, employee.LastLoginAt)
+	id := employee.ID
+
+	// Update last login to test it's retrieved
+	err = repo.UpdateLastLogin(ctx, id)
+	require.NoError(t, err)
+
+	// Get by ID
+	retrieved, err := repo.GetByID(ctx, id)
+	require.NoError(t, err)
+	assert.NotNil(t, retrieved)
+	assert.Equal(t, id, retrieved.ID)
+	assert.Equal(t, "test@example.com", retrieved.Email)
+	assert.Equal(t, "John", retrieved.FirstName)
+	assert.Equal(t, "Doe", retrieved.LastName)
+	assert.NotNil(t, retrieved.LastLoginAt)
 }
 
 func TestUserRepository_GetByID_NotFound(t *testing.T) {
-	db := setupUserTestDB(t)
-	defer db.Close()
+	cleanupDB(t)
 
-	repo := NewUserRepository(db)
-	ctx := context.Background()
+	repo := NewUserRepository(testDB)
+	ctx := testContext()
 
-	id := "non-existent-id"
+	id := "550e8400-e29b-41d4-a716-446655440999"
 	employee, err := repo.GetByID(ctx, id)
 	assert.Error(t, err)
 	assert.Nil(t, employee)
@@ -73,40 +79,88 @@ func TestUserRepository_GetByID_NotFound(t *testing.T) {
 }
 
 func TestUserRepository_GetByEmail(t *testing.T) {
-	db := setupUserTestDB(t)
-	defer db.Close()
+	cleanupDB(t)
 
-	repo := NewUserRepository(db)
-	ctx := context.Background()
+	repo := NewUserRepository(testDB)
+	ctx := testContext()
 
+	// Create test employee
+	employee := &models.AdministrativeEmployee{
+		Email:        "test@example.com",
+		PasswordHash: "hashedpassword",
+		FirstName:    "John",
+		LastName:     "Doe",
+		Role:         "admin",
+		IsActive:     true,
+	}
+	err := repo.Create(ctx, employee)
+	require.NoError(t, err)
+
+	// Get by email
 	email := "test@example.com"
-	employee, err := repo.GetByEmail(ctx, email)
+	retrieved, err := repo.GetByEmail(ctx, email)
 	assert.NoError(t, err)
-	assert.NotNil(t, employee)
-	assert.Equal(t, email, employee.Email)
-	assert.Equal(t, "hashedpassword", employee.PasswordHash)
-	assert.Nil(t, employee.LastLoginAt)
+	assert.NotNil(t, retrieved)
+	assert.Equal(t, email, retrieved.Email)
+	assert.Equal(t, "hashedpassword", retrieved.PasswordHash)
+	assert.Nil(t, retrieved.LastLoginAt)
 }
 
 func TestUserRepository_GetByEmail_CaseInsensitive(t *testing.T) {
-	db := setupUserTestDB(t)
-	defer db.Close()
+	cleanupDB(t)
 
-	repo := NewUserRepository(db)
-	ctx := context.Background()
+	repo := NewUserRepository(testDB)
+	ctx := testContext()
 
+	// Create test employee
+	employee := &models.AdministrativeEmployee{
+		Email:        "test@example.com",
+		PasswordHash: "hashedpassword",
+		FirstName:    "John",
+		LastName:     "Doe",
+		Role:         "admin",
+		IsActive:     true,
+	}
+	err := repo.Create(ctx, employee)
+	require.NoError(t, err)
+
+	// Get by email with different case
 	email := "Test@EXAMPLE.COM"
-	employee, err := repo.GetByEmail(ctx, email)
+	retrieved, err := repo.GetByEmail(ctx, email)
 	assert.NoError(t, err)
-	assert.NotNil(t, employee)
+	assert.NotNil(t, retrieved)
 }
 
 func TestUserRepository_GetAll_WithFilters(t *testing.T) {
-	db := setupUserTestDB(t)
-	defer db.Close()
+	cleanupDB(t)
 
-	repo := NewUserRepository(db)
-	ctx := context.Background()
+	repo := NewUserRepository(testDB)
+	ctx := testContext()
+
+	// Create test employees
+	employees := []*models.AdministrativeEmployee{
+		{
+			Email:        "john1@example.com",
+			PasswordHash: "hashedpassword",
+			FirstName:    "John",
+			LastName:     "Doe",
+			Role:         "admin",
+			IsActive:     true,
+		},
+		{
+			Email:        "john2@example.com",
+			PasswordHash: "hashedpassword",
+			FirstName:    "John",
+			LastName:     "Smith",
+			Role:         "admin",
+			IsActive:     true,
+		},
+	}
+
+	for _, emp := range employees {
+		err := repo.Create(ctx, emp)
+		require.NoError(t, err)
+	}
 
 	isActive := true
 	filters := EmployeeFilters{
@@ -127,16 +181,29 @@ func TestUserRepository_GetAll_WithFilters(t *testing.T) {
 	assert.Equal(t, 10, result.Limit)
 	assert.Equal(t, 1, result.TotalPages)
 
-	employees := result.Items.([]*models.AdministrativeEmployee)
-	assert.Len(t, employees, 2)
+	employeeList := result.Items.([]*models.AdministrativeEmployee)
+	assert.Len(t, employeeList, 2)
 }
 
 func TestUserRepository_GetAll_Pagination(t *testing.T) {
-	db := setupUserTestDB(t)
-	defer db.Close()
+	cleanupDB(t)
 
-	repo := NewUserRepository(db)
-	ctx := context.Background()
+	repo := NewUserRepository(testDB)
+	ctx := testContext()
+
+	// Create 15 test employees
+	for i := 0; i < 15; i++ {
+		employee := &models.AdministrativeEmployee{
+			Email:        fmt.Sprintf("user%d@example.com", i),
+			PasswordHash: "hashedpassword",
+			FirstName:    fmt.Sprintf("First%d", i),
+			LastName:     fmt.Sprintf("Last%d", i),
+			Role:         "user",
+			IsActive:     true,
+		}
+		err := repo.Create(ctx, employee)
+		require.NoError(t, err)
+	}
 
 	filters := EmployeeFilters{
 		Page:  2,
@@ -152,11 +219,12 @@ func TestUserRepository_GetAll_Pagination(t *testing.T) {
 }
 
 func TestUserRepository_GetAll_EmptyResult(t *testing.T) {
-	db := setupUserTestDB(t)
-	defer db.Close()
+	cleanupDB(t)
 
-	repo := NewUserRepository(db)
-	ctx := context.Background()
+	repo := NewUserRepository(testDB)
+
+	
+	ctx := testContext()
 
 	filters := EmployeeFilters{
 		Page:  1,
@@ -173,14 +241,26 @@ func TestUserRepository_GetAll_EmptyResult(t *testing.T) {
 }
 
 func TestUserRepository_Update(t *testing.T) {
-	db := setupUserTestDB(t)
-	defer db.Close()
+	cleanupDB(t)
 
-	repo := NewUserRepository(db)
-	ctx := context.Background()
+	repo := NewUserRepository(testDB)
+	ctx := testContext()
 
-	id := "test-id"
+	// Create test employee
 	employee := &models.AdministrativeEmployee{
+		Email:        "original@example.com",
+		PasswordHash: "hashedpassword",
+		FirstName:    "John",
+		LastName:     "Doe",
+		Role:         "user",
+		IsActive:     true,
+	}
+	err := repo.Create(ctx, employee)
+	require.NoError(t, err)
+	id := employee.ID
+
+	// Update employee
+	updatedEmployee := &models.AdministrativeEmployee{
 		Email:     "updated@example.com",
 		FirstName: "Jane",
 		LastName:  "Smith",
@@ -188,19 +268,18 @@ func TestUserRepository_Update(t *testing.T) {
 		IsActive:  true,
 	}
 
-	err := repo.Update(ctx, id, employee)
+	err = repo.Update(ctx, id, updatedEmployee)
 	assert.NoError(t, err)
-	assert.NotZero(t, employee.UpdatedAt)
+	assert.NotZero(t, updatedEmployee.UpdatedAt)
 }
 
 func TestUserRepository_Update_NotFound(t *testing.T) {
-	db := setupUserTestDB(t)
-	defer db.Close()
+	cleanupDB(t)
 
-	repo := NewUserRepository(db)
-	ctx := context.Background()
+	repo := NewUserRepository(testDB)
+	ctx := testContext()
 
-	id := "non-existent-id"
+	id := "550e8400-e29b-41d4-a716-446655440998"
 	employee := &models.AdministrativeEmployee{
 		Email:     "updated@example.com",
 		FirstName: "Jane",
@@ -215,27 +294,37 @@ func TestUserRepository_Update_NotFound(t *testing.T) {
 }
 
 func TestUserRepository_UpdatePassword(t *testing.T) {
-	db := setupUserTestDB(t)
-	defer db.Close()
+	cleanupDB(t)
 
-	repo := NewUserRepository(db)
-	ctx := context.Background()
+	repo := NewUserRepository(testDB)
+	ctx := testContext()
 
-	id := "test-id"
+	// Create test employee
+	employee := &models.AdministrativeEmployee{
+		Email:        "test@example.com",
+		PasswordHash: "hashedpassword",
+		FirstName:    "John",
+		LastName:     "Doe",
+		Role:         "user",
+		IsActive:     true,
+	}
+	err := repo.Create(ctx, employee)
+	require.NoError(t, err)
+	id := employee.ID
+
 	passwordHash := "newhashedpassword"
 
-	err := repo.UpdatePassword(ctx, id, passwordHash)
+	err = repo.UpdatePassword(ctx, id, passwordHash)
 	assert.NoError(t, err)
 }
 
 func TestUserRepository_UpdatePassword_NotFound(t *testing.T) {
-	db := setupUserTestDB(t)
-	defer db.Close()
+	cleanupDB(t)
 
-	repo := NewUserRepository(db)
-	ctx := context.Background()
+	repo := NewUserRepository(testDB)
+	ctx := testContext()
 
-	id := "non-existent-id"
+	id := "550e8400-e29b-41d4-a716-446655440997"
 	passwordHash := "newhashedpassword"
 
 	err := repo.UpdatePassword(ctx, id, passwordHash)
@@ -244,38 +333,59 @@ func TestUserRepository_UpdatePassword_NotFound(t *testing.T) {
 }
 
 func TestUserRepository_Delete(t *testing.T) {
-	db := setupUserTestDB(t)
-	defer db.Close()
+	cleanupDB(t)
 
-	repo := NewUserRepository(db)
-	ctx := context.Background()
+	repo := NewUserRepository(testDB)
+	ctx := testContext()
 
-	id := "test-id"
-	err := repo.Delete(ctx, id)
+	// Create test employee
+	employee := &models.AdministrativeEmployee{
+		Email:        "test@example.com",
+		PasswordHash: "hashedpassword",
+		FirstName:    "John",
+		LastName:     "Doe",
+		Role:         "user",
+		IsActive:     true,
+	}
+	err := repo.Create(ctx, employee)
+	require.NoError(t, err)
+	id := employee.ID
+
+	err = repo.Delete(ctx, id)
 	assert.NoError(t, err)
 }
 
 func TestUserRepository_Delete_NotFound(t *testing.T) {
-	db := setupUserTestDB(t)
-	defer db.Close()
+	cleanupDB(t)
 
-	repo := NewUserRepository(db)
-	ctx := context.Background()
+	repo := NewUserRepository(testDB)
+	ctx := testContext()
 
-	id := "non-existent-id"
+	id := "550e8400-e29b-41d4-a716-446655440996"
 	err := repo.Delete(ctx, id)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "employee not found")
 }
 
 func TestUserRepository_UpdateLastLogin(t *testing.T) {
-	db := setupUserTestDB(t)
-	defer db.Close()
+	cleanupDB(t)
 
-	repo := NewUserRepository(db)
-	ctx := context.Background()
+	repo := NewUserRepository(testDB)
+	ctx := testContext()
 
-	id := "test-id"
-	err := repo.UpdateLastLogin(ctx, id)
+	// Create test employee
+	employee := &models.AdministrativeEmployee{
+		Email:        "test@example.com",
+		PasswordHash: "hashedpassword",
+		FirstName:    "John",
+		LastName:     "Doe",
+		Role:         "user",
+		IsActive:     true,
+	}
+	err := repo.Create(ctx, employee)
+	require.NoError(t, err)
+	id := employee.ID
+
+	err = repo.UpdateLastLogin(ctx, id)
 	assert.NoError(t, err)
 }

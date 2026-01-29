@@ -16,7 +16,9 @@ func TestCarIntegration(t *testing.T) {
 	carRepo := repository.NewCarRepository(testDB)
 	insuranceRepo := repository.NewInsuranceRepository(testDB)
 	actionLogRepo := repository.NewActionLogRepository(testDB)
-	carService := service.NewCarService(carRepo, insuranceRepo, actionLogRepo)
+	accidentRepo := repository.NewAccidentRepository(testDB)
+	repairRepo := repository.NewRepairRepository(testDB)
+	carService := service.NewCarService(carRepo, insuranceRepo, actionLogRepo, accidentRepo, repairRepo)
 
 	// Get a valid insurance company ID from seed data
 	ctx := testContext()

@@ -167,6 +167,11 @@ func ValidateRepairStatus(status RepairStatus) error {
 	}
 }
 
+// Validate validates the UpdateRepairStatusRequest
+func (r *UpdateRepairStatusRequest) Validate() error {
+	return ValidateRepairStatus(r.Status)
+}
+
 // CalculateDuration calculates the repair duration in days
 func (r *Repair) CalculateDuration() *int {
 	if r.EndDate == nil {

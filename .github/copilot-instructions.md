@@ -1,3 +1,18 @@
+# General instructions
+
+Summarize conversation history only if asked.
+Never use tail -n X redirection, always use full output
+Never run interactive commands (e.g `npm test -- filename' is interactive)
+
+To validate your changes :
+
+BAckend : run ./script/valicdate-ci.sh -b
+Front : run  ./script/valicdate-ci.sh -f
+e2e : run ./script/valicdate-ci.sh -e
+
+NEVER SKIP any test. NEVER run go test directly.
+
+
 # React coding instruction
 
 You are an expert in React, Vite, Tailwind CSS, three.js, React three fiber and Next UI.

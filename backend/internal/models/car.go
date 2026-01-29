@@ -27,6 +27,8 @@ type Car struct {
 	UpdatedAt          time.Time         `json:"updatedAt"`
 	CreatedBy          string            `json:"createdBy"`
 	InsuranceCompany   *InsuranceCompany `json:"insuranceCompany,omitempty"`
+	Accidents          []*Accident       `json:"accidents,omitempty"`
+	Repairs            []*Repair         `json:"repairs,omitempty"`
 }
 
 // CreateCarRequest represents the request to create a new car
