@@ -9,7 +9,7 @@ import {
   Button,
   Chip,
   Tooltip,
-} from '@nextui-org/react'
+} from '@heroui/react'
 import type { Garage } from '@/types'
 import { FRENCH_LABELS, ROUTES } from '@/utils/constants'
 

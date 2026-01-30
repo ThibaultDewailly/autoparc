@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Input, Button, Textarea } from '@nextui-org/react'
+import { Input, Button, Textarea } from '@heroui/react'
 import { FRENCH_LABELS } from '@/utils/constants'
 import type { Garage } from '@/types'
 import type { CreateGarageRequest, UpdateGarageRequest } from '@/types'

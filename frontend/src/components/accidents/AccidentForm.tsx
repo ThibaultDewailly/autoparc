@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Input, Textarea, Button, Select, SelectItem } from '@nextui-org/react'
+import { Input, Textarea, Button, Select, SelectItem } from '@heroui/react'
 import { FRENCH_LABELS } from '@/utils/constants'
 import { validateImage, resizeImage } from '@/utils/imageUtils'
 import { formatDateForInput, isNotInFuture } from '@/utils/dateUtils'
@@ -180,7 +180,7 @@ export function AccidentForm({ accident, cars, onSubmit, onCancel, isLoading }: 
         isDisabled={!!accident}
       >
         {cars.map((car) => (
-          <SelectItem key={car.id.toString()} value={car.id.toString()}>
+          <SelectItem key={car.id.toString()}>
             {car.brand} {car.model} - {car.licensePlate}
           </SelectItem>
         ))}

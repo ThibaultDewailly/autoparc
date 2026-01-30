@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { AuthProvider } from '@/contexts/AuthContext'
 import { RepairDetailPage } from './RepairDetailPage'
 import * as repairHooks from '@/hooks/useRepairs'
 import * as carHooks from '@/hooks/useCars'
@@ -24,21 +25,21 @@ vi.mock('react-router-dom', async () => {
 })
 
 const mockCar = {
-  id: 1,
+  id: '1',
   licensePlate: 'AB-123-CD',
   brand: 'Toyota',
   model: 'Corolla',
   greyCardNumber: 'GC123456',
-  insuranceCompanyId: 1,
+  insuranceCompanyId: '1',
   rentalStartDate: '2024-01-01T00:00:00Z',
   status: 'active' as const,
-  isActive: true,
   createdAt: '2024-01-01T10:00:00Z',
   updatedAt: '2024-01-01T10:00:00Z',
+  createdBy: '1',
 }
 
 const mockGarage = {
-  id: 1,
+  id: '1',
   name: 'Garage Test',
   address: '123 Rue Test',
   phone: '0123456789',
@@ -47,12 +48,13 @@ const mockGarage = {
   isActive: true,
   createdAt: '2024-01-15T10:00:00Z',
   updatedAt: '2024-01-15T10:00:00Z',
+  createdBy: '1',
 }
 
 const mockRepair = {
-  id: 1,
-  carId: 1,
-  garageId: 1,
+  id: '1',
+  carId: '1',
+  garageId: '1',
   accidentId: null,
   repairType: 'maintenance' as const,
   description: 'Révision générale',
@@ -63,6 +65,7 @@ const mockRepair = {
   invoiceNumber: 'INV-001',
   createdAt: '2024-01-15T10:00:00Z',
   updatedAt: '2024-01-15T10:00:00Z',
+  createdBy: '1',
 }
 
 describe('RepairDetailPage', () => {
@@ -82,11 +85,13 @@ describe('RepairDetailPage', () => {
 
     return render(
       <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/repairs/:id" element={<RepairDetailPage />} />
-          </Routes>
-        </BrowserRouter>
+        <AuthProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/repairs/:id" element={<RepairDetailPage />} />
+            </Routes>
+          </BrowserRouter>
+        </AuthProvider>
       </QueryClientProvider>
     )
   }
@@ -288,7 +293,7 @@ describe('RepairDetailPage', () => {
     const statusButton = screen.getByRole('button', { name: /en cours/i })
     await user.click(statusButton)
 
-    expect(updateStatusMock).toHaveBeenCalledWith({ id: 1, status: 'in_progress' })
+    expect(updateStatusMock).toHaveBeenCalledWith({ id: '1', status: 'in_progress' })
   })
 
   it('navigates back when back button is clicked', async () => {

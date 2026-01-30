@@ -13,7 +13,7 @@ import {
   Input,
   Select,
   SelectItem,
-} from '@nextui-org/react'
+} from '@heroui/react'
 import { Navbar } from '@/components/common/Navbar'
 import { Pagination } from '@/components/common/Pagination'
 import { OperatorTable } from '@/components/operators/OperatorTable'
@@ -111,13 +111,13 @@ export function OperatorsPage() {
                 }}
                 className="w-full md:w-48"
               >
-                <SelectItem key="" value="">
+                <SelectItem key="" className="text-foreground">
                   Tous
                 </SelectItem>
-                <SelectItem key="true" value="true">
+                <SelectItem key="true" className="text-foreground">
                   {FRENCH_LABELS.active}
                 </SelectItem>
-                <SelectItem key="false" value="false">
+                <SelectItem key="false" className="text-foreground">
                   {FRENCH_LABELS.inactive}
                 </SelectItem>
               </Select>

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Button, Card, CardBody } from '@nextui-org/react'
+import { Button, Card, CardBody } from '@heroui/react'
+import { Navbar } from '@/components/common/Navbar'
 import { useGarages, useDeleteGarage } from '@/hooks/useGarages'
 import { GarageTable } from '@/components/garages/GarageTable'
 import { SearchBar } from '@/components/common/SearchBar'
@@ -36,17 +37,20 @@ export function GaragesPage() {
   const totalPages = data?.total_pages || 0
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">{FRENCH_LABELS.garageManagement}</h1>
+    <div className="min-h-screen bg-gray-50">
+      <Navbar />
+
+      <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-3xl font-bold text-gray-900">{FRENCH_LABELS.garageManagement}</h1>
         <Button color="primary" onClick={handleAddGarage}>
           {FRENCH_LABELS.addGarage}
         </Button>
       </div>
 
-      <Card className="mb-4">
-        <CardBody>
-          <div className="flex gap-4 items-center">
+        <Card className="mb-6">
+          <CardBody className="gap-4">
+            <div className="flex gap-4 items-center">
             <SearchBar
               value={search}
               onChange={setSearch}
@@ -78,28 +82,29 @@ export function GaragesPage() {
                 Tous
               </Button>
             </div>
-          </div>
-        </CardBody>
-      </Card>
-
-      <Card>
-        <CardBody>
-          <GarageTable
-            garages={garages}
-            onDelete={handleDelete}
-            isLoading={isLoading}
-          />
-          {totalPages > 1 && (
-            <div className="mt-4">
-              <Pagination
-                currentPage={page}
-                totalPages={totalPages}
-                onPageChange={setPage}
-              />
             </div>
-          )}
-        </CardBody>
-      </Card>
+          </CardBody>
+        </Card>
+
+        <Card>
+          <CardBody>
+            <GarageTable
+              garages={garages}
+              onDelete={handleDelete}
+              isLoading={isLoading}
+            />
+            {totalPages > 1 && (
+              <div className="mt-4">
+                <Pagination
+                  currentPage={page}
+                  totalPages={totalPages}
+                  onPageChange={setPage}
+                />
+              </div>
+            )}
+          </CardBody>
+        </Card>
+      </main>
     </div>
   )
 }

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Input, Button, Switch } from '@nextui-org/react'
+import { Input, Button, Switch } from '@heroui/react'
 import { FRENCH_LABELS } from '@/utils/constants'
 import type { CarOperator } from '@/types/operator'
 import type { CreateOperatorRequest, UpdateOperatorRequest } from '@/types/operator'

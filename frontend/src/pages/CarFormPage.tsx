@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from 'react-router-dom'
-import { Button, Card, CardBody, Spinner } from '@nextui-org/react'
+import { Button, Card, CardBody, Spinner } from '@heroui/react'
 import { Navbar } from '@/components/common/Navbar'
 import { CarForm } from '@/components/cars/CarForm'
 import { useCar, useCreateCar, useUpdateCar } from '@/hooks/useCars'

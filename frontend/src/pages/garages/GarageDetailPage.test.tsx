@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { AuthProvider } from '@/contexts/AuthContext'
 import { GarageDetailPage } from './GarageDetailPage'
 import * as garageHooks from '@/hooks/useGarages'
 import * as repairHooks from '@/hooks/useRepairs'
@@ -66,11 +67,13 @@ describe('GarageDetailPage', () => {
 
     return render(
       <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/garages/:id" element={<GarageDetailPage />} />
-          </Routes>
-        </BrowserRouter>
+        <AuthProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/garages/:id" element={<GarageDetailPage />} />
+            </Routes>
+          </BrowserRouter>
+        </AuthProvider>
       </QueryClientProvider>
     )
   }
@@ -214,7 +217,7 @@ describe('GarageDetailPage', () => {
     await user.click(toggleButton)
 
     expect(toggleStatusMock).toHaveBeenCalledWith({
-      id: '1',
+      id: mockGarage.id,
       data: { ...mockGarage, isActive: false },
     })
   })

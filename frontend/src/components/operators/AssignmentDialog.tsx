@@ -10,7 +10,7 @@ import {
   SelectItem,
   Input,
   Textarea,
-} from '@nextui-org/react'
+} from '@heroui/react'
 import { useOperators } from '@/hooks/useOperators'
 import { FRENCH_LABELS } from '@/utils/constants'
 import type { AssignOperatorRequest } from '@/types/operator'
@@ -131,7 +131,6 @@ export function AssignmentDialog({
                 {availableOperators.map((operator) => (
                   <SelectItem
                     key={operator.id}
-                    value={operator.id}
                     className="text-foreground"
                   >
                     {operator.first_name} {operator.last_name} (

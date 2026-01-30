@@ -103,6 +103,9 @@ export interface CarFilters {
 
 export interface PaginatedResponse<T> {
   cars?: T[]
+  garages?: T[]
+  repairs?: T[]
+  accidents?: T[]
   data?: T[]
   totalCount?: number
   total?: number
@@ -181,6 +184,7 @@ export interface UpdateGarageRequest {
   email?: string
   address?: string
   specialization?: string
+  isActive?: boolean
 }
 
 export interface GarageFilters {
@@ -246,6 +250,7 @@ export interface AccidentPhoto {
   id: string
   accidentId: string
   filename: string
+  photoUrl: string
   fileSize: number
   mimeType: string
   compressionType?: string
@@ -276,6 +281,8 @@ export interface Repair {
   startDate: string
   endDate?: string
   cost?: number
+  estimatedCost?: number
+  actualCost?: number
   status: RepairStatus
   invoiceNumber?: string
   notes?: string
@@ -293,6 +300,8 @@ export interface CreateRepairRequest {
   startDate: string
   endDate?: string
   cost?: number
+  estimatedCost?: number
+  actualCost?: number
   invoiceNumber?: string
   notes?: string
 }
@@ -303,6 +312,8 @@ export interface UpdateRepairRequest {
   startDate?: string
   endDate?: string
   cost?: number
+  estimatedCost?: number
+  actualCost?: number
   invoiceNumber?: string
   notes?: string
 }

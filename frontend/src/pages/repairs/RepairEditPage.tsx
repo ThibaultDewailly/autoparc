@@ -1,27 +1,28 @@
 import { useNavigate, useParams } from 'react-router-dom'
-import { Card, CardHeader, CardBody, Spinner } from '@nextui-org/react'
+import { Card, CardHeader, CardBody, Spinner } from '@heroui/react'
 import { RepairForm } from '@/components/repairs/RepairForm'
 import { useRepair, useUpdateRepair } from '@/hooks/useRepairs'
 import { useCars } from '@/hooks/useCars'
 import { useGarages } from '@/hooks/useGarages'
 import { useAccidents } from '@/hooks/useAccidents'
 import { FRENCH_LABELS, ROUTES } from '@/utils/constants'
-import type { UpdateRepairRequest } from '@/types'
+import type { UpdateRepairRequest, Car } from '@/types'
 
 export function RepairEditPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { data: repair, isLoading, error } = useRepair(Number(id))
-  const { data: cars = [] } = useCars({ isActive: true })
-  const { data: garagesData } = useGarages({ isActive: true })
-  const { data: accidentsData } = useAccidents({ status: 'approved' })
+  const { data: repair, isLoading, error } = useRepair(id!)
+  const { data: carsData = [] } = useCars({})
+  const { data: garagesData } = useGarages({})
+  const { data: accidentsData } = useAccidents({})
   const updateRepair = useUpdateRepair()
 
+  const cars = Array.isArray(carsData) ? carsData : carsData?.cars || []
   const garages = garagesData?.garages || []
   const accidents = accidentsData?.accidents || []
 
   async function handleSubmit(data: UpdateRepairRequest) {
-    await updateRepair.mutateAsync({ id: Number(id), data })
+    await updateRepair.mutateAsync({ id: id!, data })
     navigate(ROUTES.repairs)
   }
 
@@ -58,7 +59,7 @@ export function RepairEditPage() {
         <CardBody>
           <RepairForm
             repair={repair}
-            cars={cars}
+            cars={cars as Car[]}
             garages={garages}
             accidents={accidents}
             onSubmit={handleSubmit}

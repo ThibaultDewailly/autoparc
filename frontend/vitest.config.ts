@@ -20,6 +20,8 @@ export default defineConfig({
         '**/mockData',
         'dist/',
         'e2e/',
+        'src/main.tsx',
+        'src/App.tsx',
       ],
     },
   },

@@ -1,5 +1,5 @@
 import { useParams, useNavigate, Link } from 'react-router-dom'
-import { Card, CardBody, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Spinner } from '@nextui-org/react'
+import { Card, CardBody, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Spinner } from '@heroui/react'
 import { Navbar } from '@/components/common/Navbar'
 import { EmployeeDetail } from '@/components/employees/EmployeeDetail'
 import { useEmployee, useDeleteEmployee } from '@/hooks/useEmployees'

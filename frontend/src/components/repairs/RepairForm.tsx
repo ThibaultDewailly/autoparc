@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Input, Textarea, Button, Select, SelectItem } from '@nextui-org/react'
+import { Input, Textarea, Button, Select, SelectItem } from '@heroui/react'
 import { FRENCH_LABELS, REPAIR_TYPES } from '@/utils/constants'
 import { formatDateForInput } from '@/utils/dateUtils'
 import type { Repair, Car, Garage, Accident, RepairType } from '@/types'
@@ -133,9 +133,9 @@ export function RepairForm({
     
     try {
       const submitData = {
-        carId: parseInt(formData.carId, 10),
-        garageId: parseInt(formData.garageId, 10),
-        accidentId: formData.accidentId ? parseInt(formData.accidentId, 10) : undefined,
+        carId: formData.carId,
+        garageId: formData.garageId,
+        accidentId: formData.accidentId || undefined,
         repairType: formData.repairType as RepairType,
         description: formData.description.trim(),
         estimatedCost: formData.estimatedCost ? parseFloat(formData.estimatedCost) : undefined,
@@ -170,7 +170,7 @@ export function RepairForm({
         isDisabled={!!repair}
       >
         {cars.map((car) => (
-          <SelectItem key={car.id.toString()} value={car.id.toString()}>
+          <SelectItem key={car.id.toString()}>
             {car.brand} {car.model} - {car.licensePlate}
           </SelectItem>
         ))}
@@ -189,7 +189,7 @@ export function RepairForm({
         isRequired
       >
         {garages.map((garage) => (
-          <SelectItem key={garage.id.toString()} value={garage.id.toString()}>
+          <SelectItem key={garage.id.toString()}>
             {garage.name}
           </SelectItem>
         ))}
@@ -211,7 +211,7 @@ export function RepairForm({
         isRequired
       >
         {REPAIR_TYPES.map((type) => (
-          <SelectItem key={type.value} value={type.value}>
+          <SelectItem key={type.value}>
             {type.label}
           </SelectItem>
         ))}
@@ -231,7 +231,7 @@ export function RepairForm({
           isRequired
         >
           {accidents.map((accident) => (
-            <SelectItem key={accident.id.toString()} value={accident.id.toString()}>
+            <SelectItem key={accident.id.toString()}>
               {accident.location} - {accident.accidentDate}
             </SelectItem>
           ))}

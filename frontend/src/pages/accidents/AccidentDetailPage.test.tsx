@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { AuthProvider } from '@/contexts/AuthContext'
 import { AccidentDetailPage } from './AccidentDetailPage'
 import * as accidentHooks from '@/hooks/useAccidents'
 import * as carHooks from '@/hooks/useCars'
@@ -20,22 +21,22 @@ vi.mock('react-router-dom', async () => {
 })
 
 const mockCar = {
-  id: 1,
+  id: '1',
   licensePlate: 'AB-123-CD',
   brand: 'Toyota',
   model: 'Corolla',
   greyCardNumber: 'GC123456',
-  insuranceCompanyId: 1,
+  insuranceCompanyId: '1',
   rentalStartDate: '2024-01-01T00:00:00Z',
   status: 'active' as const,
-  isActive: true,
   createdAt: '2024-01-01T10:00:00Z',
   updatedAt: '2024-01-01T10:00:00Z',
+  createdBy: '1',
 }
 
 const mockAccident = {
-  id: 1,
-  carId: 1,
+  id: '1',
+  carId: '1',
   accidentDate: '2024-01-15T10:00:00Z',
   location: 'Paris',
   description: 'Accident description',
@@ -73,11 +74,13 @@ describe('AccidentDetailPage', () => {
 
     return render(
       <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/accidents/:id" element={<AccidentDetailPage />} />
-          </Routes>
-        </BrowserRouter>
+        <AuthProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/accidents/:id" element={<AccidentDetailPage />} />
+            </Routes>
+          </BrowserRouter>
+        </AuthProvider>
       </QueryClientProvider>
     )
   }
@@ -219,7 +222,7 @@ describe('AccidentDetailPage', () => {
     const statusButton = screen.getByRole('button', { name: /en cours d'examen/i })
     await user.click(statusButton)
 
-    expect(updateStatusMock).toHaveBeenCalledWith({ id: 1, status: 'under_review' })
+    expect(updateStatusMock).toHaveBeenCalledWith({ id: '1', status: 'under_review' })
   })
 
   it('displays accident photos', async () => {

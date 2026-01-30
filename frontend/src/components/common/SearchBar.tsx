@@ -1,4 +1,4 @@
-import { Input } from '@nextui-org/react'
+import { Input } from '@heroui/react'
 import { FRENCH_LABELS } from '@/utils/constants'
 
 interface SearchBarProps {

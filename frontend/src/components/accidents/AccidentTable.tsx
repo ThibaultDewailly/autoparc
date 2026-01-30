@@ -8,7 +8,7 @@ import {
   TableCell,
   Button,
   Tooltip,
-} from '@nextui-org/react'
+} from '@heroui/react'
 import type { Accident } from '@/types'
 import { FRENCH_LABELS, ROUTES } from '@/utils/constants'
 import { formatDateTime } from '@/utils/formatters'

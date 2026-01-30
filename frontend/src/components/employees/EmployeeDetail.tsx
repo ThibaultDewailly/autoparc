@@ -1,4 +1,4 @@
-import { Card, CardBody, Chip } from '@nextui-org/react'
+import { Card, CardBody, Chip } from '@heroui/react'
 import type { Employee } from '@/types'
 import { FRENCH_LABELS } from '@/utils/constants'
 import { formatDate } from '@/utils/formatters'

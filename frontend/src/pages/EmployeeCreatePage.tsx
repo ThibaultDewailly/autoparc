@@ -1,5 +1,5 @@
 import { useNavigate, Link } from 'react-router-dom'
-import { Card, CardBody } from '@nextui-org/react'
+import { Card, CardBody } from '@heroui/react'
 import { Navbar } from '@/components/common/Navbar'
 import { EmployeeForm } from '@/components/employees/EmployeeForm'
 import { useCreateEmployee } from '@/hooks/useEmployees'

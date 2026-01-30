@@ -1,4 +1,4 @@
-import { Chip } from '@nextui-org/react'
+import { Chip } from '@heroui/react'
 import type { RepairStatus } from '@/types'
 import { FRENCH_LABELS } from '@/utils/constants'
 

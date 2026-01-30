@@ -32,7 +32,7 @@ describe('GarageForm', () => {
 
   it('populates form when garage prop is provided', () => {
     const garage: Garage = {
-      id: 1,
+      id: '1',
       name: 'Garage Test',
       contactPerson: 'Jean Dupont',
       phone: '0123456789',
@@ -42,6 +42,7 @@ describe('GarageForm', () => {
       isActive: true,
       createdAt: '2024-01-01T00:00:00Z',
       updatedAt: '2024-01-01T00:00:00Z',
+      createdBy: '1',
     }
 
     render(<GarageForm garage={garage} onSubmit={mockOnSubmit} onCancel={mockOnCancel} />)

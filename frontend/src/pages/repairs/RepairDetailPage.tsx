@@ -1,28 +1,27 @@
 import { useParams, useNavigate } from 'react-router-dom'
-import { Card, CardHeader, CardBody, Button, Spinner, Chip } from '@nextui-org/react'
+import { Card, CardHeader, CardBody, Button, Spinner, Chip } from '@heroui/react'
 import { useRepair, useUpdateRepairStatus } from '@/hooks/useRepairs'
 import { useCars } from '@/hooks/useCars'
 import { useGarages } from '@/hooks/useGarages'
-import { useAccidents } from '@/hooks/useAccidents'
 import { FRENCH_LABELS, ROUTES } from '@/utils/constants'
 import { formatDate } from '@/utils/formatters'
+import type { Car, Garage, RepairStatus } from '@/types'
 
 export function RepairDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { data: repair, isLoading, error } = useRepair(Number(id))
-  const { data: cars = [] } = useCars({})
+  const { data: repair, isLoading, error } = useRepair(id!)
+  const { data: carsData = [] } = useCars({})
   const { data: garagesData } = useGarages({})
-  const { data: accidentsData } = useAccidents({})
   const updateStatus = useUpdateRepairStatus()
 
-  const car = cars.find((c) => c.id === repair?.carId)
-  const garage = garagesData?.garages.find((g) => g.id === repair?.garageId)
-  const _accident = accidentsData?.accidents.find((a) => a.id === repair?.accidentId)
+  const cars = Array.isArray(carsData) ? carsData : carsData?.cars || []
+  const car = cars.find((c: Car) => c.id === repair?.carId)
+  const garage = garagesData?.garages?.find((g: Garage) => g.id === repair?.garageId)
 
   async function handleStatusChange(newStatus: string) {
-    if (!repair) return
-    await updateStatus.mutateAsync({ id: repair.id, status: newStatus })
+    if (!repair?.id) return
+    await updateStatus.mutateAsync({ id: repair.id, status: newStatus as RepairStatus })
   }
 
   if (isLoading) {
@@ -165,7 +164,7 @@ export function RepairDetailPage() {
               </div>
               <div>
                 <p className="text-sm text-gray-500">{FRENCH_LABELS.endDate}</p>
-                <p className="font-semibold">{formatDate(repair.endDate)}</p>
+                <p className="font-semibold">{repair.endDate ? formatDate(repair.endDate) : "En cours"}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-500">{FRENCH_LABELS.cost}</p>

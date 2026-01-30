@@ -1,20 +1,22 @@
 import { useNavigate, useParams } from 'react-router-dom'
-import { Card, CardHeader, CardBody, Spinner } from '@nextui-org/react'
+import { Card, CardHeader, CardBody, Spinner } from '@heroui/react'
 import { AccidentForm } from '@/components/accidents/AccidentForm'
 import { useAccident, useUpdateAccident } from '@/hooks/useAccidents'
 import { useCars } from '@/hooks/useCars'
 import { FRENCH_LABELS, ROUTES } from '@/utils/constants'
-import type { UpdateAccidentRequest } from '@/types'
+import type { UpdateAccidentRequest, Car } from '@/types'
 
 export function AccidentEditPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { data: accident, isLoading, error } = useAccident(Number(id))
-  const { data: cars = [] } = useCars({ isActive: true })
+  const { data: accident, isLoading, error } = useAccident(id!)
+  const { data: carsData = [] } = useCars({})
   const updateAccident = useUpdateAccident()
 
+  const cars = Array.isArray(carsData) ? carsData : carsData?.cars || []
+
   async function handleSubmit(data: UpdateAccidentRequest) {
-    await updateAccident.mutateAsync({ id: Number(id), data })
+    await updateAccident.mutateAsync({ id: id!, data })
     navigate(ROUTES.accidents)
   }
 
@@ -51,7 +53,7 @@ export function AccidentEditPage() {
         <CardBody>
           <AccidentForm
             accident={accident}
-            cars={cars}
+            cars={cars as Car[]}
             onSubmit={handleSubmit}
             onCancel={handleCancel}
             isLoading={updateAccident.isPending}

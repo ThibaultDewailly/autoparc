@@ -9,7 +9,7 @@ import {
   DropdownMenu,
   DropdownItem,
   Avatar,
-} from '@nextui-org/react'
+} from '@heroui/react'
 import { useAuth } from '@/contexts/AuthContext'
 import { ROUTES, FRENCH_LABELS } from '@/utils/constants'
 
@@ -45,6 +45,21 @@ export function Navbar() {
         <NavbarItem>
           <Link to={ROUTES.operators} className="text-foreground hover:text-primary">
             {FRENCH_LABELS.operators}
+          </Link>
+        </NavbarItem>
+        <NavbarItem>
+          <Link to={ROUTES.garages} className="text-foreground hover:text-primary">
+            {FRENCH_LABELS.garages}
+          </Link>
+        </NavbarItem>
+        <NavbarItem>
+          <Link to={ROUTES.accidents} className="text-foreground hover:text-primary">
+            {FRENCH_LABELS.accidents}
+          </Link>
+        </NavbarItem>
+        <NavbarItem>
+          <Link to={ROUTES.repairs} className="text-foreground hover:text-primary">
+            {FRENCH_LABELS.repairs}
           </Link>
         </NavbarItem>
         <NavbarItem>

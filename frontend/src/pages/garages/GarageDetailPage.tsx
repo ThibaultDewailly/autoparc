@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom'
-import { Card, CardHeader, CardBody, Button, Spinner, Chip } from '@nextui-org/react'
+import { Card, CardHeader, CardBody, Button, Spinner, Chip } from '@heroui/react'
 import { useGarage, useUpdateGarage } from '@/hooks/useGarages'
 import { useRepairs } from '@/hooks/useRepairs'
 import { FRENCH_LABELS, ROUTES } from '@/utils/constants'
@@ -8,14 +8,14 @@ import { formatDate } from '@/utils/formatters'
 export function GarageDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { data: garage, isLoading, error } = useGarage(id)
-  const { data: repairsData } = useRepairs({ garageId: Number(id) })
+  const { data: garage, isLoading, error } = useGarage(id!)
+  const { data: repairsData } = useRepairs({ garageId: id })
   const updateGarage = useUpdateGarage()
 
   async function handleToggleStatus() {
-    if (!garage) return
+    if (!garage?.id) return
     await updateGarage.mutateAsync({
-      id: garage.id.toString(),
+      id: garage.id,
       data: { ...garage, isActive: !garage.isActive },
     })
   }
@@ -132,7 +132,7 @@ export function GarageDetailPage() {
                                 : FRENCH_LABELS.inspection}
                             </p>
                             <p className="text-sm text-gray-500">
-                              {formatDate(repair.startDate)} - {formatDate(repair.endDate)}
+                              {formatDate(repair.startDate)} - {repair.endDate ? formatDate(repair.endDate) : "En cours"}
                             </p>
                           </div>
                           <div className="text-right">

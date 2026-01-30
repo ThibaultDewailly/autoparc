@@ -8,7 +8,7 @@ import {
   Button,
   Input,
   Textarea,
-} from '@nextui-org/react'
+} from '@heroui/react'
 import { FRENCH_LABELS } from '@/utils/constants'
 import { formatDate } from '@/utils/formatters'
 import type { UnassignOperatorRequest, CarOperatorAssignment } from '@/types/operator'

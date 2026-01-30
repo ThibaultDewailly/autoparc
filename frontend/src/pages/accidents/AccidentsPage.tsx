@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Button, Card, CardBody, Select, SelectItem } from '@nextui-org/react'
+import { Button, Card, CardBody, Select, SelectItem } from '@heroui/react'
+import { Navbar } from '@/components/common/Navbar'
 import { useAccidents, useDeleteAccident } from '@/hooks/useAccidents'
 import { AccidentTable } from '@/components/accidents/AccidentTable'
 import { SearchBar } from '@/components/common/SearchBar'
@@ -36,17 +37,20 @@ export function AccidentsPage() {
   const totalPages = data?.total_pages || 0
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">{FRENCH_LABELS.accidentManagement}</h1>
+    <div className="min-h-screen bg-gray-50">
+      <Navbar />
+
+      <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-3xl font-bold text-gray-900">{FRENCH_LABELS.accidentManagement}</h1>
         <Button color="primary" onClick={handleAddAccident}>
           {FRENCH_LABELS.declareAccident}
         </Button>
       </div>
 
-      <Card className="mb-4">
-        <CardBody>
-          <div className="flex gap-4 items-center">
+        <Card className="mb-6">
+          <CardBody className="gap-4">
+            <div className="flex gap-4 items-center">
             <div className="flex-1">
               <SearchBar
                 value={search}
@@ -56,40 +60,40 @@ export function AccidentsPage() {
             </div>
             <div className="w-64">
               <Select
-                label={FRENCH_LABELS.status}
                 placeholder="Tous les statuts"
                 selectedKeys={statusFilter ? [statusFilter] : []}
                 onChange={(e) => setStatusFilter(e.target.value as AccidentStatus || undefined)}
               >
-                {ACCIDENT_STATUSES.map((status) => (
-                  <SelectItem key={status.value} value={status.value}>
+                {[{ value: '', label: 'Tous' }, ...ACCIDENT_STATUSES].map((status) => (
+                  <SelectItem key={status.value} className="text-foreground">
                     {status.label}
                   </SelectItem>
                 ))}
               </Select>
             </div>
-          </div>
-        </CardBody>
-      </Card>
-
-      <Card>
-        <CardBody>
-          <AccidentTable
-            accidents={accidents}
-            onDelete={handleDelete}
-            isLoading={isLoading}
-          />
-          {totalPages > 1 && (
-            <div className="mt-4">
-              <Pagination
-                currentPage={page}
-                totalPages={totalPages}
-                onPageChange={setPage}
-              />
             </div>
-          )}
-        </CardBody>
-      </Card>
+          </CardBody>
+        </Card>
+
+        <Card>
+          <CardBody>
+            <AccidentTable
+              accidents={accidents}
+              onDelete={handleDelete}
+              isLoading={isLoading}
+            />
+            {totalPages > 1 && (
+              <div className="mt-4">
+                <Pagination
+                  currentPage={page}
+                  totalPages={totalPages}
+                  onPageChange={setPage}
+                />
+              </div>
+            )}
+          </CardBody>
+        </Card>
+      </main>
     </div>
   )
 }

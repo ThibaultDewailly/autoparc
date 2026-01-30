@@ -14,6 +14,18 @@ import { ChangePasswordPage } from '@/pages/ChangePasswordPage'
 import { OperatorsPage } from '@/pages/OperatorsPage'
 import { OperatorDetailPage } from '@/pages/OperatorDetailPage'
 import { OperatorFormPage } from '@/pages/OperatorFormPage'
+import { GaragesPage } from '@/pages/garages/GaragesPage'
+import { GarageNewPage } from '@/pages/garages/GarageNewPage'
+import { GarageEditPage } from '@/pages/garages/GarageEditPage'
+import { GarageDetailPage } from '@/pages/garages/GarageDetailPage'
+import { AccidentsPage } from '@/pages/accidents/AccidentsPage'
+import { AccidentNewPage } from '@/pages/accidents/AccidentNewPage'
+import { AccidentEditPage } from '@/pages/accidents/AccidentEditPage'
+import { AccidentDetailPage } from '@/pages/accidents/AccidentDetailPage'
+import { RepairsPage } from '@/pages/repairs/RepairsPage'
+import { RepairNewPage } from '@/pages/repairs/RepairNewPage'
+import { RepairEditPage } from '@/pages/repairs/RepairEditPage'
+import { RepairDetailPage } from '@/pages/repairs/RepairDetailPage'
 import { ROUTES } from '@/utils/constants'
 
 function App() {
@@ -144,6 +156,114 @@ function App() {
           element={
             <ProtectedRoute>
               <OperatorFormPage />
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path={ROUTES.garages}
+          element={
+            <ProtectedRoute>
+              <GaragesPage />
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path={ROUTES.garageNew}
+          element={
+            <ProtectedRoute>
+              <GarageNewPage />
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path="/garages/:id"
+          element={
+            <ProtectedRoute>
+              <GarageDetailPage />
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path="/garages/:id/edit"
+          element={
+            <ProtectedRoute>
+              <GarageEditPage />
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path={ROUTES.accidents}
+          element={
+            <ProtectedRoute>
+              <AccidentsPage />
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path={ROUTES.accidentNew}
+          element={
+            <ProtectedRoute>
+              <AccidentNewPage />
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path="/accidents/:id"
+          element={
+            <ProtectedRoute>
+              <AccidentDetailPage />
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path="/accidents/:id/edit"
+          element={
+            <ProtectedRoute>
+              <AccidentEditPage />
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path={ROUTES.repairs}
+          element={
+            <ProtectedRoute>
+              <RepairsPage />
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path={ROUTES.repairNew}
+          element={
+            <ProtectedRoute>
+              <RepairNewPage />
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path="/repairs/:id"
+          element={
+            <ProtectedRoute>
+              <RepairDetailPage />
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path="/repairs/:id/edit"
+          element={
+            <ProtectedRoute>
+              <RepairEditPage />
             </ProtectedRoute>
           }
         />

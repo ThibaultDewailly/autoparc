@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { AuthProvider } from '@/contexts/AuthContext'
 import { RepairEditPage } from './RepairEditPage'
 import * as useRepairsHook from '@/hooks/useRepairs'
 import * as useCarsHook from '@/hooks/useCars'
@@ -20,9 +21,9 @@ vi.mock('react-router-dom', async () => {
 })
 
 const mockRepair: Repair = {
-  id: 1,
-  carId: 1,
-  garageId: 1,
+  id: '1',
+  carId: '1',
+  garageId: '1',
   repairType: 'maintenance',
   description: 'Vidange moteur',
   estimatedCost: 150.0,
@@ -30,28 +31,28 @@ const mockRepair: Repair = {
   status: 'scheduled',
   createdAt: '2024-01-20T00:00:00Z',
   updatedAt: '2024-01-20T00:00:00Z',
+  createdBy: '1',
 }
 
 const mockCars: Car[] = [
   {
-    id: 1,
+    id: '1',
     brand: 'Renault',
     model: 'Clio',
     licensePlate: 'AB-123-CD',
-    vin: 'VF1RH123456789012',
-    category: 'urban',
-    mileage: 50000,
-    acquisitionDate: '2020-01-01',
-    status: 'available',
-    isActive: true,
+    greyCardNumber: 'GC123456',
+    insuranceCompanyId: '1',
+    rentalStartDate: '2020-01-01',
+    status: 'active',
     createdAt: '2024-01-01T00:00:00Z',
     updatedAt: '2024-01-01T00:00:00Z',
+    createdBy: '1',
   },
 ]
 
 const mockGarages: Garage[] = [
   {
-    id: 1,
+    id: '1',
     name: 'Garage Auto Pro',
     contactPerson: 'Jean Dupont',
     phone: '0123456789',
@@ -59,6 +60,7 @@ const mockGarages: Garage[] = [
     isActive: true,
     createdAt: '2024-01-01T00:00:00Z',
     updatedAt: '2024-01-01T00:00:00Z',
+    createdBy: '1',
   },
 ]
 
@@ -72,11 +74,13 @@ function renderWithProviders() {
 
   return render(
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/repairs/:id/edit" element={<RepairEditPage />} />
-        </Routes>
-      </BrowserRouter>
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/repairs/:id/edit" element={<RepairEditPage />} />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
     </QueryClientProvider>
   )
 }
@@ -164,7 +168,7 @@ describe('RepairEditPage', () => {
 
     await waitFor(() => {
       expect(mockMutateAsync).toHaveBeenCalledWith({
-        id: 1,
+        id: '1',
         data: expect.objectContaining({
           description: 'Vidange et filtre',
         }),

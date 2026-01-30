@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Button, Card, CardBody, Select, SelectItem } from '@nextui-org/react'
+import { Button, Card, CardBody, Select, SelectItem } from '@heroui/react'
+import { Navbar } from '@/components/common/Navbar'
 import { useRepairs, useDeleteRepair } from '@/hooks/useRepairs'
 import { RepairTable } from '@/components/repairs/RepairTable'
 import { SearchBar } from '@/components/common/SearchBar'
@@ -38,17 +39,20 @@ export function RepairsPage() {
   const totalPages = data?.total_pages || 0
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">{FRENCH_LABELS.repairManagement}</h1>
+    <div className="min-h-screen bg-gray-50">
+      <Navbar />
+
+      <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-3xl font-bold text-gray-900">{FRENCH_LABELS.repairManagement}</h1>
         <Button color="primary" onClick={handleAddRepair}>
           {FRENCH_LABELS.addRepair}
         </Button>
       </div>
 
-      <Card className="mb-4">
-        <CardBody>
-          <div className="flex gap-4 items-center">
+        <Card className="mb-6">
+          <CardBody className="gap-4">
+            <div className="flex gap-4 items-center">
             <div className="flex-1">
               <SearchBar
                 value={search}
@@ -58,13 +62,12 @@ export function RepairsPage() {
             </div>
             <div className="w-48">
               <Select
-                label={FRENCH_LABELS.repairType}
                 placeholder="Tous les types"
                 selectedKeys={typeFilter ? [typeFilter] : []}
                 onChange={(e) => setTypeFilter(e.target.value as RepairType || undefined)}
               >
-                {REPAIR_TYPES.map((type) => (
-                  <SelectItem key={type.value} value={type.value}>
+                {[{ value: '', label: 'Tous' }, ...REPAIR_TYPES].map((type) => (
+                  <SelectItem key={type.value} className="text-foreground">
                     {type.label}
                   </SelectItem>
                 ))}
@@ -72,40 +75,40 @@ export function RepairsPage() {
             </div>
             <div className="w-48">
               <Select
-                label={FRENCH_LABELS.status}
                 placeholder="Tous les statuts"
                 selectedKeys={statusFilter ? [statusFilter] : []}
                 onChange={(e) => setStatusFilter(e.target.value as RepairStatus || undefined)}
               >
-                {REPAIR_STATUSES.map((status) => (
-                  <SelectItem key={status.value} value={status.value}>
+                {[{ value: '', label: 'Tous' }, ...REPAIR_STATUSES].map((status) => (
+                  <SelectItem key={status.value} className="text-foreground">
                     {status.label}
                   </SelectItem>
                 ))}
               </Select>
             </div>
-          </div>
-        </CardBody>
-      </Card>
-
-      <Card>
-        <CardBody>
-          <RepairTable
-            repairs={repairs}
-            onDelete={handleDelete}
-            isLoading={isLoading}
-          />
-          {totalPages > 1 && (
-            <div className="mt-4">
-              <Pagination
-                currentPage={page}
-                totalPages={totalPages}
-                onPageChange={setPage}
-              />
             </div>
-          )}
-        </CardBody>
-      </Card>
+          </CardBody>
+        </Card>
+
+        <Card>
+          <CardBody>
+            <RepairTable
+              repairs={repairs}
+              onDelete={handleDelete}
+              isLoading={isLoading}
+            />
+            {totalPages > 1 && (
+              <div className="mt-4">
+                <Pagination
+                  currentPage={page}
+                  totalPages={totalPages}
+                  onPageChange={setPage}
+                />
+              </div>
+            )}
+          </CardBody>
+        </Card>
+      </main>
     </div>
   )
 }

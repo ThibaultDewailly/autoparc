@@ -1,4 +1,4 @@
-import { Select, SelectItem } from '@nextui-org/react'
+import { Select, SelectItem } from '@heroui/react'
 import { CAR_STATUSES, FRENCH_LABELS } from '@/utils/constants'
 import type { CarStatus } from '@/types'
 
@@ -26,7 +26,7 @@ export function FilterPanel({ status, onStatusChange }: FilterPanelProps) {
         className="max-w-xs"
       >
         {CAR_STATUSES.map((item) => (
-          <SelectItem key={item.value} value={item.value} className="text-foreground">
+          <SelectItem key={item.value} className="text-foreground">
             {item.label}
           </SelectItem>
         ))}

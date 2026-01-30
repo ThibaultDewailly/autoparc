@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Input, Select, SelectItem, Button } from '@nextui-org/react'
+import { Input, Select, SelectItem, Button } from '@heroui/react'
 import { FRENCH_LABELS, CAR_STATUSES } from '@/utils/constants'
 import { validateCarForm } from '@/utils/validators'
 import { formatDateForInput } from '@/utils/formatters'
@@ -154,7 +154,7 @@ export function CarForm({ car, onSubmit, onCancel, isLoading }: CarFormProps) {
         isRequired
       >
         {(insuranceCompanies || []).map((insurance) => (
-          <SelectItem key={insurance.id} value={insurance.id} className="text-foreground">
+          <SelectItem key={insurance.id} className="text-foreground">
             {insurance.name}
           </SelectItem>
         ))}
@@ -180,7 +180,7 @@ export function CarForm({ car, onSubmit, onCancel, isLoading }: CarFormProps) {
         isRequired
       >
         {CAR_STATUSES.map((status) => (
-          <SelectItem key={status.value} value={status.value} className="text-foreground">
+          <SelectItem key={status.value} className="text-foreground">
             {status.label}
           </SelectItem>
         ))}

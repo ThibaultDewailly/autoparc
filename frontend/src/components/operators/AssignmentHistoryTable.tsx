@@ -6,7 +6,7 @@ import {
   TableRow,
   TableCell,
   Chip,
-} from '@nextui-org/react'
+} from '@heroui/react'
 import type { CarOperatorAssignment } from '@/types/operator'
 import { FRENCH_LABELS } from '@/utils/constants'
 import { formatDate } from '@/utils/formatters'

@@ -1,5 +1,5 @@
 import { useParams, useNavigate, Link } from 'react-router-dom'
-import { Card, CardBody, Spinner } from '@nextui-org/react'
+import { Card, CardBody, Spinner } from '@heroui/react'
 import { Navbar } from '@/components/common/Navbar'
 import { ChangePasswordForm } from '@/components/employees/ChangePasswordForm'
 import { useEmployee, useChangePassword } from '@/hooks/useEmployees'

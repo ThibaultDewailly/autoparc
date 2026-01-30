@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Card, CardBody, Button } from '@nextui-org/react'
+import { Card, CardBody, Button } from '@heroui/react'
 import { Navbar } from '@/components/common/Navbar'
 import { SearchBar } from '@/components/common/SearchBar'
 import { useCars } from '@/hooks/useCars'

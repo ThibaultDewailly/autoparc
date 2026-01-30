@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Card, CardBody, CardHeader, Input, Button } from '@nextui-org/react'
+import { Card, CardBody, CardHeader, Input, Button } from '@heroui/react'
 import { FRENCH_LABELS } from '@/utils/constants'
 import { validateLoginForm } from '@/utils/validators'
 import type { LoginCredentials } from '@/types'

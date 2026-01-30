@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { BrowserRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { AuthProvider } from '@/contexts/AuthContext'
 import { RepairNewPage } from './RepairNewPage'
 import * as useRepairsHook from '@/hooks/useRepairs'
 import * as useCarsHook from '@/hooks/useCars'
@@ -21,24 +22,23 @@ vi.mock('react-router-dom', async () => {
 
 const mockCars: Car[] = [
   {
-    id: 1,
+    id: '1',
     brand: 'Renault',
     model: 'Clio',
     licensePlate: 'AB-123-CD',
-    vin: 'VF1RH123456789012',
-    category: 'urban',
-    mileage: 50000,
-    acquisitionDate: '2020-01-01',
-    status: 'available',
-    isActive: true,
+    greyCardNumber: 'GC123456',
+    insuranceCompanyId: '1',
+    rentalStartDate: '2020-01-01',
+    status: 'active',
     createdAt: '2024-01-01T00:00:00Z',
     updatedAt: '2024-01-01T00:00:00Z',
+    createdBy: '1',
   },
 ]
 
 const mockGarages: Garage[] = [
   {
-    id: 1,
+    id: '1',
     name: 'Garage Auto Pro',
     contactPerson: 'Jean Dupont',
     phone: '0123456789',
@@ -46,6 +46,7 @@ const mockGarages: Garage[] = [
     isActive: true,
     createdAt: '2024-01-01T00:00:00Z',
     updatedAt: '2024-01-01T00:00:00Z',
+    createdBy: '1',
   },
 ]
 
@@ -59,7 +60,9 @@ function renderWithProviders(ui: React.ReactElement) {
 
   return render(
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>{ui}</BrowserRouter>
+      <AuthProvider>
+        <BrowserRouter>{ui}</BrowserRouter>
+      </AuthProvider>
     </QueryClientProvider>
   )
 }

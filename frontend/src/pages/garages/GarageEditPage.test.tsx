@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { AuthProvider } from '@/contexts/AuthContext'
 import { GarageEditPage } from './GarageEditPage'
 import * as useGaragesHook from '@/hooks/useGarages'
 import type { Garage } from '@/types'
@@ -17,7 +18,7 @@ vi.mock('react-router-dom', async () => {
 })
 
 const mockGarage: Garage = {
-  id: 1,
+  id: '1',
   name: 'Garage Test',
   contactPerson: 'Jean Dupont',
   phone: '0123456789',
@@ -27,6 +28,7 @@ const mockGarage: Garage = {
   isActive: true,
   createdAt: '2024-01-01T00:00:00Z',
   updatedAt: '2024-01-01T00:00:00Z',
+  createdBy: '1',
 }
 
 function renderWithProviders(_initialRoute = '/garages/1/edit') {
@@ -39,11 +41,13 @@ function renderWithProviders(_initialRoute = '/garages/1/edit') {
 
   return render(
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/garages/:id/edit" element={<GarageEditPage />} />
-        </Routes>
-      </BrowserRouter>
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/garages/:id/edit" element={<GarageEditPage />} />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
     </QueryClientProvider>,
     { wrapper: ({ children }) => <div>{children}</div> }
   )
@@ -123,7 +127,7 @@ describe('GarageEditPage', () => {
 
     await waitFor(() => {
       expect(mockMutateAsync).toHaveBeenCalledWith({
-        id: 1,
+        id: '1',
         data: expect.objectContaining({
           name: 'Garage Modifié',
         }),

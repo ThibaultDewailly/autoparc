@@ -7,7 +7,7 @@ import {
   Spinner,
   Chip,
   Divider,
-} from '@nextui-org/react'
+} from '@heroui/react'
 import { Navbar } from '@/components/common/Navbar'
 import { AssignmentHistoryTable } from '@/components/operators/AssignmentHistoryTable'
 import { useOperator, useDeleteOperator } from '@/hooks/useOperators'

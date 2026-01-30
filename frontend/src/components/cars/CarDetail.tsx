@@ -1,4 +1,4 @@
-import { Card, CardBody, Chip, Divider } from '@nextui-org/react'
+import { Card, CardBody, Chip, Divider } from '@heroui/react'
 import type { Car, CarStatus } from '@/types'
 import { FRENCH_LABELS } from '@/utils/constants'
 import { formatDate } from '@/utils/formatters'

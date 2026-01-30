@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { AuthProvider } from '@/contexts/AuthContext'
 import { AccidentEditPage } from './AccidentEditPage'
 import * as useAccidentsHook from '@/hooks/useAccidents'
 import * as useCarsHook from '@/hooks/useCars'
@@ -18,8 +19,8 @@ vi.mock('react-router-dom', async () => {
 })
 
 const mockAccident: Accident = {
-  id: 1,
-  carId: 1,
+  id: '1',
+  carId: '1',
   accidentDate: '2024-01-15',
   location: 'Paris, France',
   description: 'Accident de stationnement',
@@ -27,22 +28,22 @@ const mockAccident: Accident = {
   status: 'declared',
   createdAt: '2024-01-15T00:00:00Z',
   updatedAt: '2024-01-15T00:00:00Z',
+  createdBy: '1',
 }
 
 const mockCars: Car[] = [
   {
-    id: 1,
+    id: '1',
     brand: 'Renault',
     model: 'Clio',
     licensePlate: 'AB-123-CD',
-    vin: 'VF1RH123456789012',
-    category: 'urban',
-    mileage: 50000,
-    acquisitionDate: '2020-01-01',
-    status: 'available',
-    isActive: true,
+    greyCardNumber: 'GC123456',
+    insuranceCompanyId: '1',
+    rentalStartDate: '2020-01-01',
+    status: 'active',
     createdAt: '2024-01-01T00:00:00Z',
     updatedAt: '2024-01-01T00:00:00Z',
+    createdBy: '1',
   },
 ]
 
@@ -56,11 +57,13 @@ function renderWithProviders() {
 
   return render(
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/accidents/:id/edit" element={<AccidentEditPage />} />
-        </Routes>
-      </BrowserRouter>
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/accidents/:id/edit" element={<AccidentEditPage />} />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
     </QueryClientProvider>
   )
 }
@@ -141,7 +144,7 @@ describe('AccidentEditPage', () => {
 
     await waitFor(() => {
       expect(mockMutateAsync).toHaveBeenCalledWith({
-        id: 1,
+        id: '1',
         data: expect.objectContaining({
           location: 'Lyon, France',
         }),

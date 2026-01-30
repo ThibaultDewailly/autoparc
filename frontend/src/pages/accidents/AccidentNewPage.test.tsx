@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { BrowserRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { AuthProvider } from '@/contexts/AuthContext'
 import { AccidentNewPage } from './AccidentNewPage'
 import * as useAccidentsHook from '@/hooks/useAccidents'
 import * as useCarsHook from '@/hooks/useCars'
@@ -19,18 +20,17 @@ vi.mock('react-router-dom', async () => {
 
 const mockCars: Car[] = [
   {
-    id: 1,
+    id: '1',
     brand: 'Renault',
     model: 'Clio',
     licensePlate: 'AB-123-CD',
-    vin: 'VF1RH123456789012',
-    category: 'urban',
-    mileage: 50000,
-    acquisitionDate: '2020-01-01',
-    status: 'available',
-    isActive: true,
+    greyCardNumber: 'GC123456',
+    insuranceCompanyId: '1',
+    rentalStartDate: '2020-01-01',
+    status: 'active',
     createdAt: '2024-01-01T00:00:00Z',
     updatedAt: '2024-01-01T00:00:00Z',
+    createdBy: '1',
   },
 ]
 
@@ -44,7 +44,9 @@ function renderWithProviders(ui: React.ReactElement) {
 
   return render(
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>{ui}</BrowserRouter>
+      <AuthProvider>
+        <BrowserRouter>{ui}</BrowserRouter>
+      </AuthProvider>
     </QueryClientProvider>
   )
 }

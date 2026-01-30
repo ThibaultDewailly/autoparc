@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Input, Select, SelectItem, Button, Switch } from '@nextui-org/react'
+import { Input, Select, SelectItem, Button, Switch } from '@heroui/react'
 import { FRENCH_LABELS } from '@/utils/constants'
 import { validateEmployeeForm } from '@/utils/validators'
 import type { Employee } from '@/types'
@@ -174,7 +174,7 @@ export function EmployeeForm({ employee, onSubmit, onCancel, isLoading }: Employ
         errorMessage={errors.role}
         isRequired
       >
-        <SelectItem key="admin" value="admin">
+        <SelectItem key="admin">
           Admin
         </SelectItem>
       </Select>

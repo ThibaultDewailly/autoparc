@@ -7,13 +7,17 @@ import {
   Spinner,
   Divider,
   useDisclosure,
-} from '@nextui-org/react'
+  Tabs,
+  Tab,
+} from '@heroui/react'
 import { Navbar } from '@/components/common/Navbar'
 import { CarDetail } from '@/components/cars/CarDetail'
 import { AssignmentDialog } from '@/components/operators/AssignmentDialog'
 import { UnassignmentDialog } from '@/components/operators/UnassignmentDialog'
 import { AssignmentHistoryTable } from '@/components/operators/AssignmentHistoryTable'
 import { useCar, useDeleteCar } from '@/hooks/useCars'
+import { useAccidents } from '@/hooks/useAccidents'
+import { useRepairs } from '@/hooks/useRepairs'
 import {
   useCarAssignmentHistory,
   useAssignOperatorToCar,
@@ -28,9 +32,14 @@ export function CarDetailPage() {
   const navigate = useNavigate()
   const { data: car, isLoading } = useCar(id)
   const { data: assignmentHistory = [] } = useCarAssignmentHistory(id)
+  const { data: accidentsData } = useAccidents({ carId: id })
+  const { data: repairsData } = useRepairs({ carId: id })
   const deleteMutation = useDeleteCar()
   const assignMutation = useAssignOperatorToCar()
   const unassignMutation = useUnassignOperatorFromCar()
+
+  const accidents = accidentsData?.accidents || []
+  const repairs = repairsData?.repairs || []
 
   const {
     isOpen: isAssignOpen,
@@ -216,6 +225,95 @@ export function CarDetailPage() {
             <Divider />
             <CardBody>
               <AssignmentHistoryTable assignments={assignmentHistory} />
+            </CardBody>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <h2 className="text-xl font-semibold">
+                Accidents et Réparations
+              </h2>
+            </CardHeader>
+            <Divider />
+            <CardBody>
+              <Tabs aria-label="Accidents et Réparations">
+                <Tab key="accidents" title={`${FRENCH_LABELS.accidents} (${accidents.length})`}>
+                  <div className="space-y-4 mt-4">
+                    {accidents.length === 0 ? (
+                      <p className="text-center text-default-500">Aucun accident enregistré</p>
+                    ) : (
+                      accidents.map((accident) => (
+                        <Card key={accident.id} className="shadow-sm">
+                          <CardBody>
+                            <div className="flex justify-between items-start">
+                              <div className="space-y-1">
+                                <p className="font-semibold">{formatDate(accident.accidentDate)}</p>
+                                <p className="text-sm text-gray-600">{accident.location}</p>
+                                <p className="text-sm">{accident.description}</p>
+                                <p className="text-sm">
+                                  <span className="font-semibold">Statut:</span>{' '}
+                                  {accident.status === 'declared' ? 'Déclaré' : 
+                                   accident.status === 'under_review' ? 'En examen' :
+                                   accident.status === 'approved' ? 'Approuvé' : 'Fermé'}
+                                </p>
+                              </div>
+                              <Button
+                                size="sm"
+                                color="primary"
+                                variant="light"
+                                onPress={() => navigate(`/accidents/${accident.id}`)}
+                              >
+                                Détails
+                              </Button>
+                            </div>
+                          </CardBody>
+                        </Card>
+                      ))
+                    )}
+                  </div>
+                </Tab>
+                <Tab key="repairs" title={`${FRENCH_LABELS.repairs} (${repairs.length})`}>
+                  <div className="space-y-4 mt-4">
+                    {repairs.length === 0 ? (
+                      <p className="text-center text-default-500">Aucune réparation enregistrée</p>
+                    ) : (
+                      repairs.map((repair) => (
+                        <Card key={repair.id} className="shadow-sm">
+                          <CardBody>
+                            <div className="flex justify-between items-start">
+                              <div className="space-y-1">
+                                <p className="font-semibold">
+                                  {repair.repairType === 'accident' ? 'Accident' :
+                                   repair.repairType === 'maintenance' ? 'Maintenance' : 'Inspection'}
+                                </p>
+                                <p className="text-sm text-gray-600">
+                                  Début: {formatDate(repair.startDate)}
+                                  {repair.endDate && ` - Fin: ${formatDate(repair.endDate)}`}
+                                </p>
+                                <p className="text-sm">{repair.description}</p>
+                                <p className="text-sm">
+                                  <span className="font-semibold">Statut:</span>{' '}
+                                  {repair.status === 'scheduled' ? 'Programmé' :
+                                   repair.status === 'in_progress' ? 'En cours' :
+                                   repair.status === 'completed' ? 'Terminé' : 'Annulé'}
+                                </p>
+                              </div>
+                              <Button
+                                size="sm"
+                                color="primary"
+                                variant="light"
+                                onPress={() => navigate(`/repairs/${repair.id}`)}
+                              >
+                                Détails
+                              </Button>
+                            </div>
+                          </CardBody>
+                        </Card>
+                      ))
+                    )}
+                  </div>
+                </Tab>
+              </Tabs>
             </CardBody>
           </Card>
         </div>

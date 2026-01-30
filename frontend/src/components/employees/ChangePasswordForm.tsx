@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Input, Button } from '@nextui-org/react'
+import { Input, Button } from '@heroui/react'
 import { FRENCH_LABELS } from '@/utils/constants'
 import { validatePasswordChange } from '@/utils/validators'
 import type { ChangePasswordRequest } from '@/types'

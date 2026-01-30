@@ -1,22 +1,24 @@
 import { useParams, useNavigate } from 'react-router-dom'
-import { Card, CardHeader, CardBody, Button, Spinner, Chip, Image } from '@nextui-org/react'
+import { Card, CardHeader, CardBody, Button, Spinner, Chip, Image } from '@heroui/react'
 import { useAccident, useUpdateAccidentStatus } from '@/hooks/useAccidents'
 import { useCars } from '@/hooks/useCars'
 import { FRENCH_LABELS, ROUTES } from '@/utils/constants'
 import { formatDate } from '@/utils/formatters'
+import type { Car, AccidentStatus } from '@/types'
 
 export function AccidentDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { data: accident, isLoading, error } = useAccident(Number(id))
-  const { data: cars = [] } = useCars({})
+  const { data: accident, isLoading, error } = useAccident(id!)
+  const { data: carsData = [] } = useCars({})
   const updateStatus = useUpdateAccidentStatus()
 
-  const car = cars.find((c) => c.id === accident?.carId)
+  const cars = Array.isArray(carsData) ? carsData : carsData?.cars || []
+  const car = cars.find((c: Car) => c.id === accident?.carId)
 
   async function handleStatusChange(newStatus: string) {
     if (!accident) return
-    await updateStatus.mutateAsync({ id: accident.id, status: newStatus })
+    await updateStatus.mutateAsync({ id: accident.id, status: newStatus as AccidentStatus })
   }
 
   if (isLoading) {
