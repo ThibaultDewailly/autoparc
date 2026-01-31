@@ -180,7 +180,7 @@ export function AccidentForm({ accident, cars, onSubmit, onCancel, isLoading }: 
         isDisabled={!!accident}
       >
         {cars.map((car) => (
-          <SelectItem key={car.id.toString()}>
+          <SelectItem key={car.id.toString()} className="text-foreground">
             {car.brand} {car.model} - {car.licensePlate}
           </SelectItem>
         ))}
