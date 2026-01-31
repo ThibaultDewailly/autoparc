@@ -170,7 +170,7 @@ export function RepairForm({
         isDisabled={!!repair}
       >
         {cars.map((car) => (
-          <SelectItem key={car.id.toString()}>
+          <SelectItem key={car.id.toString()} className="text-foreground">
             {car.brand} {car.model} - {car.licensePlate}
           </SelectItem>
         ))}
@@ -189,7 +189,7 @@ export function RepairForm({
         isRequired
       >
         {garages.map((garage) => (
-          <SelectItem key={garage.id.toString()}>
+          <SelectItem key={garage.id.toString()} className="text-foreground">
             {garage.name}
           </SelectItem>
         ))}
@@ -211,7 +211,7 @@ export function RepairForm({
         isRequired
       >
         {REPAIR_TYPES.map((type) => (
-          <SelectItem key={type.value}>
+          <SelectItem key={type.value} className="text-foreground">
             {type.label}
           </SelectItem>
         ))}
@@ -231,7 +231,7 @@ export function RepairForm({
           isRequired
         >
           {accidents.map((accident) => (
-            <SelectItem key={accident.id.toString()}>
+            <SelectItem key={accident.id.toString()} className="text-foreground">
               {accident.location} - {accident.accidentDate}
             </SelectItem>
           ))}

@@ -28,3 +28,15 @@ body {
 #root {
   width: 100%;
 }
+
+/* Remove focus outline */
+input:focus,
+textarea:focus,
+select:focus,
+button:focus,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}

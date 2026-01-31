@@ -174,7 +174,7 @@ export function EmployeeForm({ employee, onSubmit, onCancel, isLoading }: Employ
         errorMessage={errors.role}
         isRequired
       >
-        <SelectItem key="admin">
+        <SelectItem key="admin" className="text-foreground">
           Admin
         </SelectItem>
       </Select>
